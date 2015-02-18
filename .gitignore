@@ -1,0 +1,8 @@
+# Texmaker #
+############
+*.log
+*.aux
+*.toc
+*.pdf
+*.gz
+*.out
