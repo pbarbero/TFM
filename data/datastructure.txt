@@ -1,0 +1,38 @@
+
+========================
+CECOCO
+========================
+
+NMEA Format
+
+
+
+========================
+MVC
+========================
+
+
+Fix
+{
+	double id
+	double time
+	double mode
+	double alt
+	double lat
+	double lon
+	double track
+	double speed
+	double climb
+	double ept
+	double epy	
+	double epx
+	double epv
+	double epd
+	double eps
+	double epc
+}
+
+string id_coche
+bool transf
+Fix fix
+string id
