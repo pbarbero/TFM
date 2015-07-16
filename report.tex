@@ -1,0 +1,169 @@
+\documentclass{article}
+
+\usepackage{Sweave}
+\begin{document}
+\input{report-concordance}
+
+\begin{Schunk}
+\begin{Sinput}
+> #install.packages("RMySQL")
+> library(RMySQL)
+> mydb = dbConnect(MySQL(), user='root', password='foobar1', dbname='posiciones', host='localhost')
+> mydb2 = dbConnect(MySQL(), user='root', password='foobar1', dbname='posicionesRio', host='localhost')
+> dbListTables(mydb)
+\end{Sinput}
+\begin{Soutput}
+[1] "posicionesgps"
+\end{Soutput}
+\begin{Sinput}
+> dbListTables(mydb2)
+\end{Sinput}
+\begin{Soutput}
+[1] "posicionesgps"
+\end{Soutput}
+\begin{Sinput}
+> dbListFields(mydb, 'posicionesgps')
+\end{Sinput}
+\begin{Soutput}
+ [1] "id"          "idServidor"  "recurso"     "latitud"     "longitud"   
+ [6] "velocidad"   "orientacion" "cobertura"   "error"       "antigua"    
+[11] "fecha"       "automatico" 
+\end{Soutput}
+\begin{Sinput}
+> dbListFields(mydb2, 'posicionesgps')
+\end{Sinput}
+\begin{Soutput}
+ [1] "id"          "idServidor"  "recurso"     "latitud"     "longitud"   
+ [6] "velocidad"   "orientacion" "cobertura"   "error"       "antigua"    
+[11] "fecha"       "automatico" 
+\end{Soutput}
+\begin{Sinput}
+> rs = dbSendQuery(mydb, "select id, recurso, latitud, longitud, velocidad, orientacion, error, antigua, fecha from posicionesgps")
+> rs2 = dbSendQuery(mydb2, "select id, recurso, latitud, longitud, velocidad, orientacion, error, antigua, fecha from posicionesgps")
+> dataSalvador = fetch(rs, n=-1)
+> dataRio = fetch(rs2, n=-1)
+> 
+> #dataSalvador
+> #dataRio
+\end{Sinput}
+\end{Schunk}
+
+\section{Estad\'istica b\'asica}
+
+\begin{Schunk}
+\begin{Sinput}
+> summary(dataRio)
+\end{Sinput}
+\begin{Soutput}
+       id              recurso             latitud           longitud      
+ Min.   :105921160   Length:6928467     Min.   :-1.5708   Min.   :-3.1416  
+ 1st Qu.:110053366   Class :character   1st Qu.:-0.4001   1st Qu.:-0.7564  
+ Median :114174200   Mode  :character   Median :-0.3994   Median :-0.7547  
+ Mean   :114114928                      Mean   :-0.3966   Mean   :-0.6647  
+ 3rd Qu.:118159095                      3rd Qu.:-0.3983   3rd Qu.:-0.7537  
+ Max.   :122223918                      Max.   : 1.3960   Max.   : 3.1385  
+   velocidad        orientacion         error           antigua     
+ Min.   :  0.000   Min.   :  0.00   Min.   :0.0000   Min.   :0e+00  
+ 1st Qu.:  0.000   1st Qu.:  0.00   1st Qu.:0.0000   1st Qu.:0e+00  
+ Median :  0.000   Median :  0.00   Median :0.0000   Median :0e+00  
+ Mean   :  9.856   Mean   : 72.73   Mean   :0.3272   Mean   :1e-07  
+ 3rd Qu.: 12.000   3rd Qu.:135.00   3rd Qu.:0.0000   3rd Qu.:0e+00  
+ Max.   :255.000   Max.   :315.00   Max.   :4.0000   Max.   :1e+00  
+    fecha          
+ Length:6928467    
+ Class :character  
+ Mode  :character  
+\end{Soutput}
+\begin{Sinput}
+> library(xtable)
+> tableSalvador=as.matrix(summary(dataSalvador))
+> tableRio=as.matrix(summary(dataRio))
+> tableS <- xtable(tableSalvador)
+> tableR <- xtable(tableRio)
+> print(tableS)
+\end{Sinput}
+\begin{Soutput}
+% latex table generated in R 3.1.2 by xtable 1.7-4 package
+% Thu Jul 16 19:05:09 2015
+\begin{table}[ht]
+\centering
+\begin{tabular}{rlllllllll}
+  \hline
+ &       id &   recurso &    latitud &    longitud &   velocidad &  orientacion &     error &    antigua &    fecha \\ 
+  \hline
+1 & Min.   :3.299e+09   & Length:4599974     & Min.   :-1.0103   & Min.   :-1.4575   & Min.   :  0.000   & Min.   :  0.0   & Min.   :0.0000   & Min.   :0e+00   & Length:4599974     \\ 
+  2 & 1st Qu.:3.300e+09   & Class :character   & 1st Qu.:-0.2266   & 1st Qu.:-0.6720   & 1st Qu.:  0.000   & 1st Qu.: 22.0   & 1st Qu.:0.0000   & 1st Qu.:0e+00   & Class :character   \\ 
+  3 & Median :3.301e+09   & Mode  :character   & Median :-0.2259   & Median :-0.6713   & Median :  0.000   & Median : 90.0   & Median :0.0000   & Median :0e+00   & Mode  :character   \\ 
+  4 & Mean   :3.301e+09   &  & Mean   :-0.1995   & Mean   :-0.6137   & Mean   :  3.751   & Mean   :118.7   & Mean   :0.3473   & Mean   :2e-07   &  \\ 
+  5 & 3rd Qu.:3.302e+09   &  & 3rd Qu.:-0.2248   & 3rd Qu.:-0.6702   & 3rd Qu.:  0.000   & 3rd Qu.:202.0   & 3rd Qu.:0.0000   & 3rd Qu.:0e+00   &  \\ 
+  6 & Max.   :3.304e+09   &  & Max.   : 0.4956   & Max.   : 2.4729   & Max.   :255.000   & Max.   :315.0   & Max.   :6.0000   & Max.   :1e+00   &  \\ 
+   \hline
+\end{tabular}
+\end{table}
+\end{Soutput}
+\begin{Sinput}
+> print(tableR)
+\end{Sinput}
+\begin{Soutput}
+% latex table generated in R 3.1.2 by xtable 1.7-4 package
+% Thu Jul 16 19:05:09 2015
+\begin{table}[ht]
+\centering
+\begin{tabular}{rlllllllll}
+  \hline
+ &       id &   recurso &    latitud &    longitud &   velocidad &  orientacion &     error &    antigua &    fecha \\ 
+  \hline
+1 & Min.   :105921160   & Length:6928467     & Min.   :-1.5708   & Min.   :-3.1416   & Min.   :  0.000   & Min.   :  0.00   & Min.   :0.0000   & Min.   :0e+00   & Length:6928467     \\ 
+  2 & 1st Qu.:110053366   & Class :character   & 1st Qu.:-0.4001   & 1st Qu.:-0.7564   & 1st Qu.:  0.000   & 1st Qu.:  0.00   & 1st Qu.:0.0000   & 1st Qu.:0e+00   & Class :character   \\ 
+  3 & Median :114174200   & Mode  :character   & Median :-0.3994   & Median :-0.7547   & Median :  0.000   & Median :  0.00   & Median :0.0000   & Median :0e+00   & Mode  :character   \\ 
+  4 & Mean   :114114928   &  & Mean   :-0.3966   & Mean   :-0.6647   & Mean   :  9.856   & Mean   : 72.73   & Mean   :0.3272   & Mean   :1e-07   &  \\ 
+  5 & 3rd Qu.:118159095   &  & 3rd Qu.:-0.3983   & 3rd Qu.:-0.7537   & 3rd Qu.: 12.000   & 3rd Qu.:135.00   & 3rd Qu.:0.0000   & 3rd Qu.:0e+00   &  \\ 
+  6 & Max.   :122223918   &  & Max.   : 1.3960   & Max.   : 3.1385   & Max.   :255.000   & Max.   :315.00   & Max.   :4.0000   & Max.   :1e+00   &  \\ 
+   \hline
+\end{tabular}
+\end{table}
+\end{Soutput}
+\end{Schunk}
+
+
+\subsection{Posiciones Salvador}
+% latex table generated in R 3.1.2 by xtable 1.7-4 package
+% Thu Jul 16 19:02:15 2015
+\begin{table}[ht]
+\centering
+  \begin{tabular}{rlllllllll}
+    \hline
+   &       id &   recurso &    latitud &    longitud &   velocidad &  orientacion &     error &    antigua &    fecha \\ 
+    \hline
+  1 & Min.   :3.299e+09   & Length:4599974     & Min.   :-1.0103   & Min.   :-1.4575   & Min.   :  0.000   & Min.   :  0.0   & Min.   :0.0000   & Min.   :0e+00   & Length:4599974     \\ 
+    2 & 1st Qu.:3.300e+09   & Class :character   & 1st Qu.:-0.2266   & 1st Qu.:-0.6720   & 1st Qu.:  0.000   & 1st Qu.: 22.0   & 1st Qu.:0.0000   & 1st Qu.:0e+00   & Class :character   \\ 
+    3 & Median :3.301e+09   & Mode  :character   & Median :-0.2259   & Median :-0.6713   & Median :  0.000   & Median : 90.0   & Median :0.0000   & Median :0e+00   & Mode  :character   \\ 
+    4 & Mean   :3.301e+09   &  & Mean   :-0.1995   & Mean   :-0.6137   & Mean   :  3.751   & Mean   :118.7   & Mean   :0.3473   & Mean   :2e-07   &  \\ 
+    5 & 3rd Qu.:3.302e+09   &  & 3rd Qu.:-0.2248   & 3rd Qu.:-0.6702   & 3rd Qu.:  0.000   & 3rd Qu.:202.0   & 3rd Qu.:0.0000   & 3rd Qu.:0e+00   &  \\ 
+    6 & Max.   :3.304e+09   &  & Max.   : 0.4956   & Max.   : 2.4729   & Max.   :255.000   & Max.   :315.0   & Max.   :6.0000   & Max.   :1e+00   &  \\ 
+     \hline
+  \end{tabular}
+\end{table}
+  
+  
+\subsection{Posiciones Río}
+% latex table generated in R 3.1.2 by xtable 1.7-4 package
+% Thu Jul 16 19:03:27 2015
+\begin{table}[ht]
+\centering
+  \begin{tabular}{rlllllllll}
+    \hline
+   &       id &   recurso &    latitud &    longitud &   velocidad &  orientacion &     error &    antigua &    fecha \\ 
+    \hline
+  1 & Min.   :105921160   & Length:6928467     & Min.   :-1.5708   & Min.   :-3.1416   & Min.   :  0.000   & Min.   :  0.00   & Min.   :0.0000   & Min.   :0e+00   & Length:6928467     \\ 
+    2 & 1st Qu.:110053366   & Class :character   & 1st Qu.:-0.4001   & 1st Qu.:-0.7564   & 1st Qu.:  0.000   & 1st Qu.:  0.00   & 1st Qu.:0.0000   & 1st Qu.:0e+00   & Class :character   \\ 
+    3 & Median :114174200   & Mode  :character   & Median :-0.3994   & Median :-0.7547   & Median :  0.000   & Median :  0.00   & Median :0.0000   & Median :0e+00   & Mode  :character   \\ 
+    4 & Mean   :114114928   &  & Mean   :-0.3966   & Mean   :-0.6647   & Mean   :  9.856   & Mean   : 72.73   & Mean   :0.3272   & Mean   :1e-07   &  \\ 
+    5 & 3rd Qu.:118159095   &  & 3rd Qu.:-0.3983   & 3rd Qu.:-0.7537   & 3rd Qu.: 12.000   & 3rd Qu.:135.00   & 3rd Qu.:0.0000   & 3rd Qu.:0e+00   &  \\ 
+    6 & Max.   :122223918   &  & Max.   : 1.3960   & Max.   : 3.1385   & Max.   :255.000   & Max.   :315.00   & Max.   :4.0000   & Max.   :1e+00   &  \\ 
+     \hline
+  \end{tabular}
+\end{table}
+
+\end{document}
+
