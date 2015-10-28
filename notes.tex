@@ -1,0 +1,98 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{amsmath, amssymb}
+\usepackage{dsfont}
+\usepackage{tikz} 
+\usepackage[utf8]{inputenc}
+%\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{exercise}
+\usepackage{algo	rithmic}
+\usepackage{mathtools}
+\usepackage{multicol}
+
+\begin{document}
+El objetivo de esta tesis es realizar un clustering de nuestros datos con el fin de encontrar patrones en \'estos que nos permitan desarrollar algunos algoritmos de consolidaci\'on de datos. 
+
+Dos tipos de consolidaci\'on de algoritmos: espacial y temporal. 
+
+
+Partitioning Clustering:
+
+K-Means es un algoritmo de clustering efectivo para encontrar posiciones significativas en un conjunto de datos hist\'oricos como el que presentamos. Es un algoritmo NP-complejo.
+
+Dado un conjunto de observaciones $(x_1, x_2, …, x_n)$ se trata de conseguir una partici\'on de las observaciones en k subconjuntos de tal manera que 
+
+Copiar f\'ormula de aqu\'i: https://es.wikipedia.org/wiki/K-means
+
+minimiza el t\'ermino del error que es la suma de las distancias al cuadrado de cada punto a el centro de su agrupamiento, un vector media. 
+
+El clustering por K medias tiene varios inconvenientes. Primero, debemos definir cuantos clusters vamos a agrupar antes de empezar el proceso. Esto puede ser un inconveniente, ya que en nuestro caso, no conocemos cu\'antos puntos significativos entre nuestros datos podemos encontrar. Seguidamente, todos los puntos son incluidos en los resultados del clustering, lo que puede introducir una gran cantidad de ruido. Una posici\'on lejana incluida (debido a un fallo del sistema, por ejemplo) puede dañar gravemente nuestro estudio y repercutir en el clustering. Por ello, quiz\'as en se deber\'ia aplicar alg\'un tipo de filtro que eliminase este tipo de posiciones no representativas, ya que la distancia al centro del cl\'uster ser\'ia notoria. Tercero, este clusteriong no es determin\'istico, el clustering obtenido al final del proceso depende de la asignaci\'on inicial de los puntos de los clusters. 
+
+\section{DJ-Cluster:}
+
+Este algoritmo est\'a basado en la densidad de puntos observados por cl\'uster, dando m\'as importancia a las zonas donde m\'as densidad se observa. La idea es la siguiente:
+
+Por cada punto, calculamos su vecindario, es decir, todos los puntos que cumplen que la distancia al primero sea menor que un Eps dado, con la condici\'on de que al menos exista una cantidad m\'inima de puntos fijada. Si esta cantidad de puntos no se cumple, se considera que el punto elegido es ruido  y se prosigue con el proceso. En caso contrario, los puntos son considerados parte de un nuevo cl\'uster si ning\'un vecino pertenece a un cl\'uster previo, o añadidos a uno existente si alg\'un vecino pertenece a uno ya existente.
+
+Esto introduce las nociones de density-based neighborhood of a point y relaci\'on density-joinable. 
+
+Vecindario basado en la proximidad de un punto:
+
+
+$$ N(p) = \{q\in S | \, dist(p, q) \leq \epsilon\}$$
+
+donde $S$ es el conjunto de todos los puntos, $q$ es cualquier punto del conjunto de observaciones y $\epsilon$ el radio del c\'irculo elegido. 
+
+
+Esta noci\'on b\'asica de distancia es interesante en el caso de que la velocidad de no sea relevante, o incluso desconocida. Pero la pregunta que se nos plantea inmediatamente es, ¿no deber\'iamos introducirla \'esta en casos en los que la velocidad sea conocida? No puede ser el mismo caso de estudio si nuestro sujeto se encuentra moviéndose a una velocidad o se encuentra estático. Luego, debemos redefinir nuestra noción de distancia, en función de si el sujeto se encuentra en movimiento y, de alguna manera, involucrar esta velocidad que poseemos. 
+
+Por poner un ejemplo práctico, no es lo mismo una distancia de dos metros si nuestro sujeto se haya moviendo a una velocidad de 3 km/h, que podr\'ia ser la velocidad de un simple paseo, o si se encuentra subido a un coche que viaje a 50 km/h. Los puntos relevantes del vecindario se encontrarán a una distancia más cercana que en el segundo caso. 
+
+Redefinimos pues, nuestra distancia y nuestro concepto de vecindario:
+
+
+$$ N(p) = \{ q\in S | \, dist(p, q)\leq \epsilon(v_{p_0})$$ 
+
+donde $v_{p_0}$ es la velocidad del centro de nuestro clúster. 
+
+
+PROBLEMA: DEFINIR LA DISTANCIA INCLUYENDO EL VECTOR VELOCIDAD O LA VELOCIDAD DE NUESTROS DATOS. 
+
+El siguiente paso del algoritmo es comprobar la condificón de que la cantidad de puntos del vecindario sea mayor que un mínimo fijado, ya que en caso contrario, se marcaría el punto como ruido y se excluyiría del proceso de clustering. 
+
+Aquí introducimos el nuevo concepto de density-joinable, es decir, un clúster es density-joinable a otro si existe un punto $o$ común a ambos.
+
+Decimos que dos cl\'usters est\'an relacionados por la relaci\'on de density-joinable si $\exists o\in S$ tal que $o\in N(p)$ y $o\in N(q)$.
+
+%\begin{algorithmic}[1]\label{djcluster}
+%        \WHILE{$p\in S$}
+%        	Se computa el vecindario de $p$ para un epsilon y se asigna a $N(p)$ 
+%           \IF{$|N(p)|$ es nulo} \THEN
+%				Se marca $p$ como punto de ruido           	
+%           \ELSE
+%           		
+%           \ENDIF
+%        \ENDWHILE\textsl{•}
+%\end{algorithmic}
+
+¿De qu\'e ayuda esto a nuestro estudio? M\'as adelante, utilizaremos estos cl\'usters encontrados con el fin de consolidar puntos, es decir, podemos identificar todos los puntos de un cl\'uster con el centro de \'este, con el fin de quedarnos con aquellos m\'as representativos y disminuir la cantidad de datos de nuestra base de datos.
+
+
+\section{K-medias}
+
+K-medias es un m\'etodo efectivo a la hora de realizar clustering iterativo. Minimiza el error cuadr\'atico del la suma de las distancias al cuadrado de los puntos con cada centro del cl\'uster. 
+
+\'Este algoritmo fija inicialmente todos los puntos a un n\'umero definido de cl\'usters de manera aleatoria. Entonces, itera a trav\'es de cada punto, encontrando el cl\'uster del que m\'as tenga el centro y asigna dicho apunto a ese cl\'uster. Esto se repite hasta que se minimiza el error.
+
+\section{Clasificaciones}
+
+En este sentido ser\'ia una tarea interesante poder encontrar algunas posiciones repetidas, como por ejemplo que nuestro sujeto est\'e est\'atico en una estaci\'on de polic\'ia o repitiendo alg\'un patr\'on, como dar vueltas a una manzana.
+
+\section{Clasificador K-NN}
+
+El clasificador KNN es un algoritmo de aprendizaje basado en la distancia entre instancias. 
+
+\end{document}
