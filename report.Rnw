@@ -59,6 +59,22 @@ result
 query = dbSendQuery(conSalvador, 'select max(fecha) from posicionesgps;')
 result = fetch(query, n=-1)
 result
+
+#Distinct sujets
+query = dbSendQuery(conSalvador, 'select distinct(recurso) from posicionesgps;')
+result = fetch(query, n=-1)
+
+#Distance max and min between times
+diff_aux = 0
+for(i in 0:dim(dataSalvador))
+{
+  diff = dataSalvador[i+1]$fecha - dataSalvador[i]$fecha 
+  if(diff > diff_aux)
+  {
+    diff_aux = diff
+  }
+}
+diff_aux
 @
 
 Contamos con \textbf{6928467} datos en esta base de datos que provienen en de \textbf{1971} recursos distintos recogidos entre las fechas 2015-02-17 08:00:05 y 2015-03-04 08:18:05.
@@ -89,6 +105,12 @@ result
 @
 
 Contamos con \textbf{4599974} datos en esta base de datos que provienen en de \textbf{5014} recursos distintos recogidos entre las fechas 2015-02-16 05:00:07 y 2015-03-04 09:06:25. 
+
+El objetivo de esta tesis es realizar un clustering de nuestros datos con el fin de encontrar patrones en éstos que nos permitan desarrollar algunos algoritmos de consolidación de datos. 
+
+
+
+
 
 
 \end{document}
