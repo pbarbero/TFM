@@ -1,0 +1,14 @@
+Contenido:
+- posicionesgps_sspba.sql
+	- Localización: Entorno de Salvador de Bahía
+	- Backup mysqldump de tabla posicionesgps con 5 millones de posiciones GPS del 2015/02/17 al 2015/03/04
+	- Contiene sentencia de creación de la tabla posicionesgps (create table) e inserts en bloque de datos sobre dicha tabla
+
+- posicionesgps_ssprj.sql
+	- Localización: Entorno de Río de Janeiro
+	- Backup mysqldump de tabla posicionesgps con 7 millones de posiciones GPS del 2015/02/16 al 2015/03/04
+	- Contiene sentencia de creación de la tabla posicionesgps (create table) e inserts en bloque de datos sobre dicha tabla
+	
+Instrucciones para restaurar:
+- Crear bases de datos MySQL destino
+- Restaurar backup con el cliente mysql, por ejemplo: mysql -u root -p nombre_base_de_datos < fichero.sql

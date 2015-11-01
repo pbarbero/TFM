@@ -15,7 +15,7 @@ devtools::install_github("rstats-db/DBI")
 library(RMySQL)
 library(DBI)
 
-conSalvador <- dbConnect(RMySQL::MySQL(), group = "posiciones", user="root", password="foobar1", dbname="posiciones")
+conSalvador <- dbConnect(RMySQL::MySQL(), group = "posiciones", user="root", password="foobar1", dbname="posicionesSalvador")
 conRio <- dbConnect(RMySQL::MySQL(), group = "posicionesRio", user="root", password="foobar1", dbname="posicionesRio")
 #dbListTables(con)
 
