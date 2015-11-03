@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from consolidation import consolidationByEps
 from position import Position
 from datetime import datetime
 from db import connect_db 
@@ -12,7 +13,7 @@ def main():
 	cur_sal = connect_db("posicionesSalvador")
 	cur_rio = connect_db("posicionesRio")
 
-	limit = 5000000 
+	limit = 1000
 	cmd = "SELECT * FROM posicionesgps LIMIT {0};".format(limit)
 	cur_sal.execute(cmd)
 
@@ -29,7 +30,16 @@ def main():
 		            )
 		list_pos.append(q)
 
+	print "FIRST LIST: "
+	#for pos in list_pos:
+	#	print pos.toString()
 	print len(list_pos)
+
+	result = consolidationByEps(list_pos, 0.5)
+	print "EPIS LIST: "	
+	#for pos in result:
+	#	print pos.toString()
+	print len(result)
 
 
 if __name__ == '__main__':
