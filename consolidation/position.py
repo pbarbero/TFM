@@ -1,4 +1,5 @@
 import math
+import time
 
 class Position:
 	"Represents GPS position"
@@ -21,5 +22,11 @@ class Position:
 
 
 	"Is it in neighboorhoud with radio eps?"
-	def is_neighboorhoud(self, q, eps):
+	def is_neighboorhoudByDistance(self, q, eps):
 		return self.distance_eu(q) < eps
+
+	"Is it in neighboorhood by time?"
+	def is_neighboorhoudByTime(self, q, lapse):
+		foo = time.mktime(self.date.timetuple())
+		bar = time.mktime(q.date.timetuple())
+		return abs(foo - bar) < lapse
