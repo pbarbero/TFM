@@ -108,6 +108,18 @@ Contamos con \textbf{4599974} datos en esta base de datos que provienen en de \t
 
 El objetivo de esta tesis es realizar un clustering de nuestros datos con el fin de encontrar patrones en éstos que nos permitan desarrollar algunos algoritmos de consolidación de datos. 
 
+\section{DJ-Cluster}
+<<echo=false>>=
+
+
+@
+
+\section{KNN-Vecinos}
+<<echo=false>>=
+
+
+
+@
 
 
 

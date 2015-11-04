@@ -1,0 +1,12 @@
+Pasos seguidos del pdf oficial de weka y de https://weka.wikispaces.com/Databases
+
+
+1. Instalar weka en ~/weka/
+2. Crear directorios ~/jars/ ~/datasets
+3. Bajar el JDBC de MySQL y posicionarlo en ~/jars/
+4. Setear la url jdbc:hsqldb:hsql://localhost3306:/posicionesSalvador
+5. Extraer el archivo de weka.jar localizado en la ruta weka/experiment/DatabaseUtils.props.mysql y editarlo con la configuración del mysql server
+6. Colocarlo en la carpeta de weka
+7. Se crean los class paths ejecutando el script de /home/pilar/TFM/DJCluster+Weka/scriptWeka
+
+

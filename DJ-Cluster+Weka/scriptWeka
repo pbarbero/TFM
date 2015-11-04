@@ -1,0 +1,12 @@
+#!/bin/bash
+WEKA_HOME=/home/pilar/weka
+export WEKA_JAR=$WEKA_HOME/weka.jar
+export PATH=$WEKA_HOME:$PATH
+CP="/usr/share/java/:/home/pilar/weka/mysql-connector-java-5.1.37-bin.jar:$WEKA_JAR"
+echo "used CLASSPATH: $CP"
+DIR=/home/pilar/weka/data/
+echo "changing to '$DIR'"
+cd "$DIR"
+export WEKA_HOME=$DIR
+# start Weka's small GUIChooser window
+java -cp $CP -Xmx500m weka.gui.GUIChooser &
