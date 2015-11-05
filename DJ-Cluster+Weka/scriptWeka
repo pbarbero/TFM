@@ -9,4 +9,5 @@ echo "changing to '$DIR'"
 cd "$DIR"
 export WEKA_HOME=$DIR
 # start Weka's small GUIChooser window
-java -cp $CP -Xmx500m weka.gui.GUIChooser &
+#java -cp $CP -Xmx500m weka.gui.GUIChooser &
+java -cp $CP -Xmx4000m weka.gui.GUIChooser &

@@ -9,4 +9,6 @@ Pasos seguidos del pdf oficial de weka y de https://weka.wikispaces.com/Database
 6. Colocarlo en la carpeta de weka
 7. Se crean los class paths ejecutando el script de /home/pilar/TFM/DJCluster+Weka/scriptWeka
 
+8.coloca el fichero propiedades /home/pilar/weka/data/props/DatabaseUtils.props
+
 

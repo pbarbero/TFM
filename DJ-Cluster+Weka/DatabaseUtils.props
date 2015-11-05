@@ -9,26 +9,10 @@
 # version: $Revision: 5837 $
 
 # JDBC driver (comma-separated list)
-#jdbcDriver=org.gjt.mm.mysql.Driver
-jdbcDriver=com.mysql.jdbc.Driver
+jdbcDriver=org.gjt.mm.mysql.Driver
 
 # database URL
-#jdbcURL=jdbc:mysql://server_name:3306/database_name
 jdbcURL=jdbc:mysql://localhost:3306/posicionesSalvador
-
-# specific data types
-# string, getString() = 0;    --> nominal
-# boolean, getBoolean() = 1;  --> nominal
-# double, getDouble() = 2;    --> numeric
-# byte, getByte() = 3;        --> numeric
-# short, getByte()= 4;        --> numeric
-# int, getInteger() = 5;      --> numeric
-# long, getLong() = 6;        --> numeric
-# float, getFloat() = 7;      --> numeric
-# date, getDate() = 8;        --> date
-# text, getString() = 9;      --> string
-# time, getTime() = 10;       --> date
-
 
 # specific data types
  string, getString() = 0;    --> nominal
@@ -43,47 +27,20 @@ jdbcURL=jdbc:mysql://localhost:3306/posicionesSalvador
  text, getString() = 9;      --> string
  time, getTime() = 10;       --> date
 
+TINYINT\ UNSIGNED=5
+SMALLINT\ UNSIGNED=5
+TIMESTAMP=5
+
+
 # other options
 CREATE_DOUBLE=DOUBLE
 CREATE_STRING=TEXT
 CREATE_INT=INT
+CREATE_DATE=DATETIME
+DateFormat=yyyy-MM-dd HH:mm:ss
 checkUpperCaseNames=false
 checkLowerCaseNames=false
 checkForTable=true
-
-CHAR=0
-TEXT=0
-VARCHAR=0
-LONGVARCHAR=9
-BINARY=0
-VARBINARY=0
-LONGVARBINARY=9
-BIT=1
-NUMERIC=2
-DECIMAL=2
-FLOAT=2
-DOUBLE=2
-TINYINT=3
-SMALLINT=4
-SHORT=4
-SHORT=5
-INTEGER=5
-BIGINT=6
-LONG=6
-REAL=7
-DATE=8
-TIME=10
-TIMESTAMP=8 
-
-# other options
-#CREATE_DOUBLE=DOUBLE
-#CREATE_STRING=TEXT
-#CREATE_INT=INT
-CREATE_DATE=DATETIME
-DateFormat=yyyy-MM-dd HH:mm:ss
-#checkUpperCaseNames=false
-#checkLowerCaseNames=false
-#checkForTable=true
 
 # All the reserved keywords for this database
 # Based on the keywords listed at the following URL (2009-04-13):
