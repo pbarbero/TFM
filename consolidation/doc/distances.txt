@@ -4,3 +4,20 @@ Useful tips
 http://stackoverflow.com/questions/15736995/how-can-i-quickly-estimate-the-distance-between-two-latitude-longitude-points
 
 http://stackoverflow.com/questions/4913349/haversine-formula-in-python-bearing-and-distance-between-two-gps-points
+
+Haversine formula -> https://es.wikipedia.org/wiki/F%C3%B3rmula_del_Haversine (??)
+
+==============================================================================
+==============================================================================
+==============================================================================
+
+
+1. Distance eu simple
+d((x_0, y_0), (x_1, y_1)) < eps
+
+2. Distance eu involving speed (only module)
+d((x_0, y_0), (x_1, y_1)) < eps * speed
+
+3. Distance eu involving speed (with coordinates x, y obtained by orientation)
+d((x_0, y_0), (x_1, y_1)) < eps * (v_x, v_y) with (v_x, v_y) = v*(o_x, o_y) [(o_x, o_y) is orientation]
+
