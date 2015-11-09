@@ -1,5 +1,6 @@
 #!/usr/bin/python
-from consolidation import consolidationByDistance, consolidationByTime, consolidationEachNumber
+#from consolidation import consolidationByDistance, consolidationByTime, consolidationEachNumber
+import consolidation
 from position import Position
 from datetime import datetime
 from db import connect_db 
@@ -13,7 +14,7 @@ def main():
 	cur_sal = connect_db("posicionesSalvador")
 	cur_rio = connect_db("posicionesRio")
 
-	limit = 1000
+	limit = 10
 	cmd = "SELECT * FROM posicionesgps LIMIT {0};".format(limit)
 	cur_sal.execute(cmd)
 
@@ -30,18 +31,15 @@ def main():
 		            )
 		list_pos.append(q)
 
-	print "FIRST LIST: "
-	#for pos in list_pos:
-	#	print pos.toString()
-	print len(list_pos)
-
+	# Consolidations
 	#result = consolidationByDistance(list_pos, 0.5)
 	#result = consolidationEachNumber(list_pos, 2)
-	result = consolidationByTime(list_pos, 1)
-	print "EPIS LIST: "	
-	#for pos in result:
-	#	print pos.toString()
-	print len(result)
+	#result = consolidationByTime(list_pos, 1)
+	result = consolidation.ConsolidationByDistance(list_pos, 0.5, 2)
+
+	print "EPIS LIST: Result -> " + str(len(result)) + " positions."
+	for pos in result:
+		print pos.toString()
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import math
 import time
 
@@ -27,12 +28,13 @@ class Position:
 		
 	"Neighboorhoud EU involving speed module."
 	def is_in_neighborhoodByEURelativeSpeed(self, q, eps):
-		return distance_eu(self, q) < eps * self.speed
+		return self.distance_eu(q) < eps * self.speed
 		
-	"Neighboorhoud EU involving speed module."
+	"Neighboorhoud EU involving speed and orientation."
 	def is_in_neighborhoodByEURelativeSpeedOrientation(self, q, eps):
-		#Obtain orientation from self.orientation
-		return distance_eu(self, q) < eps * self.speed 
+		# TODO :Obtain orientation from self.orientation
+		# return distance_eu(self, q) < eps * self.speed 
+		return NotImplemented
 
 
 	"Is it in neighboorhood by time?"
