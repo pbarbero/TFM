@@ -16,14 +16,24 @@ class Position:
 	def toString(self):
 		return "id:{0}, recurso:{1}, latitud:{2}, longitud:{3}, velocidad:{4}, orientacion:{5}, fecha:{6}".format(self.id, self.resource, self.lat, self.lon, self.speed, self.track, self.date)
 
-	"Distance. Usage: p.distance(q)"
+	"Distance EU simple. Usage: p.distance(q)"
 	def distance_eu(self, q):
 		return math.sqrt((self.lat - q.lat)**2 + (self.lon - q.lon)**2)
-
-
+		
+	
 	"Is it in neighboorhoud with radio eps?"
-	def is_neighboorhoudByDistance(self, q, eps):
+	def is_in_neighborhoodByEUSimple(self, q, eps):
 		return self.distance_eu(q) < eps
+		
+	"Neighboorhoud EU involving speed module."
+	def is_in_neighborhoodByEURelativeSpeed(self, q, eps):
+		return distance_eu(self, q) < eps * self.speed
+		
+	"Neighboorhoud EU involving speed module."
+	def is_in_neighborhoodByEURelativeSpeedOrientation(self, q, eps):
+		#Obtain orientation from self.orientation
+		return distance_eu(self, q) < eps * self.speed 
+
 
 	"Is it in neighboorhood by time?"
 	def is_neighboorhoudByTime(self, q, lapse):
