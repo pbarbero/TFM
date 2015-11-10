@@ -35,11 +35,11 @@ def main():
 	#result = consolidationByDistance(list_pos, 0.5)
 	#result = consolidationEachNumber(list_pos, 2)
 	#result = consolidationByTime(list_pos, 1)
-	result = consolidation.ConsolidationByDistance(list_pos, 0.5, 2)
+	result = consolidation.ConsolidationByDistance(list_pos, 2, 0, 1)
 
-	print "EPIS LIST: Result -> " + str(len(result)) + " positions."
-	for pos in result:
-		print pos.toString()
+#	print "EPIS LIST: Result -> " + str(len(result)) + " positions."
+#	for pos in result:
+#		print pos.toString()
 
 
 if __name__ == '__main__':

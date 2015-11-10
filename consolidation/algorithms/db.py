@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import MySQLdb
 
 "Connect to given database. Returns cursor."

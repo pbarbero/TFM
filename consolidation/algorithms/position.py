@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import math
 import time
 
@@ -21,7 +20,6 @@ class Position:
 	def distance_eu(self, q):
 		return math.sqrt((self.lat - q.lat)**2 + (self.lon - q.lon)**2)
 		
-	
 	"Is it in neighboorhoud with radio eps?"
 	def is_in_neighborhoodByEUSimple(self, q, eps):
 		return self.distance_eu(q) < eps
@@ -30,6 +28,10 @@ class Position:
 	def is_in_neighborhoodByEURelativeSpeed(self, q, eps):
 		return self.distance_eu(q) < eps * self.speed
 		
+	"Neighboorhoud t0-reachable using distance EU and speed module."
+	def is_in_neighborhoodT0Reachable(self, q, t0):
+		return self.distance_eu(q) < t0 * self.speed
+
 	"Neighboorhoud EU involving speed and orientation."
 	def is_in_neighborhoodByEURelativeSpeedOrientation(self, q, eps):
 		# TODO :Obtain orientation from self.orientation
