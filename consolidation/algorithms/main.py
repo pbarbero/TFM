@@ -4,6 +4,7 @@ import consolidation
 from position import Position
 from datetime import datetime
 from db import connect_db 
+from djCluster import DjCluster
 
 def main():
 #	eps = 0.1
@@ -40,6 +41,11 @@ def main():
 #	print "EPIS LIST: Result -> " + str(len(result)) + " positions."
 #	for pos in result:
 #		print pos.toString()
+
+	# CLUSTERING
+	print "CLUSTERING"
+	print DjCluster(list_pos, 0, 0.5, 2, 0.50)
+	
 
 
 if __name__ == '__main__':

@@ -44,3 +44,15 @@ class Position:
 		foo = time.mktime(self.date.timetuple())
 		bar = time.mktime(q.date.timetuple())
 		return abs(foo - bar) < lapse
+
+
+class Cluster:
+	"Cluster of points, basically set of points with a center"
+	def __init__(self, center, points):
+		self.center = center
+		self.points = points
+
+
+	"String Representation"
+	def toString(self):
+		return "Cluster centered in: " + self.center
