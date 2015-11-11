@@ -6,3 +6,6 @@
 *.pdf
 *.gz
 *.out
+# Python #
+##########
+*.pyc
