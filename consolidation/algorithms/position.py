@@ -45,6 +45,13 @@ class Position:
 		bar = time.mktime(q.date.timetuple())
 		return abs(foo - bar) < lapse
 
+	def isInCluster(self, cluster):
+		for q in cluster.points:
+			if self.id == q.id:
+				return True
+
+		return False
+
 
 class Cluster:
 	"Cluster of points, basically set of points with a center"
@@ -52,7 +59,25 @@ class Cluster:
 		self.center = center
 		self.points = points
 
-
 	"String Representation"
 	def toString(self):
-		return "Cluster centered in: " + self.center
+		return "Cluster centered in: " + str(self.center.toString())
+
+	"Cluster is density Joinable with list of clusters? Returns false if not, returns cluster if yes"
+	def isDensityJoinable(self, listClusters):
+		for cluster in listClusters:
+			for p in self.points:
+				if p.isInCluster(cluster):
+					return cluster
+
+		return None 
+
+	"Merge current cluster with another"
+	def mergeCluster(self, cluster)					:
+		for p in cluster.points:
+			if not p.isInCluster(cluster):
+				self.points.append(p)	
+
+		return self 
+				
+		
