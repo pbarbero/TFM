@@ -1,0 +1,15 @@
+- Eliminar todas las posiciones (0,0) ya que nos fastidian la clusterización y sólo nos encuentran dos clústers.
+- Pasar a timestamp el campo fecha para poder introducirla en los algoritmos de Weka.
+
+- Weka: realizar primero un clustering simple, K simple means, antes de un DJ con el fin de bajar a un número de 
+posiciones necesario y luego a través del DJ hacer una consolidación máxima con el fin de quedarnos sólo con los datos
+mejores. 
+
+- Analizar cuántas posiciones podrían ocupar la memoria del dispositivo en una jornada de trabajo, ir baranjando ideas
+de cuántas consolidaciones cada cierto tiempo tenemos que hacer, o cuantos datos debemos eliminar para que el número de
+consolidaciones sea mínimo sin perder información. A través de esto, encontraremos los parámetros de eps y minPoints, 
+o el número de clústers para el KMeans.
+
+- Investigar sobre el canocopy (mejor que el Kmeans, éste es muy simple)
+
+- Investigar otro tipo de distancia ofrecida por weka?
