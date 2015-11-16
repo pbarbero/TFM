@@ -16,6 +16,7 @@ def DjCluster(setPoints, typeDistance, eps, minPoints, t0):
 		# DEBUG
 		if np is not None:
 			print np.toString()
+		# END DEBUG
 
 		# Si N(p) es nulo (es decir, N(p) no esta en un cluster)
 		if np is None:

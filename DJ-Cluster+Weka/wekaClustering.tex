@@ -1,41 +1,46 @@
 \documentclass[a4paper,12pt]{article}
 \usepackage{graphicx}
 \graphicspath{ {imagesTex/} }
+\usepackage{listings}
 
 
 \begin{document}
 
-El conjunto de nuestros datos cuenta con datos de $1917$ sujetos diferentes, para los cuales hemos elegido los cuatro \'ultimos con m\'as datos para realizar la clasificaci\'on.
+El conjunto de nuestros datos cuenta con datos de $1917$ sujetos diferentes, de los cuales vamos a filtrar aquellas posiciones con informaci\'on relevante, es decir, cuya latitud y longitud no sea nula (es nula porque no se recibe bien la posici\'on). Para ello, ejecutamos la siguiente consulta con el fin de quedarnos con los 5 recursos con datos m\'as representativos. 
 
-Posiciones Salvador:
+\begin{lstlisting}
+mysql> select recurso, count(id) 
+	   from posicionesgps 
+	   where latitud <> 0 and longitud <> 0 
+	   group by recurso order by 2 desc limit 5;
+	   
+	   +----------------+-----------+
+	   | recurso        | count(id) |
+	   +----------------+-----------+
+	   | tetra:12082781 |     39839 |
+	   | tetra:12082364 |     35858 |
+	   | tetra:12086044 |     27532 |
+	   | tetra:12082579 |     17574 |
+	   | tetra:12082434 |     15257 |
+	   +----------------+-----------+
 
-\begin{itemize}
-\item Sujeto tetra:12082781: 41962 datos
-\item Sujeto tetra:12082364: 37327 datos
-\item Sujeto tetra:12086044: 28715 datos
-\item Sujeto tetra:12082434: 23978 datos
-\end{itemize}
+\end{lstlisting}
 
-Posiciones R\'io:
-\begin{itemize}
-\item Sujeto tetra:1121386: 12401 datos
-\item Sujeto tetra:1120324: 12501 datos
-\item Sujeto tetra:1131765: 12933 datos
-\item Sujeto tetra:1320443: 12969 datos
-\end{itemize}
 
 \section{K-Means}
 
-Vamos a realizar un clustering de K-medias utilizando Weka sobre el sujeto tetra:12082781; utilizando los siguientes par\'ametros:
+Vamos a realizar un clustering de K-medias utilizando Weka sobre el primer sujeto tetra:12082781, importamos la latitud, longitud y fecha en Weka con la siguiente consulta
 
-\bigskip
+\begin{lstlisting}
+select latitud, longitud, UNIX_TIMESTAMP(fecha) from posicionesgps 
+where latitud <> 0 and longitud <> 0 and recurso="tetra:12082781";
+\end{lstlisting}
 
-\includegraphics[scale=0.5]{kMeans_tetra:12082781.png}
-
-
-Utilizamos s\'olo las variables de latitud, longitud y fecha para realizar el clustering:
+Si visualizamos los datos de latitud y longitud, obtenemos
 
 Resultados: 
+
+\includegraphics[scale=.5]{tetra:12082781.png}
 
 \section{DJ-clustering}
 
