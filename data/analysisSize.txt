@@ -1,0 +1,13 @@
+1. http://stackoverflow.com/questions/9620198/how-to-get-the-sizes-of-the-tables-of-a-mysql-database
+
+Obtenemos el tamaño de nuestra base de datos y sabiendo la cantidad de registros que tenemos, obtener el tamaño de una posición,
+no sólo la latitud y longitud, sino los demás datos que se guardan.
+
+2. Hacer una media de cuántas posiciones se toman a la hora.
+
+3. Establecer la cantidad de posiciones que puede almacenar una consola vehicular, dando que por ejemplo, se reserven 1gb de su 
+espacio en disco para guardar estas.
+
+4. Calcular en cuántas horas de trabajo se llenaría su memoria, por ejemplo, que se llenara en dos horas. Si en 2 horas se cumple el 100%
+del espacio reservado para éstas, decididir por ejemplo consolidarlas a un 40% de las mismas, con el fin de no perder muchos datos nuevos,
+y realizar por ejemplo la consolidación de los datos cuando el límite de espacio llega a un 90% de éste.
