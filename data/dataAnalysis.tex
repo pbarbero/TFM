@@ -1,0 +1,62 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage{listings}
+
+
+\begin{document}
+
+
+\section{Cantidad de posiciones a guardar}
+
+Con la cantidad de posiciones suministradas, cu\'anto ocupa cada posici\'on en disco, para hacernos una idea de cu\'antas posiciones ser\'ia posible acumular en funci\'on de la frecuencia de \'estas sobre un espacio finito.
+
+En nuestra base de datos llamada \textbf{R\'io de Janeiro} contamos con \textbf{6928467} posiciones y en \textbf{Salvador de Bah\'ia} contamos con \textbf{4599974} posiciones.
+
+\begin{lstlisting}
+mysql> SELECT table_schema as `Database`, table_name AS `Table`,  round(((data_length + index_length) / 1024 / 1024), 2) `Size in MB`  
+	   FROM information_schema.TABLES  
+	   ORDER BY (data_length + index_length) DESC;
+
+
++--------------------+---------------------------+------------+------------+
+| Database           | Table                     | Size in MB | Size in KB |
++--------------------+---------------------------+------------+------------+
+| rio                | posicionesgps             |    1205.64 |  120564000 |
+| bahia              | posicionesgps             |     961.42 |   96142000 |
++--------------------+---------------------------+------------+------------+
+
+\end{lstlisting}
+
+
+$$\frac{120564000}{6928467} = 17.4012519653 $$
+
+$$\frac{96142000}{4599974} = 20.9005529162 $$
+
+Podemos aproximar el tama\~no de una posici\'on por unos 19 KB.
+
+Supongamos que una consola tiene unos 30GB de almacenamiento. Podemos almacenar unas $1578947$ posiciones en estos 30GB. 
+
+Los datos han sido recogidos entre las fechas 2015-02-17 08:00:05 y 2015-03-04 08:18:05, lo que hace una diferencia de 360 horas.
+
+
+$$ \frac{360}{6928467}$$
+
+Tenemos 5014 distintos tipos de sujetos a estudiar:
+
+\begin{lstlisting}
+mysql> select count(distinct(recurso)) from posicionesgps;
++--------------------------+
+| count(distinct(recurso)) |
++--------------------------+
+|                     5014 |
++--------------------------+
+1 row in set (0,24 sec)
+
+\end{lstlisting}
+
+Lo que nos da una frecuencia de toma de :
+
+$$ \frac{6928467}{5014 \cdot 360} = 3.83$$ posiciones a la hora.
+
+Si aument\'aramos esta frecuencia a una posici\'on cada 30 segundos, conseguri\r'iamos una frecuencia de 120 posiciones a la hora, luego un \'unico sujeto, en una jornada laboral de 8 horas, ocupar\'ia en espacio de 19.2 MB. 
+
+\end{document}
