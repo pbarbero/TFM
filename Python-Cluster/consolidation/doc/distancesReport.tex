@@ -1,0 +1,58 @@
+\documentclass[a4paper,12pt]{article}
+
+
+
+\begin{document}
+
+\section{Vecindarios}
+
+Con el fin de realizar los algoritmos de consolidaci\'on, hemos realizado un estudio acerca de distintos tipos de vecindarios a utilizar para los algoritmos de consolidaci\'on propios y los algoritmos de \textit{clustering} utilizados en \textsc{Weka}.
+
+\subsection{Vecindario simple}
+
+Utilizando la distancia eucl\'idea, definimos un vecindario como aquel conjunto de puntos que se  encuentran a una distancia eucl\'idea menor que $\epsilon$ con respecto su centro $p_0$, es decir,
+
+$$ d_E(p_0, p) = \sqrt{lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \epsilon $$
+
+donde $p$ es un punto con latitud $lat_{p}$ y longitud $long_{p}$.
+
+\subsection{Vecindario involucrando el m\'odulo de la velocidad}
+
+En el momento que se toma la posici\'on $p_0$, aparte de la latidud y su longitud, se toma la velocidad instant\'anea del sujeto. Podemos considerar en este caso que, dado que nuestro sujeto se  encuentra a mayor velocidad, puntos m\'as alejados de lo que considerar\'iamos en el primer caso (fuera de nuestro vecindario simple), podr\'ian estar dentro de nuestro nuevo radio, que depender\'ia de la velocidad instant\'anea. As\'i, definimos nuestro nuevo vecindario:
+
+$$ d_E(p_0, p) = \sqrt{lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \epsilon \cdot vel_{p_0} $$
+
+donde $vel_{p_0}$ es la velocidad instant\'anea de nuestro punto centro.
+
+\subsection{Vecindario involucrando el m\'odulo de la velocidad y la orientaci\'on}
+
+Igual que contamos con la velocidad instant\'anea del sujeto, contamos tambi\'en con el dato de la orientaci\'on respecto al norte de nuestro sujeto muestreado. Esta medida est\'a tomada en grados sexagesimales en el sentido de las agujas del reloj respecto al norte.
+
+Gracias a este dato, podemos calcular el vector direcci\'on que contiene la informaci\'on de la orientaci\'on de nuestro sujeto y como tambi\'en conocemos el m\'odulo de la velocidad, obtener el vector velocidad. 
+
+Nuestra componente $x$ que identificaremos con el eje del vector direcci\'on ser\'a el coseno de nuestra orientaci\'on,
+
+$$ cos(or_{p_0})$$
+
+Y nuestra componente $y$ del vector direcci\'on ser\'a el seno de nuestra orientaci\'on,
+
+$$ sin(or_{p_0}) $$
+
+\subsection{Vecindad t0-alcanzable}
+
+Si fijamos un intervalo de tiempo $t_0$, podemos definir una vecindad $t_0$-alcanzable como aquellos puntos que nuestro sujeto puede alcanzar en un tiempo $t_0$. Un sujeto que se desplace a velocidad reducida, tendr\'a una vecindad $t_0$-alcanzable m\'as reducido  que otro que se desplace a una velo$vel_{p_0}\cdot t_0$. 
+
+$$ d_E(p_0, p) = \sqrt{lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < vel_{p_0} \cdot t_0 $$
+
+\'Este es un caso concreto del vecindario involucrando la velocidad. 
+
+\subsection{Vecindario involucrando el tiempo}
+
+Las posiciones de nuestros sujetos vienen muestreadas adem\'as con el instante en el que fueron tomadas. Podemos considerar que el tiempo entre tomas tambi\'en es una distancia y definir un vecindario. Definimos esta distancia temporal como la resta de ambos instantes, y el vecindario como:
+
+$$ d_T(p_0, p) = time_p - time_{p_0} < \delta $$
+
+
+
+
+\end{document}
