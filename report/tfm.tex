@@ -85,11 +85,27 @@ columns=fullflexible,
 
 \tableofcontents
 
+\newpage
+
+\mbox{}
+\thispagestyle{empty}
+\newpage
+
 \pagebreak
 
 \newpage
 
 \section{Planteamiento del problema}
+
+Hoy en d\'ia, muchos dispositivos cuentan con un sistema de geolocalizaci\'on GPS que nos permite conocer la localizaci\'on de un sujeto en tiempo real. Con el fin de obtener la mayor informaci\'on posible en todo momento, estas posiciones recogidas se guardan en una base de datos que puede ser temporal o permanente. En el caso de ser permanente, nos encontraremos con el problema de que la base de datos puede crecer hasta un l\'imite desmesurado en el que dispositivo que recoge y almacena esta informaci\'on llene su memoria, impidiendo almacenar posiciones nuevas. \\
+
+En este momento, es necesario tomar la decisi\'on de borrar parte de las posiciones almacenadas, seg\'un alg\'un criterio. La dificultad en este momento es elegir el criterio con el cual eliminaremos este exceso de datos, por ejemplo, borrando posiciones repetidas o posiciones que no aporten la suficiente eficiencia en relaci\'on al espacio que ocupan en memoria. Esto introduce el concepto de funci\'on de consolidaci\'on o compactaci\'on, es decir una funci\'on que elimine un exceso de datos permiti\'endonos conservar el m\'aximo de informaci\'on posible. \\
+
+Contamos con datos proporcionados por una empresa de telecomunicaciones de sede en Zaragoza obtenidas de una base central. Esta base recibe peri\'odicamente posiciones GPS de distintos sujetos, que inserta en una base de datos centralizada. \'Estas posiciones son tomadas por la terminal de cada operativo, almacenadas localmente en esta terminal de manera temporal y enviadas a la central en el momento de conectividad con \'esta. \\
+
+Nos planteamos que tanto la terminal personal que lleva cada sujeto como la base centralizada pueden llegar a l\'imite no deseado, provocando que este se sature e impida la insercci\'on de nuevos datos. Con el fin de impedir esto, se va a realizar un estudio de distintas t\'ecnicas de \textit{consolidaci\'on}\ref{} con el fin de almacenar el m\'inimo de datos pero con la m\'axima informaci\'on posible.  \\
+
+\pagebreak
 
 \section{Datos y estructura de los datos suministrados}
 
@@ -281,7 +297,7 @@ donde $p$ es un punto con latitud $lat_{p}$ y longitud $long_{p}$.
 Su implementaci\'on en Python es la siguiente,
 
 \begin{python}
-        def is_in_neighborhoodByEUSimple(self, q, eps):
+        def IsInneighborhoodByEUSimple(self, q, eps):
                 return self.distance_eu(q) < eps
 \end{python}
 
@@ -298,7 +314,7 @@ donde $vel_{p_0}$ es la velocidad instant\'anea de nuestro punto centro.
 Su implementaci\'on en Python es la siguiente,
 
 \begin{python}
-        def is_in_neighborhoodT0Reachable(self, q, eps):
+        def IsInNeighborhoodT0Reachable(self, q, eps):
                 return self.distance_eu(q) < eps * self.speed
 \end{python}
 
@@ -351,7 +367,10 @@ $$ d_T(p_0, p) = time_p - time_{p_0} < \delta $$
 \subsection{Preprocesado de datos}
 Antes de empezar a realizar un algoritmo que nos realice una consolidaci\'on de los datos, es conveniente realizar un preprocesado de \'estos. \\
 
-Vamos a fijar una cantidad m\'inima de distancia, un $\varepsilon_0$, y compararemos una posici\'on con la \'ultima le\'ida para decidir si la insertamos en base de datos o no. Si la distancia del nuevo muestreo con la \'ultima es menor que este $\varepsilon_0$ fijado, desecharemos esta nueva posici\'on. Esto permite que m\'as adelante nuestro algoritmo de consolidaci\'on sea mucho m\'as r\'apido. 
+Un primer procesado consistir\'ia en la eliminaci\'on de todos aquellos registros que tienen como latitud y longitud $0$ ya que son datos tomados por error que lo \'unico que har\'ian ser\'ia conseguir un cl\'uster centrado en $(latitud = 0, longitud = 0)$ \\
+
+Vamos a fijar una cantidad m\'inima de distancia, un $\varepsilon_0$, y compararemos una posici\'on con la \'ultima le\'ida para decidir si la insertamos en base de datos o no. Si la distancia del nuevo muestreo con la \'ultima es menor que este $\varepsilon_0$ fijado, desecharemos esta nueva posici\'on. Esto permite que m\'as adelante nuestro algoritmo de consolidaci\'on sea mucho m\'as r\'apido. \\
+
 
 \pagebreak
 \section{Algoritmos de consolidaci\'on simples}
@@ -428,7 +447,7 @@ Se puede dar el caso que la consolidaci\'on por distancia no sea lo suficienteme
 
 
 
-En la secci\'on \ref{sec:positionClass} hemos definido una implementaci\'on en Python para el concepto de posici\'on. Si queremos utilizar m\'etodos de cl\'ustering m\'as avanzados, se ha de definir el concepto de \textit{cl\'user}. \\
+En la secci\'on \ref{sec:positionClass} hemos definido una implementaci\'on en Python para el concepto de posici\'on. Si queremos utilizar m\'etodos de cl\'ustering m\'as avanzados, se ha de definir el concepto de \textit{cl\'uster}. \\
 
 Definimos un cl\'uster de posiciones como un conjunto de posiciones agrupado en torno a una posici\'on singular, llamada posici\'on central del cl\'uster.\\
 
@@ -449,7 +468,7 @@ class Cluster:
 
 \textbf{K-means} es un m\'etodo eficiente de \textit{clustering} que tiene como objetivo la partici\'on de un conjunto de $n$ elementos en $k$ grupos distintos. Dado un cojunto de datos $(x_1, x_2, \ldots , x_n)$, $K-$means construye una partici\'on de las observaciones en $k$ conjuntos con $k\leq n$, $S=\{S_1, S_2, \ldots, S_k\}$ con el fin de minimizar el t\'ermino de error que es la suma de las distancias al cuadrado de cada punto al centro de su cl\'uster, es decir,
 
-$$ E=\sum{i=1}^{n} \sum_{x\in S_i} d(x, m_i) $$
+$$ E=\sum_{i=1}^{n} \sum_{x\in S_i} d(x, m_i) $$
 
 donde $m_i$ es el centro de cada cl\'uster $S_i$ y $d(x, m_i)$ es la distancia definida entre el punto $x$ y $m_i$.
 
@@ -464,20 +483,25 @@ En segundo caso, no hay distintos ente puntos considerados "ruido", ya que todos
 
 Adem\'as, $K-$means es un algoritmo no determin\'istico, debido a la primera fase de asignaci\'on de centros de cl\'usters de manera aleatoria, por lo que no ser\'ia muy fiable.
 
+\subsubsection{Estudio con Weka}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+TODO: Introducir estudio con Weka
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagebreak
 \subsection{DBSCAN}
 
-\textbf{DBSCAN} o \textbf{Density-based spatial clustering of applications with noise} es un algoritmo de \textit{clustering} que dado un conjunto de puntos en un espacio, los agrupa en funci\'on de la densidad de puntos que tengan a su alrededor, dejando a un lado aquellos que tienen una densidad baja. 
+\textbf{DBSCAN} o \textbf{Density-based spatial clustering of applications with noise} es un algoritmo de \textit{clustering} que dado un conjunto de puntos en un espacio, los agrupa en funci\'on de la densidad de puntos que tengan a su alrededor, dejando a un lado aquellos que tienen una densidad baja. \\
 
 Se considera un conjunto de puntos a aplicar la t\'ecnica. El algoritmo clasificar\'a los puntos en tres grupos, 
 
 \begin{itemize}
 	\item Un punto $p$ es considerado \textit{n\'ucleo} si al menos un n\'umero de puntos m\'inimo (al que denotaremos por $minPts$ est\'an a una distancia menor que $\varepsilon$ de $p$. Este conjunto de puntos se considerar\'an \textit{directamente alcanzables} desde $p$.
-	\item Un punto $q$ es considerado \textit{alcanzable} de $p$ si existe un camino $p_1, \ldots, p_n$ tal que $p_1=p$ y $p_n=q$, donde cada $p_{i+1}$ es directamente alcanzable desde $p_i$ (todos los puntos del camino son puntos n\'ucleo, excepto quizás $q$).
+	\item Un punto $q$ es considerado \textit{alcanzable} de $p$ si existe un camino $p_1, \ldots, p_n$ tal que $p_1=p$ y $p_n=q$, donde cada $p_{i+1}$ es directamente alcanzable desde $p_i$ (todos los puntos del camino son puntos n\'ucleo, excepto quiz\'as $q$).
 	\item Todos los puntos que no son considerados ni n\'ucleos ni alcanzables son considerados \textit{aislados}.
 \end{itemize}
 
-Ahora, si $p$ es un punto n\'ucleo, entonces forma un cl\'uster con aquellos puntos que sean alcanzables desde $p$. Cada cl\'uster contiene al menos un punto n\'ucleo; y puntos no n\'ucleo pueden formar parte de \'este, pero formaran lo que parten del \textit{borde}, ya que no permiten \textit{alcanzar} m\'as puntos. 
+Ahora, si $p$ es un punto n\'ucleo, entonces forma un cl\'uster con aquellos puntos que sean alcanzables desde $p$. Cada cl\'uster contiene al menos un punto n\'ucleo; y puntos no n\'ucleo pueden formar parte de \'este, pero formaran lo que parten del \textit{borde}, ya que no permiten \textit{alcanzar} m\'as puntos. \\
 
 \begin{figure}\label{fig:DBSCAN}
 	\centering
@@ -498,7 +522,7 @@ Redefinimos la noci\'on de cl\'uster que previamente hab\'iamos definido. Un cl\
 
 \textbf{DBSCAN} requiere de dos par\'ametros para empezar: $\varepsilon$ para la noci\'on de vecindario y $minPts$ para el n\'umero m\'inimo de puntos necesario para formar un cl\'uster. Se empieza tomando arbirariamente un punto del conjunto que no haya sido visitado. Se obtiene su vecindario, en el caso de que no exista, este punto se marca como ruido y se pasa al siguiente. Si no es nulo y tiene un n\'umero de puntos mayor que $minPts$, se crea un cl\'uster. \\
 
-Si uno de los puntos del proceso resulta que es parte de un cl\'uster, su vecindario tambi\'en se a\~nade a \'este. Se reitera este proceso, ya que todos los puntos nuevos a\~nadidos del vecindario anterior, son parte del cl\'uster, luego el vecindario de cada uno es a\~nadido. Este proceso se contin\'ua hasta que se obtiene el cl\'uster densamente conectado. 
+Si uno de los puntos del proceso resulta que es parte de un cl\'uster, su vecindario tambi\'en se a\~nade a \'este. Se reitera este proceso, ya que todos los puntos nuevos a\~nadidos del vecindario anterior, son parte del cl\'uster, luego el vecindario de cada uno es a\~nadido. Este proceso se contin\'ua hasta que se obtiene el cl\'uster densamente conectado. \\
 
 \begin{algorithm}[!h]\label{DBSCAN}
 \begin{algorithmic}[1]
@@ -545,7 +569,19 @@ Si uno de los puntos del proceso resulta que es parte de un cl\'uster, su vecind
 \end{algorithm}
 
 
+\subsubsection{Estudio con Weka}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+TODO: Introducir estudio con Weka
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
+\subsubsection{Implementaci\'on en Python}
+
+Podemos encontrar una implementaci\'on de \textbf{DBSCAN} en el paquete de herramientas \texttt{scikit-learn} de python\ref{scikit-learn}.\\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+TODO: Introducir ejemplo realizado en IPython Notebook!!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \pagebreak
@@ -596,7 +632,11 @@ La complejidad de este algoritmo es $\mathcal{O}(n\log{}n)$ \ref{importantPlaces
 
 \subsubsection{Comparaci\'on de K-Means con DJ-Cluster}
 
+\subsubsection{Estudio con Weka}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+TODO: Introducir estudio con Weka
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
 
 
@@ -605,12 +645,26 @@ La complejidad de este algoritmo es $\mathcal{O}(n\log{}n)$ \ref{importantPlaces
 
 \pagebreak
 \subsection{Canocopy}
+\subsubsection{Estudio con Weka}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+TODO: Introducir estudio con Weka
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \pagebreak
 \section{Conclusiones}
 
 \pagebreak
 \section{Herramientas utilizadas}
+
+\begin{enumerate}
+	\item Weka
+	\item IPython Notebook
+	\item R
+	\item \texttt{scikit-learn}
+
+
+\end{enumerate}
 
 \newpage
 
@@ -621,27 +675,26 @@ La complejidad de este algoritmo es $\mathcal{O}(n\log{}n)$ \ref{importantPlaces
 \begin{python}
 "Consolidation By distance"
 def ConsolidationByDistance(listPositions, typeOfDistance, eps, t0):
-	print "Starting consolidation by: {0}".format(str(typeOfDistance))
 	i = 0
 	result = []
-    while i < len(listPositions) - 1:
-    	# Neighborhood: Distance EU simple
-        if typeOfDistance == 0:
-        	if not listPositions[i].is_in_neighborhoodByEUSimple(listPositions[i+1], eps):
-           		result.append(listPositions[i])
+	while i < len(listPositions) - 1:
+		# Neighborhood: Distance EU simple
+		if typeOfDistance == 0:
+			if not listPositions[i].is_in_neighborhoodByEUSimple(listPositions[i+1], eps):
+				result.append(listPositions[i])
 		# Neighborhood: Distance EU relative to speed
 		elif typeOfDistance == 1:
-        	if not listPositions[i].is_in_neighborhoodByEURelativeSpeed(listPositions[i+1], eps):
-           		result.append(listPositions[i])
+			if not listPositions[i].is_in_neighborhoodByEURelativeSpeed(listPositions[i+1], eps):
+				result.append(listPositions[i])
 		# Neighborhood t0 reachable
-        elif typeOfDistance == 2:
+		elif typeOfDistance == 2:
 			if not listPositions[i].is_in_neighborhoodT0Reachable(listPositions[i+1], t0):
-           		result.append(listPositions[i])
+				result.append(listPositions[i])
 		else:
-        	raise ValueError('That distance does not exist')
-        i=i+1
+			raise ValueError('That distance does not exist')
 
-	#Por defecto anadiremos la ultima posicion, ya que no tiene siguiente con quien comparar
+		i=i+1
+
 	result.append(listPositions[len(listPositions) - 1])
 
 	return result
@@ -649,26 +702,81 @@ def ConsolidationByDistance(listPositions, typeOfDistance, eps, t0):
 \end{python}
 
 \newpage
-\section{Impementaci\'on de consolidaci\'on por tiempo} \label{App:AppendixB}
+\section{Impementaci\'on de consolidaci\'on cada cierto n\'umero} \label{App:AppendixB}
 
 \begin{python}
 "Deletes one position every k positions."
 def ConsolidationEachNumber(listPositions, k, j):
 	if k >= j:
-    	raise ValueError('K tiene que ser menor que J')
+		raise ValueError('K tiene que ser menor que J')
         
 	i = 0
-    result = []
+	result = []
 	while i < len(listPositions) - 1:
-    	if i%j == 0:
-        	l = 0
-           while l < k:
-           		result.append(listPositions[i - l])
-               l = l+1
+		if i%j == 0:
+			l = 0
+			while l < k:
+				result.append(listPositions[i - l])
+				l = l+1
 			i = i+1
 
 	return result
 \end{python}
+
+
+\newpage
+\section{Impementaci\'on de DJ-Cluster} \label{App:AppendixC}
+
+\begin{python}
+from position import Position, Cluster
+
+"Dj-Clustering Algorithm"
+def DjCluster(setPoints, typeDistance, eps, minPoints, t0):
+
+	listClusters = []
+	listNoises = []
+
+	for p in setPoints:
+		np = computeNeighborhood(p, setPoints, typeDistance, minPoints, eps, t0)
+
+		if np is None:
+			listNoises.append(p) 
+		else:
+			result = np.isDensityJoinable(listClusters)
+
+			if result is None:
+				listClusters.append(np) 
+			else:
+				result.mergeCluster(np)
+
+	return [listClusters, listNoises]
+
+"Compute Neighborhood"
+def computeNeighborhood(p, setPoints, typeDistance, minPoints, eps, t0):
+	pointsOfCluster = []
+	for q in setPoints:
+		if typeDistance == 0:
+			if p.is_in_neighborhoodByEUSimple(q, eps):
+				pointsOfCluster.append(q)
+		elif typeDistance == 1:
+			if p.is_in_neighborhoodEURelativeSpeed(q, eps):
+				pointsOfCluster.append(q)
+		elif typeDistance == 2:
+			if p.is_in_neighborhoodT0Reachable(q, t0):
+				pointsOfCluster.append(q)
+
+	if len(pointsOfCluster) < minPoints:
+		return None
+	else:
+		return Cluster(p, pointsOfCluster)			
+
+\end{python}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 \newpage
 
 \addcontentsline{toc}{section}{Bibliograf\'ia}
@@ -680,6 +788,8 @@ def ConsolidationEachNumber(listPositions, k, j):
 \bibitem{importantPlaces}\label{importantPlaces} \textsc{Mining Personally Important Places from GPS Track} \\ \url{http://www-users.cs.umn.edu/~czhou/pub/place-important_v3.pdf}
 
 \bibitem{clusteringApproach}\label{clusteringApproach}\textsc{Discovering Personal Gazetteers: An Interactive Clustering Approach} \\ \url{http://files.grouplens.org/papers/zhou-acmgis04.pdf}
+
+\bibitem{scikit-learn}\label{scikit-learn} \texttt{scikit-learn} \\ \url{http://scikit-learn.org/stable/auto_examples/cluster/plot_dbscan.html} 
 
 \end{thebibliography}
 
