@@ -15,6 +15,7 @@ def main():
 	cur_sal = connect_db("posicionesSalvador")
 	cur_rio = connect_db("posicionesRio")
 
+	logFile = "simpleConsolidation.log"
 	limit = 10
 	cmd = "SELECT * FROM posicionesgps LIMIT {0};".format(limit)
 	cur_sal.execute(cmd)
@@ -43,8 +44,8 @@ def main():
 #		print pos.toString()
 
 	# CLUSTERING
-	print "CLUSTERING"
-	print DjCluster(list_pos, 0, 0.5, 2, 0.50)
+	#print "CLUSTERING"
+	#print DjCluster(list_pos, 0, 0.5, 2, 0.50)
 	
 
 

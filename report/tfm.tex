@@ -13,14 +13,59 @@
 \newcolumntype{b}{>{\columncolor{white}}c}
 %%
 
+%%%%%%%%%%%%%%%%%%%%PYTHON CODING
+
+% Default fixed font does not support bold face
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{11} % for bold
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{11}  % for normal
+
+% Custom colors
+\usepackage{color}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+% Python style for highlighting
+\newcommand\pythonstyle{\lstset{
+language=Python,
+basicstyle=\ttm,
+otherkeywords={self},             % Add keywords here
+keywordstyle=\ttb\color{deepblue},
+emph={MyClass,__init__},          % Custom highlighting
+emphstyle=\ttb\color{deepred},    % Custom highlighting style
+stringstyle=\color{deepgreen},
+frame=tb,                         % Any extra options here
+showstringspaces=false,           % 
+basicstyle=\small,
+}}
+
+
+% Python environment
+\lstnewenvironment{python}[1][]
+{
+\pythonstyle
+\lstset{#1}
+}
+{}
+
+% Python for external files
+\newcommand\pythonexternal[2][]{{
+\pythonstyle
+\lstinputlisting[#1]{#2}}}
+
+% Python for inline
+\newcommand\pythoninline[1]{{\pythonstyle\lstinline!#1!}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
+
+\tableofcontents
 
 \section{Planteamiento del problema}
 
 \section{Datos y estructura de los datos suministrados}
 
-Se nos suministran dos bases de datos correspondientes a dos ciudades brasile\~nas distintas, Salvador de Bah\'ia y R\'io de Janeiro. En cada de una de ellas encontramos posiciones de distintos sujetos estudiados identificados a trav\'es de un c\'odigo. Cada base de datos contiene una tabla llamada \textit{posicionesgps} en la que encontramos un registro por cada posici\'on tomada por cada sujeto entre los d\'ias 2015-02-17 08:00:05 y 2015-03-04 08:18:05. \\
+Se nos suministran dos bases de datos correspondientes a dos ciudades brasile\~nas distintas, \textbf{Salvador de Bah\'ia} y \textbf{R\'io de Janeiro}. En cada de una de ellas encontramos posiciones de distintos sujetos estudiados identificados a trav\'es de un c\'odigo. Cada base de datos contiene una tabla llamada \textit{posicionesgps} en la que encontramos un registro por cada posici\'on tomada por cada sujeto entre los d\'ias 2015-02-17 08:00:05 y 2015-03-04 08:18:05. \\
 
 La estructura de los registros es la siguiente:\\
 
@@ -164,11 +209,38 @@ $$ \frac{6928467}{5014 \cdot 360} = 3.83$$ posiciones a la hora.
 
 Si aument\'aramos esta frecuencia a una posici\'on cada 30 segundos, conseguri\r'iamos una frecuencia de 120 posiciones a la hora, luego un \'unico sujeto, en una jornada laboral de 8 horas, ocupar\'ia en espacio de 19.2 MB. 
 
+\subsection{Implementaci\'on de los datos en clases de Python}
+
+La estructura de los datos es implementable en diversos lenguajes, pero se elige Python por su simplicidad y ya que es el lenguaje cient\'ifico m\'as usado hoy en d\'ia.
+
+Se define la clase \texttt{Posici\'on} de la siguiente manera,
+
+\begin{python}
+class Position:
+    def __init__(self, id, resource, lat
+    		    , lon, speed, track, date):
+        self.id = id
+        self.resource = resource
+        self.lat = lat
+        self.lon = lon
+        self.speed = speed
+        self.track = track
+        self.date = date
+\end{python}
+
+A partir de esta clase definiremos una serie de m\'etodos propios a \'esta que nos permitir\'an saber si un punto est\'a en un vecindario asociado a la posici\'on. Vamos a utilizar la noci\'on de distancia eucl\'idea como concepto en el que apoyarnos.\\
+
+\begin{python}
+        def distance_eu(self, q):
+                return math.sqrt((self.lat - q.lat)**2 
+                	+ (self.lon - q.lon)**2)
+\end{python}
+
 
 \pagebreak
-\section{Nociones de distancia y vecindario}
+\section{Nociones de vecindario}
 
-Con el fin de realizar los algoritmos de consolidaci\'on, hemos realizado un estudio acerca de distintos tipos de vecindarios a utilizar para los algoritmos de consolidaci\'on propios y los algoritmos de \textit{clustering} utilizados en \textsc{Weka}.
+Con el fin de realizar los algoritmos de consolidaci\'on, hemos realizado un estudio acerca de distintos tipos de vecindarios a utilizar para los algoritmos de consolidaci\'on propios y los algoritmos de \textit{clustering} utilizados que usaremos m\'as adelante.
 
 \subsection{Vecindario simple}
 
@@ -178,6 +250,14 @@ $$ d_E(p_0, p) = \sqrt{lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \e
 
 donde $p$ es un punto con latitud $lat_{p}$ y longitud $long_{p}$.
 
+Su implementaci\'on en Python es la siguiente,
+
+\begin{python}
+        def is_in_neighborhoodByEUSimple(self, q, eps):
+                return self.distance_eu(q) < eps
+\end{python}
+
+
 \subsection{Vecindario involucrando el m\'odulo de la velocidad}
 
 En el momento que se toma la posici\'on $p_0$, aparte de la latidud y su longitud, se toma la velocidad instant\'anea del sujeto. Podemos considerar en este caso que, dado que nuestro sujeto se  encuentra a mayor velocidad, puntos m\'as alejados de lo que considerar\'iamos en el primer caso (fuera de nuestro vecindario simple), podr\'ian estar dentro de nuestro nuevo radio, que depender\'ia de la velocidad instant\'anea. As\'i, definimos nuestro nuevo vecindario:
@@ -186,19 +266,28 @@ $$ d_E(p_0, p) = \sqrt{lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \e
 
 donde $vel_{p_0}$ es la velocidad instant\'anea de nuestro punto centro.
 
-\subsection{Vecindario involucrando el m\'odulo de la velocidad y la orientaci\'on}
 
-Igual que contamos con la velocidad instant\'anea del sujeto, contamos tambi\'en con el dato de la orientaci\'on respecto al norte de nuestro sujeto muestreado. Esta medida est\'a tomada en grados sexagesimales en el sentido de las agujas del reloj respecto al norte.
+Su implementaci\'on en Python es la siguiente,
 
-Gracias a este dato, podemos calcular el vector direcci\'on que contiene la informaci\'on de la orientaci\'on de nuestro sujeto y como tambi\'en conocemos el m\'odulo de la velocidad, obtener el vector velocidad. 
+\begin{python}
+        def is_in_neighborhoodT0Reachable(self, q, eps):
+                return self.distance_eu(q) < eps * self.speed
+\end{python}
 
-Nuestra componente $x$ que identificaremos con el eje del vector direcci\'on ser\'a el coseno de nuestra orientaci\'on,
 
-$$ cos(or_{p_0})$$
-
-Y nuestra componente $y$ del vector direcci\'on ser\'a el seno de nuestra orientaci\'on,
-
-$$ sin(or_{p_0}) $$
+%\subsection{Vecindario involucrando el m\'odulo de la velocidad y la orientaci\'on}
+%
+%Igual que contamos con la velocidad instant\'anea del sujeto, contamos tambi\'en con el dato de la orientaci\'on respecto al norte de nuestro sujeto muestreado. Esta medida est\'a tomada en grados sexagesimales en el sentido de las agujas del reloj respecto al norte.
+%
+%Gracias a este dato, podemos calcular el vector direcci\'on que contiene la informaci\'on de la orientaci\'on de nuestro sujeto y como tambi\'en conocemos el m\'odulo de la velocidad, obtener el vector velocidad. 
+%
+%Nuestra componente $x$ que identificaremos con el eje del vector direcci\'on ser\'a el coseno de nuestra orientaci\'on,
+%
+%$$ cos(or_{p_0})$$
+%
+%Y nuestra componente $y$ del vector direcci\'on ser\'a el seno de nuestra orientaci\'on,
+%
+%$$ sin(or_{p_0}) $$
 
 \subsection{Vecindad t0-alcanzable}
 
@@ -208,15 +297,75 @@ $$ d_E(p_0, p) = \sqrt{lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < ve
 
 \'Este es un caso concreto del vecindario involucrando la velocidad. 
 
+
+Su implementaci\'on en Python es la siguiente,
+
+\begin{python}
+        def is_in_neighborhoodT0Reachable(self, q, t0):
+                return self.distance_eu(q) < t0 * self.speed
+\end{python}
+
 \subsection{Vecindario involucrando el tiempo}
 
 Las posiciones de nuestros sujetos vienen muestreadas adem\'as con el instante en el que fueron tomadas. Podemos considerar que el tiempo entre tomas tambi\'en es una distancia y definir un vecindario. Definimos esta distancia temporal como la resta de ambos instantes, y el vecindario como:
 
 $$ d_T(p_0, p) = time_p - time_{p_0} < \delta $$
 
+\begin{python}
+	def is_neighboorhoudByTime(self, q, lapse):
+		foo = time.mktime(self.date.timetuple())
+		bar = time.mktime(q.date.timetuple())
+		return abs(foo - bar) < lapse
+\end{python}
+
+
 \pagebreak
 \section{Algoritmos de consolidaci\'on simples}
 
+	Utilizando las nociones de vecindario definidas en la secci\'on anterior, nos planteamos la idea de definir unos algoritmos de consolidaci\'on simples con el fin de mantener la base de datos en un tama\~no m\'as o menos estable. \\
+
+Una primera aproximaci\'on ser\'ia una creaci\'on de un trigger o un peque\~no programa en el momento de insercci\'on en base de datos que comparara la \'ultima posici\'on recibida para ese sujeto con la nueva a insertar. Se comparar\'ia la distancia entre \'estas con una distancia eucl\'idea simple, y si \'esta estuviera bajo el l\'imite permitido (es decir, muy pr\'oxima), se obviar\'ia. \\
+
+Una segunda aproximaci\'on ser\'a definir una tarea programada \texttt{cron} (ya que nuestros dispositivos est\'an basados en una distribuci\'on de Linux) que cada cierto tiempo ejecutara una consolidaci\'on sobre estos. \\
+
+Estas consolidaciones menos avanzadas se realizar\'an sobre posiciones antiguas, es decir, seg\'un el tama\~no de la base de datos y el nivel cr\'itico al que puede llegar a estar, mandaremos un cierto n\'umero de posiciones a realizar la consolidaci\'on. \\
+
+Utilizando los tres tipos de vecindarios que hemos definido, definimos el siguiente m\'etodo que realizar\'a la consolidaci\'on del tipo que le indiquemos, \\
+
+\begin{python}
+"Consolidation By distance. Usage: consolidationByDistance(listOfPositionsToConsolidate, typeOfNeighborhoud, epsilon, t0)"	
+def ConsolidationByDistance(listPositions, typeOfDistance, eps, t0):
+	print "Starting consolidation by: {0}".format(str(typeOfDistance))
+	i = 0
+	result = []
+	while i < len(listPositions) - 1:
+		# Neighborhood: Distance EU simple
+		if typeOfDistance == 0:
+			if not listPositions[i].is_in_neighborhoodByEUSimple(listPositions[i+1], eps):
+				result.append(listPositions[i])
+			else:
+				print "[{0}]: {1} removed!".format(str(datetime.datetime.now()), listPositions[i].toString())
+		# Neighborhood: Distance EU relative to speed
+		elif typeOfDistance == 1:
+			if not listPositions[i].is_in_neighborhoodByEURelativeSpeed(listPositions[i+1], eps):
+				result.append(listPositions[i])
+			else:
+				print "[{0}]: {1} removed!".format(str(datetime.datetime.now()), listPositions[i].toString())
+		# Neighborhood t0 reachable
+		elif typeOfDistance == 2:
+			if not listPositions[i].is_in_neighborhoodT0Reachable(listPositions[i+1], t0):
+				result.append(listPositions[i])
+			else:
+				print "[{0}]: {1} removed!".format(str(datetime.datetime.now()), listPositions[i].toString())
+		else:
+			raise ValueError('That distance does not exist')
+		i=i+1
+			
+	#Por defecto anadiremos la ultima posicion, ya que no tiene siguiente con quien comparar
+	result.append(listPositions[len(listPositions) - 1])
+	
+	return result
+\end{python}
 \section{K-means}
 \section{DJ-Cluser}
 \section{Canocopy}
