@@ -1,5 +1,9 @@
 \documentclass[a4paper, 12pt]{article}
 \usepackage{listings}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{amsmath}
+\usepackage{amssymb}
 
 
 %%Color table
@@ -60,6 +64,10 @@ basicstyle=\small,
 \begin{document}
 
 \tableofcontents
+
+\pagebreak
+
+\newpage
 
 \section{Planteamiento del problema}
 
@@ -322,7 +330,7 @@ $$ d_T(p_0, p) = time_p - time_{p_0} < \delta $$
 \pagebreak
 \section{Algoritmos de consolidaci\'on simples}
 
-	Utilizando las nociones de vecindario definidas en la secci\'on anterior, nos planteamos la idea de definir unos algoritmos de consolidaci\'on simples con el fin de mantener la base de datos en un tama\~no m\'as o menos estable. \\
+Utilizando las nociones de vecindario definidas en la secci\'on anterior, nos planteamos la idea de definir unos algoritmos de consolidaci\'on simples con el fin de mantener la base de datos en un tama\~no m\'as o menos estable. \\
 
 Una primera aproximaci\'on ser\'ia una creaci\'on de un trigger o un peque\~no programa en el momento de insercci\'on en base de datos que comparara la \'ultima posici\'on recibida para ese sujeto con la nueva a insertar. Se comparar\'ia la distancia entre \'estas con una distancia eucl\'idea simple, y si \'esta estuviera bajo el l\'imite permitido (es decir, muy pr\'oxima), se obviar\'ia. \\
 
@@ -330,44 +338,69 @@ Una segunda aproximaci\'on ser\'a definir una tarea programada \texttt{cron} (ya
 
 Estas consolidaciones menos avanzadas se realizar\'an sobre posiciones antiguas, es decir, seg\'un el tama\~no de la base de datos y el nivel cr\'itico al que puede llegar a estar, mandaremos un cierto n\'umero de posiciones a realizar la consolidaci\'on. \\
 
+\subsection{Consolidaci\'on por distancia}
+
 Utilizando los tres tipos de vecindarios que hemos definido, definimos el siguiente m\'etodo que realizar\'a la consolidaci\'on del tipo que le indiquemos, \\
 
-\begin{python}
-"Consolidation By distance. Usage: consolidationByDistance(listOfPositionsToConsolidate, typeOfNeighborhoud, epsilon, t0)"	
-def ConsolidationByDistance(listPositions, typeOfDistance, eps, t0):
-	print "Starting consolidation by: {0}".format(str(typeOfDistance))
-	i = 0
-	result = []
-	while i < len(listPositions) - 1:
-		# Neighborhood: Distance EU simple
-		if typeOfDistance == 0:
-			if not listPositions[i].is_in_neighborhoodByEUSimple(listPositions[i+1], eps):
-				result.append(listPositions[i])
-			else:
-				print "[{0}]: {1} removed!".format(str(datetime.datetime.now()), listPositions[i].toString())
-		# Neighborhood: Distance EU relative to speed
-		elif typeOfDistance == 1:
-			if not listPositions[i].is_in_neighborhoodByEURelativeSpeed(listPositions[i+1], eps):
-				result.append(listPositions[i])
-			else:
-				print "[{0}]: {1} removed!".format(str(datetime.datetime.now()), listPositions[i].toString())
-		# Neighborhood t0 reachable
-		elif typeOfDistance == 2:
-			if not listPositions[i].is_in_neighborhoodT0Reachable(listPositions[i+1], t0):
-				result.append(listPositions[i])
-			else:
-				print "[{0}]: {1} removed!".format(str(datetime.datetime.now()), listPositions[i].toString())
-		else:
-			raise ValueError('That distance does not exist')
-		i=i+1
-			
-	#Por defecto anadiremos la ultima posicion, ya que no tiene siguiente con quien comparar
-	result.append(listPositions[len(listPositions) - 1])
-	
-	return result
-\end{python}
+
+\pagebreak
+
+\begin{algorithm}[h]\label{consolidationByDistance}
+\begin{algorithmic}[1]
+\Function{ConsolidationByDistance}{$positions, typeOfDistance, eps, t0$}
+\For{\textbf{each} pos \textbf{in} positions}
+    \If{$typeOfDistance == 'distanceEUSimple'$}
+        \If{$pos.IsInNeighBorhood(next(pos), eps)$}
+        	\State{Remove position in DB}
+        \Else
+        	\State{Maintain position in DB}
+        \EndIf
+    \EndIf
+    \If{$typeOfDistance == 'Distance EU relative to speed'$}
+        \If{$pos.IsInNeighBorhoodForEURelativeSpeed(next(pos), eps)$}
+        	\State{Remove position in DB}
+        \Else
+        	\State{Maintain position in DB}
+        \EndIf
+    \EndIf
+    \If{$typeOfDistance == 't0 reachable'$}
+        \If{$pos.IsInNeighBorhoodForT0Reachablee(next(pos), t0)$}
+        	\State{Remove position in DB}
+        \Else
+        	\State{Maintain position in DB}
+        \EndIf
+    \EndIf
+\EndFor
+\EndFunction
+\end{algorithmic}
+\caption{\label{alg:seeifrelin} Algoritmo de consolidaci\'on simple}
+\end{algorithm}
+
+
+\subsection{Consolidaci\'on cada cierto n\'umero de posiciones}
+
+Se puede dar el caso que la consolidaci\'on por distancia no sea lo suficientemente eficaz y no de los resultados necesarios de liberaci\'on de espacio, ya que las posiciones est\'en muy lejos entre s\'i. Como \'ulima opci\'on, se puede recurrir a un tipo de consolidaci\'on en la cual dada una lista de posiciones normalmente antiguas, se elimine un subconjunto de estas, por ejemplo, 3 de cada 5. As\'i asegurar\'iamos una p\'erdida m\'inima de informaci\'on. \\
+
+\begin{algorithm}[h]\label{consolidationByEachSomeNumber}
+\begin{algorithmic}[1]
+\Function{ConsolidationByEachJinK}{$positions, j, k$}\Comment{$j < k$}
+	\For{\textbf{each} pos in positions}
+		\If{$position.Index \% k == 0$}
+			\For{$i = 0; i < k; i++$}
+				\State{Remove position with index == position.Index}
+			\EndFor
+		\EndIf
+	\EndFor
+\EndFunction
+\end{algorithmic}
+\caption{\label{alg:seeifrelin} Algoritmo de consolidaci\'on cada cierto n\'umero}
+\end{algorithm}
+
+\pagebreak
 \section{K-means}
+\pagebreak
 \section{DJ-Cluser}
+\pagebreak
 \section{Canocopy}
 
 \section{Conclusiones}
