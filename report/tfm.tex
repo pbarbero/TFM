@@ -4,6 +4,9 @@
 \usepackage{algorithm}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{hyperref}
+
+\usepackage{glossaries}
 
 
 %%Color table
@@ -62,7 +65,20 @@ columns=fullflexible,
 \newcommand\pythoninline[1]{{\pythonstyle\lstinline!#1!}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+
+
+\title{TFM}
+\author{Pilar Barbero Iriarte}
+\date{\today}
+
 \begin{document}
+
+
+\maketitle
+
+\newpage
 
 \tableofcontents
 
@@ -218,7 +234,7 @@ $$ \frac{6928467}{5014 \cdot 360} = 3.83$$ posiciones a la hora.
 
 Si aument\'aramos esta frecuencia a una posici\'on cada 30 segundos, conseguri\r'iamos una frecuencia de 120 posiciones a la hora, luego un \'unico sujeto, en una jornada laboral de 8 horas, ocupar\'ia en espacio de 19.2 MB. 
 
-\subsection{Implementaci\'on de los datos en clases de Python}
+\subsection{Implementaci\'on de los datos en clases de Python}\label{sec:positionClass}
 
 La estructura de los datos es implementable en diversos lenguajes, pero se elige Python por su simplicidad y ya que es el lenguaje cient\'ifico m\'as usado hoy en d\'ia.
 
@@ -399,18 +415,48 @@ Se puede dar el caso que la consolidaci\'on por distancia no sea lo suficienteme
 
 \pagebreak
 \section{Algoritmos de consolidaci\'on asociados a m\'etodos de clustering}
+
+En la secci\'on \ref{sec:positionClass} hemos definido una implementaci\'on en Python para el concepto de posici\'on. Si queremos utilizar m\'etodos de cl\'ustering m\'as avanzados, se ha de definir el concepto de \textit{cl\'user}. \\
+
+Definimos un cl\'uster de posiciones como un conjunto de posiciones agrupado en torno a una posici\'on singular, llamada posici\'on central del cl\'uster.\\
+
+Realizando una sencilla implementaci\'on en Python,
+
+
+\begin{python}
+class Cluster:
+	"Cluster of points"
+	def __init__(self, center, points):
+    	self.center = center
+		self.points = points
+\end{python}
+
+
+\pagebreak
 \subsection{K-means}
 \pagebreak
-\subsection{DJ-Cluser}
+\subsection{DJ-Cluster}
+
+\textbf{Density-Joinable Cl\'uster}\ref{importantPlaces} es un tipo de algoritmo de \textit{clustering} cuya realizaci\'on depende de la distancia elegida, la cual nos generar\'a un tipo de vecindario en concreto. Este algoritmo localiza puntos significativos sobre el conjunto de todos los puntos, es decir, el centro del cl\'uster. No debemos olvidar que nuestro objetivo es encontrar posiciones significativas en todo nuestro conjunto de posiciones GPS, y \'estos centros de cl\'uster que nos generar\'a este algoritmo nos servir\'an para tal prop\'osito. 
+
+La idea del algoritmo es la siguiente, para cada punto, calculamos su vecindario. Este vecindario depender\'a de la distancia elegida entre todas las anteriores definidas, y seg\'un cu\'al sea la elegida, depender\'a de una variable $\varepsilo$ o un instante $t_0$ escogido. Se impone la condici\'on de que el n\'umero de puntos conseguido al computar su vecindario sea al menos un \textit{MinPts} definido previamente. Si esta condici\'on no se cumple, se marca la posici\'on actual como \textit{ruido} y se prosigue con la siguiente. En el caso de cumplirse, este nuevo punto es el centro del cl\'uster, junto a su vecindario. 
+
+Con este nuevo cl\'uster creado, el siguiente paso es comprobar que este cl\'uster no sea \textit{densamente acoplable} con los que ya llevamos computados. 
+
+Un cl\'uster es \textit{densamente acoplable} a otro cl\'uster si y s\'olo si 
+
+
+
 
 
 \pagebreak
 \subsection{Canocopy}
 
+\pagebreak
 \section{Conclusiones}
 
-
 \newpage
+
 
 \appendix
 \section{Impementaci\'on de consolidaci\'on por distancia} \label{App:AppendixA}
@@ -465,14 +511,19 @@ def ConsolidationEachNumber(listPositions, k, j):
 			i = i+1
 
 	return result
-
 \end{python}
 \newpage
+
 \addcontentsline{toc}{section}{Bibliograf\'ia}
 \begin{thebibliography}{50}
 
-\bibitem{FirstReference}
+
+\bibitem{lifePatter}\label{lifePatter} \textsc{Mining Individual Life Pattern} \\ \url{http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.361.9085&rep=rep1&type=pdf}
+
+\bibitem{importantPlaces}\label{importantPlaces} \textsc{Mining Personally Important Places from GPS Track} \\ \url{http://www-users.cs.umn.edu/~czhou/pub/place-important_v3.pdf}
 
 \end{thebibliography}
+
+
 
 \end{document}
