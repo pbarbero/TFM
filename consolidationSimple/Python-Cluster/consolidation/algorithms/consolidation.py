@@ -49,12 +49,18 @@ def ConsolidationByDistance(listPositions, typeOfDistance, eps, t0):
 	return result
 
 "Deletes one position every k positions."
-def ConsolidationEachNumber(listPositions, k):
+def ConsolidationEachNumber(listPositions, k, j):
+	if k >= j:
+		raise ValueError('K tiene que ser menor que J')
+	
 	i = 0
 	result = []
 	while i < len(listPositions) - 1:
-		if i%k == 0:
-			result.append(listPositions[i])
+		if i%j == 0:
+			l = 0
+			while l < k:
+				result.append(listPositions[i - l])
+				l = l+1
 		i = i+1
 
 	return result
