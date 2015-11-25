@@ -465,13 +465,7 @@ En segundo caso, no hay distintos ente puntos considerados "ruido", ya que todos
 Adem\'as, $K-$means es un algoritmo no determin\'istico, debido a la primera fase de asignaci\'on de centros de cl\'usters de manera aleatoria, por lo que no ser\'ia muy fiable.
 
 \pagebreak
-\section{DBSCAN}
-
-%La definici\'on de cl\'uster dada por \textbf{DBSCAN} es ligeramente distinta a la que hemos proporcionado antes, ya que se basa en la noci\'on de puntos \textit{densamente alcanzables}. B\'asicamente, se considera que $q$ es densamente alcanzable \textbf{directamente} desde $p$ si la distancia entre ellos no es m\'as de un $\varepsilon$ fijado y adem\'as $p$ tiene una cantidad m\'inima de puntos alrededor suficiente para formar un cl\'uster.  \\
-%
-%Se dice que $q$ es densamente alcanzable desde $p$ (no directamente) si existe una secuencia de puntos $p_1, \ldots, p_n$ con $p_1 = p$ y $p_n = q$ donde cada $p_{i+1}$ es densamente alcanzable desde $p_i$. \\
-%
-%Esta relaci\'on no es sim\'etrica. Dos puntos en el borde del mismo cl\'uster $S$ pueden no ser densamente alcanzables entre ellos 
+\subsection{DBSCAN}
 
 \textbf{DBSCAN} o \textbf{Density-based spatial clustering of applications with noise} es un algoritmo de \textit{clustering} que dado un conjunto de puntos en un espacio, los agrupa en funci\'on de la densidad de puntos que tengan a su alrededor, dejando a un lado aquellos que tienen una densidad baja. 
 
@@ -501,6 +495,55 @@ Redefinimos la noci\'on de cl\'uster que previamente hab\'iamos definido. Un cl\
 	\item Todos los puntos deben estar mutuamente \textit{densamente conectados}.
 	\item Si un punto $q$ es densamente alcanzable desde un punto $p$ del cl\'uster, $q$ es parte del cl\'uster tambi\'en. 
 \end{enumerate}
+
+\textbf{DBSCAN} requiere de dos par\'ametros para empezar: $\varepsilon$ para la noci\'on de vecindario y $minPts$ para el n\'umero m\'inimo de puntos necesario para formar un cl\'uster. Se empieza tomando arbirariamente un punto del conjunto que no haya sido visitado. Se obtiene su vecindario, en el caso de que no exista, este punto se marca como ruido y se pasa al siguiente. Si no es nulo y tiene un n\'umero de puntos mayor que $minPts$, se crea un cl\'uster. \\
+
+Si uno de los puntos del proceso resulta que es parte de un cl\'uster, su vecindario tambi\'en se a\~nade a \'este. Se reitera este proceso, ya que todos los puntos nuevos a\~nadidos del vecindario anterior, son parte del cl\'uster, luego el vecindario de cada uno es a\~nadido. Este proceso se contin\'ua hasta que se obtiene el cl\'uster densamente conectado. 
+
+\begin{algorithm}[!h]\label{DBSCAN}
+\begin{algorithmic}[1]
+\Function{DBSCAN}{$positions, eps, minPts$}
+	\State{C = 0}
+	\For{\textbf{each} pos in positions}
+		\If{$pos$ has been visited}
+			\State{Continue next position}
+		\Else
+			\State{Mark $pos$ as visited}
+			\State{N(pos) = NeighborPts(pos, eps)}
+			\If{$length(N(pos)) < MinPts$}
+				\State{Mark $pos$ as noise}
+			\Else
+				\State{C = next Cluster}
+				\State{expandCluster(pos, N(pos), C, eps, MinPts)}				
+			\EndIf
+		
+		\EndIf
+	\EndFor
+\EndFunction
+\State{}
+\Function{expandCluster}{$P, NeighborPts, C, eps, MinPts$}
+	\State{add P to cluster C}
+	\For{\textbf{each} P' in NeighborPts}
+		\If{P' is not visited}
+			\State{Mark P' as visited}
+			\State{NeighborPts' = regionQuery(P', eps)}
+			\If{$length(NeighborPts') >= MinPts$}
+				\State{NeighborPts = NeighborPts joined with NeighborPts'}
+			\EndIf
+		\EndIf
+		\If{P' is not yet member of any cluster}
+			\State{add P' to Cluster C}
+		\EndIf
+	\EndFor
+\EndFunction
+\State{}
+\Function{NeighborPts}{$P, eps$}
+	\State{return all points within P's eps-neighborhood (also P)}
+\EndFunction
+\end{algorithmic}
+\caption{\label{alg:DBSCAN} Algoritmo DBSCAN}
+\end{algorithm}
+
 
 
 
@@ -565,6 +608,9 @@ La complejidad de este algoritmo es $\mathcal{O}(n\log{}n)$ \ref{importantPlaces
 
 \pagebreak
 \section{Conclusiones}
+
+\pagebreak
+\section{Herramientas utilizadas}
 
 \newpage
 
