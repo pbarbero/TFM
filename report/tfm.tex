@@ -640,19 +640,46 @@ Si uno de los puntos del proceso resulta que es parte de un cl\'uster, su vecind
 \end{algorithm}
 
 
-\subsubsection{Estudio con Weka}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-TODO: Introducir estudio con Weka
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\pagebreak
 \subsubsection{Implementaci\'on en Python}
 
-Podemos encontrar una implementaci\'on de \textbf{DBSCAN} en el paquete de herramientas \texttt{scikit-learn} de python\ref{scikit-learn}.\\
+Se encuentra una implementaci\'on bastante eficaz y sencilla en el repositorio de \href{https://github.com/SushantKafle/DBSCAN}{Sushant Kafle} \ref{dbscanPython}.\\
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-TODO: Introducir ejemplo realizado en IPython Notebook!!
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{python}
+from dbscanner import dbscanner
+from algorithms.db import connect_db
+
+cur= connect_db("bahia")
+recurso = "tetra:12082781"
+limit = 1000
+cmd = "SELECT latitud, longitud 
+	   FROM posicionesgps 
+	   WHERE latitud <> 0 and longitud <> 0 
+	   AND recurso=\"{0}\" 
+	   LIMIT {1};".format(recurso, limit)
+cur.execute(cmd)
+
+a=[]
+for pos in cur.fetchall():
+    a.append([pos[0], pos[1]])
+
+Data = a
+eps = 0.0001
+MinPts= 5
+
+dbc = dbscanner()
+dbc.dbscan(Data, eps, MinPts)
+\end{python}
+
+Notar que hemos tomado como valor de $\varepsilon = 0.0001$ ya que es una aproximaci\'on de la distancia media de toma entre posiciones y $5$ es un buen valor a la hora de hacer una consolidaci\'on. El resultado consiste en algunas posiciones marcadas como ruido y $5$ cl\'usters. Debido a que es un proceso muy costoso, nos hemos limitado en este caso a hacer la consolidaci\'on en unas $1000$ posiciones.\\
+
+\begin{figure}[!htbp]
+	\begin{center}
+	\includegraphics[scale=.7]{dbscan_2_0.png}
+	\end{center}
+	\caption{Resultados del algoritmo \textbf{DBSCAN} con $\varepsilon = 0.0001$ y $minPts = 5$}
+\end{figure}
+
+
 
 
 \pagebreak
@@ -997,7 +1024,9 @@ Clustered Instances
 
 \bibitem{jerar}\label{jerar} \textsc{Hierarchical clustering} \\ \url{https://en.wikipedia.org/wiki/Hierarchical_clustering}
 
-\bibitem{canopyGitHub} \label{canopyGitHub} \textsc{Canopy Implementation} \\ \url{https://gist.github.com/gdbassett/528d816d035f2deaaca1}
+\bibitem{canopyGitHub} \label{canopyGitHub} \textsc{Canopy Implementation in Python} \\ \url{https://gist.github.com/gdbassett/528d816d035f2deaaca1}
+
+\bibitem{dbscanPython} \label{dbscanPython} \textsc{DBSCAN Implementation in Python} \\ \url{https://github.com/SushantKafle/DBSCAN}
 \end{thebibliography}
 
 
