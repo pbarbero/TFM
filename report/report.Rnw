@@ -19,16 +19,19 @@ conSalvador <- dbConnect(RMySQL::MySQL(), group = "posiciones", user="root", pas
 conRio <- dbConnect(RMySQL::MySQL(), group = "posicionesRio", user="root", password="foobar1", dbname="posicionesRio")
 #dbListTables(con)
 
-dataquery=dbSendQuery(conSalvador, "select id, recurso, latitud, longitud, velocidad, orientacion, error, antigua, fecha from posicionesgps")
-dataquery2=dbSendQuery(conRio, "select id, recurso, latitud, longitud, velocidad, orientacion, error, antigua, fecha from posicionesgps")
+dataquery=dbSendQuery(conSalvador, "select id, recurso, latitud, longitud, velocidad, orientacion, fecha from posicionesgps")
+dataquery2=dbSendQuery(conRio, "select id, recurso, latitud, longitud, velocidad, orientacion, fecha from posicionesgps")
 
 dataSalvador = fetch(dataquery, n=-1)
 dataRio = fetch(dataquery2, n=-1)
-summary(dataSalvador)
-summary(dataRio)
 
-#dbListTables(mydb)
-#dbListTables(mydb2)
+library(xtable)
+valuesSalvador <- data.frame(x=dataSalvador$fecha)
+xtable(summary(valuesSalvador))
+
+
+valuesRio <- data.frame(x=dataRio)
+xtable(summary(valuesRio))
 
 #dbListFields(mydb, 'posicionesgps')
 #dbListFields(mydb2, 'posicionesgps')

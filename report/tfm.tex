@@ -1,3 +1,19 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ORIGINAL COVER PAGE TEMPLATE FROM 
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Peter Wilson (herries.press@earthlink.net)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 \documentclass[a4paper, 12pt]{article}
 \usepackage{listings}
 \usepackage{algpseudocode}
@@ -6,11 +22,44 @@
 \usepackage{amssymb}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{glossaries}
 \graphicspath{ {images/} }
 
+\newcommand*{\plogo}{\includegraphics[scale=.3]{unizar.png}} % Generic publisher logo
 
-\usepackage{glossaries}
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
 
+\newcommand*{\titleGP}{\begingroup % Create the command for including the title page in the document
+\centering % Center all text
+\vspace*{\baselineskip} % White space at the top of the page
+
+\rule{\textwidth}{1.6pt}\vspace*{-\baselineskip}\vspace*{2pt} % Thick horizontal line
+\rule{\textwidth}{0.4pt}\\[\baselineskip] % Thin horizontal line
+
+{\LARGE M\'aster en Modelizaci\'on e Investigaci\'on  \\[0.3\baselineskip] Matem\'atica, Estad\'istica y Computaci\'on}\\[0.2\baselineskip] % Title
+
+\rule{\textwidth}{0.4pt}\vspace*{-\baselineskip}\vspace{3.2pt} % Thin horizontal line
+\rule{\textwidth}{1.6pt}\\[\baselineskip] % Thick horizontal line
+
+\scshape % Small caps
+Trabajo Fin de M\'aster \\ % Tagline(s) or further description
+Identificaci\'on de patrones y algoritmos de consolidaci\'on en bases de datos de posicionamiento\\[\baselineskip] % Tagline(s) or further description
+{\Large Pilar Barbero Iriarte\par} 
+
+\vspace*{2\baselineskip} % Whitespace between location/year and editors
+
+Dirigido por \\[\baselineskip]
+Tom\'as Alcal\'a \par % Editor list
+{\itshape Universidad de Zaragoza\par} % Editor affiliation
+
+\vfill % Whitespace between editor names and publisher logo
+
+\plogo \\[0.3\baselineskip] % Publisher logo
+
+\endgroup}
 
 %%Color table
 
@@ -70,30 +119,22 @@ columns=fullflexible,
 
 
 
-
-
-\title{TFM}
-\author{Pilar Barbero Iriarte}
-\date{\today}
-
 \begin{document}
 
 
-\maketitle
+\pagestyle{empty} % Removes page numbers
 
-\newpage
-
-\tableofcontents
-
-\newpage
+\titleGP % This command includes the title page
 
 \mbox{}
 \thispagestyle{empty}
 \newpage
 
+\tableofcontents
+
+
 \pagebreak
 
-\newpage
 
 \section{Planteamiento del problema}
 
@@ -103,7 +144,9 @@ En este momento, es necesario tomar la decisi\'on de borrar parte de las posicio
 
 Contamos con datos proporcionados por una empresa de telecomunicaciones de sede en Zaragoza obtenidas de una base central. Esta base recibe peri\'odicamente posiciones GPS de distintos sujetos, que inserta en una base de datos centralizada. \'Estas posiciones son tomadas por la terminal de cada operativo, almacenadas localmente en esta terminal de manera temporal y enviadas a la central en el momento de conectividad con \'esta. \\
 
-Nos planteamos que tanto la terminal personal que lleva cada sujeto como la base centralizada pueden llegar a l\'imite no deseado, provocando que este se sature e impida la insercci\'on de nuevos datos. Con el fin de impedir esto, se va a realizar un estudio de distintas t\'ecnicas de \textit{consolidaci\'on}\ref{} con el fin de almacenar el m\'inimo de datos pero con la m\'axima informaci\'on posible.  \\
+Nos planteamos que tanto la terminal personal que lleva cada sujeto como la base centralizada pueden llegar a l\'imite no deseado, provocando que este se sature e impida la insercci\'on de nuevos datos. Con el fin de impedir esto, se va a realizar un estudio de distintas t\'ecnicas de \textit{consolidaci\'on}\ref{} con el fin de almacenar el m\'inimo de datos pero con la m\'axima informaci\'on posible. \\
+
+Este trabajo realiza una comparaci\'on entre diferentes t\'ecnicas de \textit{clustering} y algoritmos dise\~nados propios con el fin de encontrar un m\'etodo eficiente que evite el problema anteriormente explicado. 
 
 \pagebreak
 
@@ -182,6 +225,123 @@ Para este estudio se ha trabajado s\'olo con los siguientes datos,\\
 
 \pagebreak
 \subsection{An\'alisis de los datos}
+
+Vamos a utilizar R con el IDE Rstudio para realizar un an\'alisis previo de los datos recibidos. Para ellos necesitamos de algunas librer\'ias a la hora de conectarnos a la base de datos importada,\\
+
+\begin{lstlisting}[language=R, columns=fullflexible, basicstyle=\small]
+devtools::install_github("rstats-db/RMySQL")
+devtools::install_github("rstats-db/DBI")
+library(RMySQL)
+library(DBI)
+\end{lstlisting}
+
+Importamos los datos haciendo un \textit{select} de todas las columnas de nuestra base de datos. Cada base de datos se nos ha proporcionado cuenta con una tabla llamada \textit{posicionesgps},\\
+
+\begin{lstlisting}[language=R, columns=fullflexible, basicstyle=\small]
+conSalvador <- dbConnect(RMySQL::MySQL()
+					   , group = "posiciones"
+					   , user="root"
+					   , password="****"
+					   , dbname="posicionesSalvador")
+
+dataquery=dbSendQuery(conSalvador
+					, "SELECT id, recurso, latitud, longitud, velocidad, orientacion, error, antigua, fecha 
+					   FROM posicionesgps")
+
+dataSalvador = fetch(dataquery, n=-1)
+\end{lstlisting}
+
+Analicemos las columnas que m\'as nos interesan, es decir, la latitud, longitud, la velocidad, la orientaci\'on y la fecha, \\
+
+\begin{lstlisting}[language=R, basicstyle=\small, columns=fullflexible]
+library(xtable)
+valuesRio <- data.frame(x=dataRio)
+xtable(summary(valuesRio))
+\end{lstlisting}
+
+\bigskip 
+
+\begin{center}
+\begin{minipage}[t]{.3\textwidth}
+	\begin{tabular}{rl}
+  \hline
+ &       latitud \\ 
+  \hline
+1 & Min.   :-1.0103   \\ 
+  2 & 1st Qu.:-0.2266   \\ 
+  3 & Median :-0.2259   \\ 
+  4 & Mean   :-0.1995   \\ 
+  5 & 3rd Qu.:-0.2248   \\ 
+  6 & Max.   : 0.4956   \\ 
+   \hline
+\end{tabular}
+\end{minipage}\hfil
+\begin{minipage}[t]{.3\textwidth}
+	\begin{tabular}{rl}
+  \hline
+ &       longitud \\ 
+  \hline
+1 & Min.   :-1.4575   \\ 
+  2 & 1st Qu.:-0.6720   \\ 
+  3 & Median :-0.6713   \\ 
+  4 & Mean   :-0.6137   \\ 
+  5 & 3rd Qu.:-0.6702   \\ 
+  6 & Max.   : 2.4729   \\ 
+   \hline
+\end{tabular}
+\end{minipage}
+\begin{minipage}[t]{.3\textwidth}
+\begin{tabular}{rl}
+  \hline
+ &       velocidad \\ 
+  \hline
+1 & Min.   :  0.000   \\ 
+  2 & 1st Qu.:  0.000   \\ 
+  3 & Median :  0.000   \\ 
+  4 & Mean   :  3.751   \\ 
+  5 & 3rd Qu.:  0.000   \\ 
+  6 & Max.   :255.000   \\ 
+   \hline
+\end{tabular}
+\end{minipage}
+\end{center}
+
+
+\begin{figure}
+
+\begin{center}
+\begin{minipage}[t]{.3\textwidth}
+	\begin{tabular}{rl}
+  \hline
+ &       orientacion \\ 
+  \hline
+1 & Min.   :  0.0   \\ 
+  2 & 1st Qu.: 22.0   \\ 
+  3 & Median : 90.0   \\ 
+  4 & Mean   :118.7   \\ 
+  5 & 3rd Qu.:202.0   \\ 
+  6 & Max.   :315.0   \\ 
+   \hline
+\end{tabular}
+\end{minipage}\hfil
+\begin{minipage}[t]{.5\textwidth}
+	\begin{tabular}{rl}
+  \hline
+ &       fecha \\ 
+  \hline
+1 & Min.   :2015-02-17 08:00:05   \\ 
+  2 & 1st Qu.:2015-02-19 21:41:13   \\ 
+  3 & Median :2015-02-26 01:40:02   \\ 
+  4 & Mean   :2015-02-24 19:55:44   \\ 
+  5 & 3rd Qu.:2015-03-01 03:49:20   \\ 
+  6 & Max.   :2015-03-04 08:18:05   \\ 
+   \hline
+\end{tabular}
+\end{minipage}
+\end{center}
+\caption{summary de los datos de Salvador}
+\end{figure}
+
 
 \pagebreak
 \subsection{Espacio en disco}
@@ -768,7 +928,12 @@ El resultado del \textit{clustering} muestra una primera clasificaci\'on por \te
 \begin{verbatim}
 === Run information ===
 
-Scheme:       weka.clusterers.MakeDensityBasedClusterer -M 0.001 -W weka.clusterers.Canopy -- -N 8000 -max-candidates 100 -periodic-pruning 10000 -min-density 2.0 -t2 -1.0 -t1 -1.25 -S 1
+Scheme:       weka.clusterers.MakeDensityBasedClusterer -M 0.001 
+													   -W weka.clusterers.Canopy -- 
+													   -N 8000 -max-candidates 100 
+													   -periodic-pruning 10000 
+													   -min-density 2.0 -t2 -1.0 
+													   -t1 -1.25 -S 1
 Relation:     QueryResult
 Instances:    39839
 Attributes:   3
@@ -873,12 +1038,24 @@ Mostramos s\'olamente las primeras instancias, ya que son muchos cl\'usters, per
 
 \begin{enumerate}
 	\item \textbf{Weka} (Waikato Environment for Knowledge Analysis, en espa\~nol «entorno para an\'alisis del conocimiento de la Universidad de Waikato») es una plataforma de software para el aprendizaje autom\'atico y la miner\'ia de datos escrito en Java y desarrollado en la Universidad de Waikato. Weka es software libre distribuido bajo la licencia GNU-GPL.\ref{weka}
-	\item Implementaci\'on de Canopy \\ \url{https://gist.github.com/gdbassett/528d816d035f2deaaca1}
+	
+	\item \textbf{Implementaci\'on de Canopy} \\ \url{https://gist.github.com/gdbassett/528d816d035f2deaaca1}
 
-	\item Implementaci\'on de DBSCAN en Python \\ \url{https://github.com/SushantKafle/DBSCAN}
-
-
+	\item \textbf{Implementaci\'on de DBSCAN en Python} \\ \url{https://github.com/SushantKafle/DBSCAN}
+	
+	\item \textbf{R} es un lenguaje y entorno de programación para análisis estadístico y gráfico. \textbf{R} se distribuye bajo la licencia GNU GPL y está disponible para los sistemas operativos Windows, Macintosh, Unix y GNU/Linux.\ref{r}
+	
+	\item \textbf{GitHub} es una plataforma de desarrollo colaborativo para alojar proyectos utilizando el sistema de control de versiones Git.
+	
+	\item \textbf{MySQL} es un sistema de gestión de bases de datos relacional, multihilo y multiusuario bajo una licencia GNU GPL para uso no comercial.
+	
 \end{enumerate}
+
+\pagebreak
+
+\section{¿D\'onde puedo encontrar todo esto?}
+
+El c\'odigo est\'a disponible para bajarse y utilizarse bajo una licencia Creative-Commons (by-nc-sa)\ref{creative}
 
 \newpage
 
@@ -1126,6 +1303,10 @@ Clustered Instances
 \bibitem{dbscanPython} \label{dbscanPython} \textsc{DBSCAN Implementation in Python} \\ \url{https://github.com/SushantKafle/DBSCAN}
 
 \bibitem{weka} \label{weka} \textsc{Weka} \\ 	\url{http://www.cs.waikato.ac.nz/ml/weka/}
+
+\bibitem{r} \label{r} \textsc{R} \\ \url{https://www.r-project.org/}
+
+\bibitem{creative} \label{creative} \textsc{Creative Commons License} \\ \url{https://creativecommons.org/licenses/by-nc-sa/4.0/}
 \end{thebibliography}
 
 
