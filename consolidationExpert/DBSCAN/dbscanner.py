@@ -24,7 +24,7 @@ class dbscanner:
         
         C = -1
         Noise = cluster('Noise')
-        
+       
         for point in D:
             if point not in self.visited:
                 self.visited.append(point)
