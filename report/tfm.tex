@@ -680,7 +680,27 @@ Notar que hemos tomado como valor de $\varepsilon = 0.0001$ ya que es una aproxi
 \end{figure}
 
 
+\pagebreak
+\subsection{Canopy}\label{sec:canopy}
 
+El algoritmo de clustering de \textbf{Canopy} se usa generalmente como un preprocesado de los datos para posteriormente aplicar un clustering de tipo \textbf{K-means} o alguna t\'ecnica de agrupamiento jerarquizado\ref{jerar}.\\
+
+La idea se basa en el uso de una medida de distancia aproximada para dividir el conjunto de los datos en subconjuntos que se superponen. A estos subconjuntos los llamaremos \textit{canopies}. Un \textit{canopy} es un subconjunto de puntos que yacen bajo el vecindario de un punto central. Un punto puede pertenecer a varias \textit{canopies} distintas. Los \textit{canopies} son creados con la intenci\'on de que si dos puntos no pertenecen a un \textit{canopy} en com\'un, est\'an bastante lejos de pertenecer a un mismo cl\'uster. \\
+
+Debido a que \textbf{Canopy} no es m\'as que un preprocesado de los datos, se fija una distancia sencilla con el fin de reducir dr\'asticamente el n\'umero de puntos y posteriormente aplicar una t\'ecnica mejor. En nuestro caso, utilizaremos la distancia eucl\'idea como distancia para realizar este proceso. \\
+
+Dada una distancia eucl\'idea, se crean los \textit{canopies} como sigue,
+
+\begin{enumerate}
+	\item Sea $S$ nuestro conjunto de puntos.
+	\item Se fijan dos umbrales para $T_1, T_2$ tal que $T_1 > T_2$. 
+	\item Se toma un punto $p\in S$, \'este ser\'a nuestro primer \textit{canopy}.
+	\item Se colocan todos los puntos $q\in S\setminus{p}$ tal que $d_E(p, q) < T_1$ en el mismo \textit{canopy}. 
+	\item Se eliminan del conjunto inicial $S$ aquellos puntos que est\'en dentro del umbral de distancia $T_2$.
+	\item Se repite hasta que el conjunto inicial est\'e vac\'io.
+\end{enumerate}
+
+La implementaci\'on\ref{App:AppendixD} en Python se puede encontrar en GitHub gracias a \href{https://github.com/gdbassett}{Gabe} \ref{canopyGitHub}.
 
 \pagebreak
 \subsection{DJ-Cluster}
@@ -732,41 +752,118 @@ La complejidad de este algoritmo es $\mathcal{O}(n\log{}n)$ \ref{importantPlaces
 
 \subsubsection{Estudio con Weka}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-TODO: Introducir estudio con Weka
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
+Weka tambi\'en permite realizar un \textit{clustering} por DJ-Cluster. Vamos a realizar un primer preprocesado de ratos utilizando la t\'ecnica de \textbf{Canopy}\ref{sec:canoy} que posteriormente est\'a explicada. Como antes, realizaremos primero una consolidaci\'on a unos 8000 cl\'usters y posteriormente aplicaremos \textbf{DJ-Clustering}.\\
+
+Los par\'ametros utilizados en este m\'etodo son los siguientes.\\
+
+\begin{figure}[!htbp]
+\centering
+	\includegraphics[scale=.55]{wekaDJClusterParametersTotal.png}
+\caption{DJ-Clustering}
+\end{figure}
 
 
+El resultado del \textit{clustering} muestra una primera clasificaci\'on por \textbf{Canopy} en $8000$ posiciones,\\
+
+\begin{verbatim}
+=== Run information ===
+
+Scheme:       weka.clusterers.MakeDensityBasedClusterer -M 0.001 -W weka.clusterers.Canopy -- -N 8000 -max-candidates 100 -periodic-pruning 10000 -min-density 2.0 -t2 -1.0 -t1 -1.25 -S 1
+Relation:     QueryResult
+Instances:    39839
+Attributes:   3
+              latitud
+              longitud
+              UNIX_TIMESTAMP(fecha)
+Test mode:    evaluate on training data
 
 
+=== Clustering model (full training set) ===
 
-\pagebreak
-\subsection{Canopy}
+MakeDensityBasedClusterer: 
 
-El algoritmo de clustering de \textbf{Canopy} se usa generalmente como un preprocesado de los datos para posteriormente aplicar un clustering de tipo \textbf{K-means} o alguna t\'ecnica de agrupamiento jerarquizado\ref{jerar}.\\
+Wrapped clusterer: 
+Canopy clustering
+=================
 
-La idea se basa en el uso de una medida de distancia aproximada para dividir el conjunto de los datos en subconjuntos que se superponen. A estos subconjuntos los llamaremos \textit{canopies}. Un \textit{canopy} es un subconjunto de puntos que yacen bajo el vecindario de un punto central. Un punto puede pertenecer a varias \textit{canopies} distintas. Los \textit{canopies} son creados con la intenci\'on de que si dos puntos no pertenecen a un \textit{canopy} en com\'un, est\'an bastante lejos de pertenecer a un mismo cl\'uster. \\
+Number of canopies (cluster centers) found: 8000
+T2 radius: 0,492     
+T1 radius: 0,615     
 
-Debido a que \textbf{Canopy} no es m\'as que un preprocesado de los datos, se fija una distancia sencilla con el fin de reducir dr\'asticamente el n\'umero de puntos y posteriormente aplicar una t\'ecnica mejor. En nuestro caso, utilizaremos la distancia eucl\'idea como distancia para realizar este proceso. \\
-
-Dada una distancia eucl\'idea, se crean los \textit{canopies} como sigue,
-
-\begin{enumerate}
-	\item Sea $S$ nuestro conjunto de puntos.
-	\item Se fijan dos umbrales para $T_1, T_2$ tal que $T_1 > T_2$. 
-	\item Se toma un punto $p\in S$, \'este ser\'a nuestro primer \textit{canopy}.
-	\item Se colocan todos los puntos $q\in S\setminus{p}$ tal que $d_E(p, q) < T_1$ en el mismo \textit{canopy}. 
-	\item Se eliminan del conjunto inicial $S$ aquellos puntos que est\'en dentro del umbral de distancia $T_2$.
-	\item Se repite hasta que el conjunto inicial est\'e vac\'io.
-\end{enumerate}
-
-La implementaci\'on\ref{App:AppendixD} en Python se puede encontrar en GitHub gracias a \href{https://github.com/gdbassett}{Gabe} \ref{canopyGitHub}.
-
-\pagebreak
-\subsection{Hierarchichal clustering}
+Cluster 0: -0.224664,-0.67139,1424989490.451634,{28191}
+Cluster 1: -0.224653,-0.671401,1424267875.663668,{10448} 
+Cluster 2: -0.226511,-0.670619,1425045583.497826,{460}
+Cluster 3: -0.225134,-0.66939,1424602410.92381,{210}
+..........................................................
+\end{verbatim}
 
 
+Con la distribuci\'on media de cada par\'ametro a analizar por cl\'uster,\\
+
+\begin{verbatim}
+Fitted estimators (with ML estimates of variance):
+
+Cluster: 0 Prior probability: 0
+
+Attribute: latitud
+Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+Attribute: longitud
+Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+Attribute: UNIX_TIMESTAMP(fecha)
+Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+
+Cluster: 1 Prior probability: 0
+
+Attribute: latitud
+Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+Attribute: longitud
+Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+Attribute: UNIX_TIMESTAMP(fecha)
+Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+
+Cluster: 2 Prior probability: 0
+
+Attribute: latitud
+Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+Attribute: longitud
+Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+Attribute: UNIX_TIMESTAMP(fecha)
+Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+
+Cluster: 3 Prior probability: 0
+
+Attribute: latitud
+Normal Distribution. Mean = -0.2252 StdDev = 0.001
+Attribute: longitud
+Normal Distribution. Mean = -0.6695 StdDev = 0.001
+Attribute: UNIX_TIMESTAMP(fecha)
+Normal Distribution. Mean = 1424636974 StdDev = 411992.8182
+
+\end{verbatim}
+
+Y m\'as adelante visualizamos el \textit{clustering} por DJ-Cluster, en la que podemos observar que se ha realizado una consolidaci\'on m\'as fina.
+
+\begin{verbatim}
+Time taken to build model (full training data) : 105.91 seconds
+
+=== Model and evaluation on training set ===
+
+Clustered Instances
+
+   9          9 (  0%)
+  10          2 (  0%)
+  12          3 (  0%)
+  13          3 (  0%)
+  --------------------
+\end{verbatim}
+
+Mostramos s\'olamente las primeras instancias, ya que son muchos cl\'usters, pero se observa que los 8 primeros han sido eliminados al igual que el n\'umero 11.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \pagebreak
 \section{Conclusiones}
@@ -775,10 +872,10 @@ La implementaci\'on\ref{App:AppendixD} en Python se puede encontrar en GitHub gr
 \section{Herramientas utilizadas}
 
 \begin{enumerate}
-	\item Weka
-	\item IPython Notebook
-	\item R
-	\item \texttt{scikit-learn}
+	\item \textbf{Weka} (Waikato Environment for Knowledge Analysis, en espa\~nol «entorno para an\'alisis del conocimiento de la Universidad de Waikato») es una plataforma de software para el aprendizaje autom\'atico y la miner\'ia de datos escrito en Java y desarrollado en la Universidad de Waikato. Weka es software libre distribuido bajo la licencia GNU-GPL.\ref{weka}
+	\item Implementaci\'on de Canopy \\ \url{https://gist.github.com/gdbassett/528d816d035f2deaaca1}
+
+	\item Implementaci\'on de DBSCAN en Python \\ \url{https://github.com/SushantKafle/DBSCAN}
 
 
 \end{enumerate}
@@ -1027,6 +1124,8 @@ Clustered Instances
 \bibitem{canopyGitHub} \label{canopyGitHub} \textsc{Canopy Implementation in Python} \\ \url{https://gist.github.com/gdbassett/528d816d035f2deaaca1}
 
 \bibitem{dbscanPython} \label{dbscanPython} \textsc{DBSCAN Implementation in Python} \\ \url{https://github.com/SushantKafle/DBSCAN}
+
+\bibitem{weka} \label{weka} \textsc{Weka} \\ 	\url{http://www.cs.waikato.ac.nz/ml/weka/}
 \end{thebibliography}
 
 
