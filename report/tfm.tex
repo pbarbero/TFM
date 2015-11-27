@@ -13,8 +13,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
 \documentclass[a4paper, 12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{listings}
 \usepackage{algpseudocode}
 \usepackage{algorithm}
@@ -24,11 +25,18 @@
 \usepackage{graphicx}
 \usepackage{multicol}
 \usepackage{glossaries}
+\usepackage{float}
+\usepackage[dvipsnames]{xcolor}
 \graphicspath{ {images/} }
 
+\hypersetup{
+     colorlinks   = true,
+     linkcolor    = RoyalPurple,
+     citecolor    = red,
+     urlcolor     = blue,
+}
 
-
-\newcommand*{\plogo}{\includegraphics[scale=.3]{unizar.png}} 
+\newcommand*{\plogo}{\includegraphics[scale=.45]{unizar.png}} 
 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
@@ -41,14 +49,15 @@
 \rule{\textwidth}{1.6pt}\vspace*{-\baselineskip}\vspace*{2pt} % Thick horizontal line
 \rule{\textwidth}{0.4pt}\\[\baselineskip] % Thin horizontal line
 
-{\LARGE M\'aster en Modelizaci\'on e Investigaci\'on  \\[0.3\baselineskip] Matem\'atica, Estad\'istica y Computaci\'on}\\[0.2\baselineskip] % Title
+{\LARGE Identificaci\'on de patrones \\[0.1\baselineskip] y algoritmos  de consolidaci\'on  \\[0.3\baselineskip] en bases de datos de posicionamiento}\\[0.2\baselineskip] % Title
 
 \rule{\textwidth}{0.4pt}\vspace*{-\baselineskip}\vspace{3.2pt} % Thin horizontal line
 \rule{\textwidth}{1.6pt}\\[\baselineskip] % Thick horizontal line
 
 \scshape % Small caps
 Trabajo Fin de M\'aster \\ % Tagline(s) or further description
-Identificaci\'on de patrones y algoritmos de consolidaci\'on en bases de datos de posicionamiento\\[\baselineskip] % Tagline(s) or further description
+%Identificaci\'on de patrones y algoritmos de consolidaci\'on en bases de datos de posicionamiento\\[\baselineskip] %
+M\'aster en Modelizaci\'on e Investigaci\'on Matem\'atica, Estad\'istica y Computaci\'on\\[\baselineskip] % Tagline(s) or further description
 {\Large Pilar Barbero Iriarte\par} 
 
 \vspace*{2\baselineskip} % Whitespace between location/year and editors
@@ -119,18 +128,17 @@ columns=fullflexible,
 \newcommand\pythoninline[1]{{\pythonstyle\lstinline!#1!}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+\renewcommand{\contentsname}{Bibliograf\'ia}
+\renewcommand{\refname}{Bibliograf\'ia}
 
 \begin{document}
 
 
-\pagestyle{empty} % Removes page numbers
 
 \titleGP % This command includes the title page
+\pagestyle{empty} % Removes page numbers
 
-\mbox{}
-\thispagestyle{empty}
-\newpage
+\newpage\null\thispagestyle{empty}\newpage
 
 \tableofcontents
 
@@ -138,17 +146,26 @@ columns=fullflexible,
 \pagebreak
 
 
-\section{Planteamiento del problema}
+\section{Introducci\'on}
 
 Hoy en d\'ia, muchos dispositivos cuentan con un sistema de geolocalizaci\'on GPS que nos permite conocer la localizaci\'on de un sujeto en tiempo real. Con el fin de obtener la mayor informaci\'on posible en todo momento, estas posiciones recogidas se guardan en una base de datos que puede ser temporal o permanente. En el caso de ser permanente, nos encontraremos con el problema de que la base de datos puede crecer hasta un l\'imite desmesurado en el que dispositivo que recoge y almacena esta informaci\'on llene su memoria, impidiendo almacenar posiciones nuevas. \\
 
 En este momento, es necesario tomar la decisi\'on de borrar parte de las posiciones almacenadas, seg\'un alg\'un criterio. La dificultad en este momento es elegir el criterio con el cual eliminaremos este exceso de datos, por ejemplo, borrando posiciones repetidas o posiciones que no aporten la suficiente eficiencia en relaci\'on al espacio que ocupan en memoria. Esto introduce el concepto de funci\'on de consolidaci\'on o compactaci\'on, es decir una funci\'on que elimine un exceso de datos permiti\'endonos conservar el m\'aximo de informaci\'on posible. \\
 
-Contamos con datos proporcionados por una empresa de telecomunicaciones de sede en Zaragoza obtenidas de una base central. Esta base recibe peri\'odicamente posiciones GPS de distintos sujetos, que inserta en una base de datos centralizada. \'Estas posiciones son tomadas por la terminal de cada operativo, almacenadas localmente en esta terminal de manera temporal y enviadas a la central en el momento de conectividad con \'esta. \\
+Contamos con datos proporcionados por una empresa de telecomunicaciones de sede en Zaragoza obtenidas de una base central. Se observa que esta empresa provee un servicio a sus clientes que permite que peri\'odicamente se reciban posiciones de unos sujetods portadores de una terminal que transmita su posici\'on GPS. Esta posici\'on se inserta en una base de datos centralizada. Dichas posiciones son tomadas por la terminal de cada operativo, almacenadas localmente en esta terminal de manera temporal y enviadas a la central en el momento de conectividad con \'esta. \\
 
-Nos planteamos que tanto la terminal personal que lleva cada sujeto como la base centralizada pueden llegar a l\'imite no deseado, provocando que este se sature e impida la insercci\'on de nuevos datos. Con el fin de impedir esto, se va a realizar un estudio de distintas t\'ecnicas de \textit{consolidaci\'on}\ref{} con el fin de almacenar el m\'inimo de datos pero con la m\'axima informaci\'on posible. \\
+Se observa un problema de almacenamiento de datos. Estos datos, cada vez m\'as numerosos, empiezan a poblar la base de datos de una manera err\'atica, es decir, un sujeto puede permanecer mucho tiempo en un sitio y seguir transmitiendo una posici\'on constante a base. Nos lleva a plantearnos la siguiente pregunta, ¿es \'esto necesario?. ¿No ser\'ia m\'as eficiente almacenar s\'olo una muestra de \'esta? Al fin y al cabo, el objetivo del almacenamieno de estas posiciones es el ser posicionadas en un mapa, por lo que no necesitamos varias instancias de una misma. \\
 
-Este trabajo realiza una comparaci\'on entre diferentes t\'ecnicas de \textit{clustering} y algoritmos dise\~nados propios con el fin de encontrar un m\'etodo eficiente que evite el problema anteriormente explicado. 
+Surge el concepto de \textit{consolidaci\'on}. Este concepto nos lleva a que si un sujeto se ha movido muy poco o nada en una zona del espacio, sea posible eliminar de nuestra base de datos estas posiciones, qued\'andonos con una central. A este proceso lo llamaremos consolidaci\'on y deberemos averiguar, dados los datos suministrados, las variables que nos son \'utiles a la hora de realizar este estudio.
+
+Nos planteamos que tanto la terminal personal que lleva cada sujeto como la base centralizada pueden llegar a l\'imite no deseado, provocando que este se sature e impida la inserci\'on de nuevos datos. Con el fin de impedir esto, se va a realizar un estudio de distintas t\'ecnicas de \textit{consolidaci\'on} con el fin de almacenar el m\'inimo de datos pero con la m\'axima informaci\'on posible. \\
+
+Este trabajo realiza una comparaci\'on entre diferentes t\'ecnicas de \textit{clustering} y algoritmos dise\~nados propios con el fin de encontrar un m\'etodo eficiente que evite el problema anteriormente explicado. \\
+
+El c\'odigo est\'a disponible para bajarse y utilizarse bajo una licencia GNU GPL en,\\
+
+\href{http://pbarbero.github.io/TFM/}{http://pbarbero.github.io/TFM/}
+
 
 \pagebreak
 
@@ -156,7 +173,7 @@ Este trabajo realiza una comparaci\'on entre diferentes t\'ecnicas de \textit{cl
 
 Se nos suministran dos bases de datos correspondientes a dos ciudades brasile\~nas distintas, \textbf{Salvador de Bah\'ia} y \textbf{R\'io de Janeiro}. En cada de una de ellas encontramos posiciones de distintos sujetos estudiados identificados a trav\'es de un c\'odigo. Cada base de datos contiene una tabla llamada \textit{posicionesgps} en la que encontramos un registro por cada posici\'on tomada por cada sujeto entre los d\'ias 2015-02-17 08:00:05 y 2015-03-04 08:18:05. \\
 
-La estructura de los registros es la siguiente:\\
+La estructura de los registros es la siguiente:
 
 \begin{center}
 	\begin{tabular}{| l | l  |}
@@ -181,15 +198,17 @@ La estructura de los registros es la siguiente:\\
 
 \smallskip
 
-En base de datos, el tipo de datos guardado es:
+En base de datos, el tipo de datos guardado es:\\
 
-\begin{lstlisting}[language=bash, basicstyle=\small, columns=fullflexible]
-mysql> explain posicionesgps;
+\begin{lstlisting}[language=sql, basicstyle=\small, columns=fullflexible, frame=tbrl]
+mysql> EXPLAIN posicionesgps;
 \end{lstlisting}
 
 
 \begin{center}
+	
 	\begin{tabular}{|l|l|l|l|l|}
+	\hline
 	\rowcolor{LightCyan}
 	\hline
 	Field & Type & Null & Key & Default \\
@@ -204,7 +223,7 @@ mysql> explain posicionesgps;
 	cobertura & tinyint(10) unsigned & YES  & & NULL \\
 	error & tinyint(10) unsigned  & YES & & NULL  \\
 	antigua & tinyint(10) unsigned & YES  & & 0  \\
-	fecha\_timestamp & timestamp & NO & MUL & CURRENT\_TIMESTAMP \\
+	fecha & timestamp & NO & MUL & CURRENT\_TIMESTAMP \\
 	autom\'atico & tiniyint(10) unsigned & NO & MUL & 0  \\
 	\hline
 	\end{tabular}
@@ -213,49 +232,37 @@ mysql> explain posicionesgps;
 \smallskip
 
 
-Para este estudio se ha trabajado s\'olo con los siguientes datos,\\
-
-\begin{enumerate}
-\item Id
-\item Recurso
-\item Latitud
-\item Longitud
-\item Velocidad
-\item Fecha
-\end{enumerate}
-
-
 \pagebreak
 \subsection{An\'alisis de los datos}
 
-Vamos a utilizar R con el IDE Rstudio para realizar un an\'alisis previo de los datos recibidos. Para ellos necesitamos de algunas librer\'ias a la hora de conectarnos a la base de datos importada,\\
+Vamos a utilizar \textbf{R} con el IDE \textit{Rstudio} para realizar un an\'alisis previo de los datos recibidos. Para ellos necesitamos de algunas librer\'ias a la hora de conectarnos a la base de datos importada,\\
 
-\begin{lstlisting}[language=R, columns=fullflexible, basicstyle=\small]
+\begin{lstlisting}[language=R, columns=fullflexible, basicstyle=\small, frame=tblr]
 devtools::install_github("rstats-db/RMySQL")
 devtools::install_github("rstats-db/DBI")
 library(RMySQL)
 library(DBI)
 \end{lstlisting}
 
-Importamos los datos haciendo un \textit{select} de todas las columnas de nuestra base de datos. Cada base de datos se nos ha proporcionado cuenta con una tabla llamada \textit{posicionesgps},\\
+Importamos los datos haciendo una consulta sobre cada base de datos. Cada base de datos que se nos ha proporcionado cuenta con una tabla llamada \textit{posicionesgps},\\
 
-\begin{lstlisting}[language=R, columns=fullflexible, basicstyle=\small]
+\begin{lstlisting}[language=R, columns=fullflexible, basicstyle=\small,frame=tbrl, showstringspaces=false]
 conSalvador <- dbConnect(RMySQL::MySQL()
-					   , group = "posiciones"
-					   , user="root"
-					   , password="****"
-					   , dbname="posicionesSalvador")
+	, group = "posiciones"
+	, user="root"
+	, password="****"
+	, dbname="posicionesSalvador")
 
 dataquery=dbSendQuery(conSalvador
-					, "SELECT id, recurso, latitud, longitud, velocidad, orientacion, error, antigua, fecha 
-					   FROM posicionesgps")
+	, "SELECT latitud, longitud, velocidad, orientacion, fecha 
+		FROM posicionesgps")
 
 dataSalvador = fetch(dataquery, n=-1)
 \end{lstlisting}
 
 Analicemos las columnas que m\'as nos interesan, es decir, la latitud, longitud, la velocidad, la orientaci\'on y la fecha, \\
 
-\begin{lstlisting}[language=R, basicstyle=\small, columns=fullflexible]
+\begin{lstlisting}[language=R, basicstyle=\small, columns=fullflexible, frame=tbrl, showstringspaces=false]
 library(xtable)
 valuesRio <- data.frame(x=dataRio)
 xtable(summary(valuesRio))
@@ -295,9 +302,9 @@ xtable(summary(valuesRio))
 \begin{minipage}[t]{.3\textwidth}
 \begin{tabular}{rl}
   \hline
- &       velocidad \\ 
+ 	& velocidad \\ 
   \hline
-1 & Min.   :  0.000   \\ 
+  1 & Min.   :  0.000   \\ 
   2 & 1st Qu.:  0.000   \\ 
   3 & Median :  0.000   \\ 
   4 & Mean   :  3.751   \\ 
@@ -354,7 +361,7 @@ En nuestra base de datos llamada \textbf{R\'io de Janeiro} contamos con \textbf{
 
 El tama\~no en disco de nuestras bases de datos es,
 
-\begin{lstlisting}[language=sql, basicstyle=\small, columns=fullflexible]
+\begin{lstlisting}[language=sql, basicstyle=\small, columns=fullflexible, frame=tbrl, showstringspaces=false]
 mysql> SELECT table_schema as `Database`, 
 	   table_name AS `Table`,  
 	   round(((data_length + index_length) / 1024 / 1024), 2) 
@@ -391,7 +398,7 @@ Los datos han sido recogidos entre las fechas 2015-02-17 08:00:05 y 2015-03-04 0
 
 Tenemos 5014 distintos tipos de sujetos a estudiar en la base de datos de r\'io:
 
-\begin{lstlisting}
+\begin{lstlisting}[language=sql, columns=fullflexible, basicstyle=\small, frame=tbrl, showstringspaces=false]
 mysql> USE rio;
 mysql> SELECT COUNT(distinct(recurso)) 
 	   FROM posicionesgps;
@@ -408,8 +415,7 @@ mysql> SELECT COUNT(distinct(recurso))
  \end{tabular}
 \end{center}
 
-
-Lo que nos da una frecuencia de toma de :
+Lo que nos da una frecuencia de toma de:
 
 $$ \frac{6928467}{5014 \cdot 360} = 3.83$$ posiciones a la hora.
 
@@ -419,7 +425,7 @@ Si aument\'aramos esta frecuencia a una posici\'on cada 30 segundos, conseguri\r
 
 La estructura de los datos es implementable en diversos lenguajes, pero se elige Python por su simplicidad y ya que es el lenguaje cient\'ifico m\'as usado hoy en d\'ia.
 
-Se define la clase \texttt{Posici\'on} de la siguiente manera,
+Se define la clase \texttt{Position} de la siguiente manera,
 
 \begin{python}
 class Position:
@@ -452,7 +458,7 @@ Con el fin de realizar los algoritmos de consolidaci\'on, hemos realizado un est
 
 Utilizando la distancia eucl\'idea, definimos un vecindario como aquel conjunto de puntos que se  encuentran a una distancia eucl\'idea menor que $\epsilon$ con respecto su centro $p_0$, es decir,
 
-$$ d_E(p_0, p) = \sqrt{lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \epsilon $$
+$$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \epsilon $$
 
 donde $p$ es un punto con latitud $lat_{p}$ y longitud $long_{p}$.
 
@@ -468,7 +474,7 @@ Su implementaci\'on en Python es la siguiente,
 
 En el momento que se toma la posici\'on $p_0$, aparte de la latidud y su longitud, se toma la velocidad instant\'anea del sujeto. Podemos considerar en este caso que, dado que nuestro sujeto se  encuentra a mayor velocidad, puntos m\'as alejados de lo que considerar\'iamos en el primer caso (fuera de nuestro vecindario simple), podr\'ian estar dentro de nuestro nuevo radio, que depender\'ia de la velocidad instant\'anea. As\'i, definimos nuestro nuevo vecindario:
 
-$$ d_E(p_0, p) = \sqrt{lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \epsilon \cdot vel_{p_0} $$
+$$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \epsilon \cdot vel_{p_0} $$
 
 donde $vel_{p_0}$ es la velocidad instant\'anea de nuestro punto centro.
 
@@ -497,14 +503,14 @@ Su implementaci\'on en Python es la siguiente,
 
 \subsection{Vecindad t0-alcanzable}
 
-Si fijamos un intervalo de tiempo $t_0$, podemos definir una vecindad $t_0$-alcanzable como aquellos puntos que nuestro sujeto puede alcanzar en un tiempo $t_0$. Un sujeto que se desplace a velocidad reducida, tendr\'a una vecindad $t_0$-alcanzable m\'as reducido  que otro que se desplace a una velo$vel_{p_0}\cdot t_0$. 
+Si fijamos un intervalo de tiempo $t_0$, podemos definir una vecindad $t_0$-alcanzable como aquellos puntos que nuestro sujeto puede alcanzar en un tiempo $t_0$. Un sujeto que se desplace a velocidad reducida, tendr\'a una vecindad $t_0$-alcanzable m\'as reducido  que otro que se desplace a una velo$vel_{p_0}\cdot t_0$.  \\
 
-$$ d_E(p_0, p) = \sqrt{lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < vel_{p_0} \cdot t_0 $$
+$$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < vel_{p_0} \cdot t_0 $$
 
-\'Este es un caso concreto del vecindario involucrando la velocidad. 
+\'Este es un caso concreto del vecindario involucrando la velocidad. \\
 
 
-Su implementaci\'on en Python es la siguiente,
+Su implementaci\'on en Python es la siguiente,\\
 
 \begin{python}
         def is_in_neighborhoodT0Reachable(self, q, t0):
@@ -513,7 +519,7 @@ Su implementaci\'on en Python es la siguiente,
 
 \subsection{Vecindario involucrando el tiempo}
 
-Las posiciones de nuestros sujetos vienen muestreadas adem\'as con el instante en el que fueron tomadas. Podemos considerar que el tiempo entre tomas tambi\'en es una distancia y definir un vecindario. Definimos esta distancia temporal como la resta de ambos instantes, y el vecindario como:
+Las posiciones de nuestros sujetos vienen muestreadas adem\'as con el instante en el que fueron tomadas. Podemos considerar que el tiempo entre tomas tambi\'en es una distancia y definir un vecindario. Definimos esta distancia temporal como la resta de ambos instantes, y el vecindario como: \\
 
 $$ d_T(p_0, p) = time_p - time_{p_0} < \delta $$
 
@@ -526,7 +532,7 @@ $$ d_T(p_0, p) = time_p - time_{p_0} < \delta $$
 
 
 \pagebreak
-\subsection{Preprocesado de datos}
+\section{Preprocesado de datos}
 Antes de empezar a realizar un algoritmo que nos realice una consolidaci\'on de los datos, es conveniente realizar un preprocesado de \'estos. \\
 
 Un primer procesado consistir\'ia en la eliminaci\'on de todos aquellos registros que tienen como latitud y longitud $0$ ya que son datos tomados por error que lo \'unico que har\'ian ser\'ia conseguir un cl\'uster centrado en $(latitud = 0, longitud = 0)$ \\
@@ -534,21 +540,43 @@ Un primer procesado consistir\'ia en la eliminaci\'on de todos aquellos registro
 Vamos a fijar una cantidad m\'inima de distancia, un $\varepsilon_0$, y compararemos una posici\'on con la \'ultima le\'ida para decidir si la insertamos en base de datos o no. Si la distancia del nuevo muestreo con la \'ultima es menor que este $\varepsilon_0$ fijado, desecharemos esta nueva posici\'on. Esto permite que m\'as adelante nuestro algoritmo de consolidaci\'on sea mucho m\'as r\'apido. \\
 
 
+\subsection{Canopy}\label{sec:canopy}
+
+El algoritmo de clustering de \textbf{Canopy} se usa generalmente como un preprocesado de los datos para posteriormente aplicar un clustering de tipo \textbf{K-means} o alguna t\'ecnica de agrupamiento jerarquizado\\
+
+La idea se basa en el uso de una medida de distancia aproximada para dividir el conjunto de los datos en subconjuntos que se superponen. A estos subconjuntos los llamaremos \textit{canopies}. Un \textit{canopy} es un subconjunto de puntos que yacen bajo el vecindario de un punto central. Un punto puede pertenecer a varias \textit{canopies} distintas. Los \textit{canopies} son creados con la intenci\'on de que si dos puntos no pertenecen a un \textit{canopy} en com\'un, est\'an bastante lejos de pertenecer a un mismo cl\'uster. \\
+
+Debido a que \textbf{Canopy} no es m\'as que un preprocesado de los datos, se fija una distancia sencilla con el fin de reducir dr\'asticamente el n\'umero de puntos y posteriormente aplicar una t\'ecnica mejor. En nuestro caso, utilizaremos la distancia eucl\'idea como distancia para realizar este proceso. \\
+
+Dada una distancia eucl\'idea, se crean los \textit{canopies} como sigue,\\
+
+\begin{enumerate}
+	\item Sea $S$ nuestro conjunto de puntos.
+	\item Se fijan dos umbrales para $T_1, T_2$ tal que $T_1 > T_2$. 
+	\item Se toma un punto $p\in S$, \'este ser\'a nuestro primer \textit{canopy}.
+	\item Se colocan todos los puntos $q\in S\setminus{p}$ tal que $d_E(p, q) < T_1$ en el mismo \textit{canopy}. 
+	\item Se eliminan del conjunto inicial $S$ aquellos puntos que est\'en dentro del umbral de distancia $T_2$.
+	\item Se repite hasta que el conjunto inicial est\'e vac\'io.
+\end{enumerate}
+
+La implementaci\'on en Python se puede encontrar en el ap\'endice \ref{App:AppendixD}.\\
+
 \pagebreak
 \section{Algoritmos de consolidaci\'on simples}
 
 Utilizando las nociones de vecindario definidas en la secci\'on anterior, nos planteamos la idea de definir unos algoritmos de consolidaci\'on simples con el fin de mantener la base de datos en un tama\~no m\'as o menos estable. \\
 
-Una primera aproximaci\'on ser\'ia una creaci\'on de un trigger o un peque\~no programa en el momento de insercci\'on en base de datos que comparara la \'ultima posici\'on recibida para ese sujeto con la nueva a insertar. Se comparar\'ia la distancia entre \'estas con una distancia eucl\'idea simple, y si \'esta estuviera bajo el l\'imite permitido (es decir, muy pr\'oxima), se obviar\'ia. \\
+Una primera aproximaci\'on ser\'ia una creaci\'on de un trigger o un peque\~no programa en el momento de inserci\'on en base de datos que comparara la \'ultima posici\'on recibida para ese sujeto con la nueva a insertar. Se comparar\'ia la distancia entre \'estas con una distancia eucl\'idea simple, y si \'esta estuviera bajo el l\'imite permitido (es decir, muy pr\'oxima), se obviar\'ia. \\
 
 Una segunda aproximaci\'on ser\'a definir una tarea programada \texttt{cron} (ya que nuestros dispositivos est\'an basados en una distribuci\'on de Linux) que cada cierto tiempo ejecutara una consolidaci\'on sobre estos. \\
 
 Estas consolidaciones menos avanzadas se realizar\'an sobre posiciones antiguas, es decir, seg\'un el tama\~no de la base de datos y el nivel cr\'itico al que puede llegar a estar, mandaremos un cierto n\'umero de posiciones a realizar la consolidaci\'on. \\
 
+\pagebreak
+
 \subsection{Consolidaci\'on por distancia}
 
 Utilizando los tres tipos de vecindarios que hemos definido, definimos el siguiente m\'etodo que realizar\'a la consolidaci\'on del tipo que le indiquemos, \\
-
 
 \pagebreak
 
@@ -558,23 +586,23 @@ Utilizando los tres tipos de vecindarios que hemos definido, definimos el siguie
 \For{\textbf{each} pos \textbf{in} positions}
     \If{$typeOfDistance == 'distanceEUSimple'$}
         \If{$pos.IsInNeighBorhood(next(pos), eps)$}
-        	\State{Remove position in DB}
+        		\State{Remove position in DB}
         \Else
-        	\State{Maintain position in DB}
+        		\State{Maintain position in DB}
         \EndIf
     \EndIf
     \If{$typeOfDistance == 'Distance EU relative to speed'$}
-        \If{$pos.IsInNeighBorhoodForEURelativeSpeed(next(pos), eps)$}
-        	\State{Remove position in DB}
+        \If{$pos.IsInNeighBorhoodRelativeSpeed(next(pos), eps)$}
+        		\State{Remove position in DB}
         \Else
-        	\State{Maintain position in DB}
+        		\State{Maintain position in DB}
         \EndIf
     \EndIf
     \If{$typeOfDistance == 't0 reachable'$}
-        \If{$pos.IsInNeighBorhoodForT0Reachablee(next(pos), t0)$}
-        	\State{Remove position in DB}
+        \If{$pos.IsInNeighBorhoodT0Reachablee(next(pos), t0)$}
+        		\State{Remove position in DB}
         \Else
-        	\State{Maintain position in DB}
+        		\State{Maintain position in DB}
         \EndIf
     \EndIf
 \EndFor
@@ -584,13 +612,13 @@ Utilizando los tres tipos de vecindarios que hemos definido, definimos el siguie
 \end{algorithm}
 
 
-\subsection{Consolidaci\'on cada cierto n\'umero de posiciones}
+\subsection{Consolidaci\'on por adelgazamiento}
 
 Se puede dar el caso que la consolidaci\'on por distancia no sea lo suficientemente eficaz y no de los resultados necesarios de liberaci\'on de espacio, ya que las posiciones est\'en muy lejos entre s\'i. Como \'ulima opci\'on, se puede recurrir a un tipo de consolidaci\'on en la cual dada una lista de posiciones normalmente antiguas, se elimine un subconjunto de estas, por ejemplo, 3 de cada 5. As\'i asegurar\'iamos una p\'erdida m\'inima de informaci\'on. \\
 
-\begin{algorithm}[h]\label{consolidationByEachSomeNumber}
+\begin{algorithm}[H]\label{consolidationByEachSomeNumber}
 \begin{algorithmic}[1]
-\Function{ConsolidationByEachJinK}{$positions, j, k$}\Comment{$j < k$}
+\Function{ConsolidationByThinning}{$positions, j, k$}\Comment{$j < k$}
 	\For{\textbf{each} pos in positions}
 		\If{$position.Index \% k == 0$}
 			\For{$i = 0; i < k; i++$}
@@ -600,14 +628,45 @@ Se puede dar el caso que la consolidaci\'on por distancia no sea lo suficienteme
 	\EndFor
 \EndFunction
 \end{algorithmic}
-\caption{\label{alg:consolidationByEach} Algoritmo de consolidaci\'on cada cierto n\'umero}
+\caption{\label{alg:consolidationByEach} Algoritmo de consolidaci\'on por adelgazamiento}
 \end{algorithm}
+
+Una sencilla implementaci\'on en Python se encuentra en el ap\'endice \ref{App:AppendixB}.\\
+
+\subsection{Consolidaci\'on por tiempo}
+
+Es posible que la toma de posiciones se tome de manera muy pr\'oxima en el tiempo, o simplemente que sea necesaria hacer una consolidaci\'on m\'as dr\'astica de las posiciones y se tome la decisi\'on de reducir de un modo m\'as severo la base de datos. Otra opci\'on a la reducci\'on por adelgazamiento ser\'ia una consolidaci\'on por tiempo. Se fija un lapso de tiempo que se debe cumplir entre posici\'on y posici\'on, y se eliminan todas aquellas que est\'en cuya distancia temporal con su siguiente est\'e por debajo de este lapso fijado.
+
+
+\begin{algorithm}[H]\label{consolidationByTime}
+\begin{algorithmic}[1]
+\Function{ConsolidationByTime}{$positions, lapse$}
+	\For{\textbf{each} pos in positions}
+		\State{$nextpos = pos++$}
+		\If{$IsInNeighboorhodByTime(nextpos, pos, lapse)$}
+			\State{Remove pos}
+		\EndIf
+	\EndFor
+\EndFunction
+\State{}
+\Function{IsInNeighboorhodByTime}{pos1, pos2, lapse}
+	\If{$|pos1.time - pos2.time| < lapse$}
+		\State{Return true}
+	\Else
+		\State{Return false}
+	\EndIf
+\EndFunction
+\end{algorithmic}
+\caption{\label{alg:consolidationByEach} Algoritmo de consolidaci\'on por tiempo}
+\end{algorithm}
+
+Una implementaci\'on en Python se puede encontrar en el ap\'endice \ref{App:AppendixF}.\\
 
 
 \pagebreak
 \section{Algoritmos de consolidaci\'on asociados a m\'etodos de clustering}
 
-
+Un an\'alisis cluster es un conjunto de t\'ecnicas multivariantes utilizadas para clasificar a un conjunto de individuos en grupos homog\'eneos. En nuestro problema, \'esto nos va a resultar muy \'util a la hora de encontrar ciertos patrones, o ciertos cl\'usters que nos agrupar\'an nuestros en datos en subconjuntos de \'estos, con el fin de identificar \'ese subconjunto con su centro y poder eliminar el resto de puntos. \\
 
 En la secci\'on \ref{sec:positionClass} hemos definido una implementaci\'on en Python para el concepto de posici\'on. Si queremos utilizar m\'etodos de cl\'ustering m\'as avanzados, se ha de definir el concepto de \textit{cl\'uster}. \\
 
@@ -625,7 +684,6 @@ class Cluster:
 \end{python}
 
 
-\pagebreak
 \subsection{K-means}
 
 \textbf{K-means} es un m\'etodo eficiente de \textit{clustering} que tiene como objetivo la partici\'on de un conjunto de $n$ elementos en $k$ grupos distintos. Dado un cojunto de datos $(x_1, x_2, \ldots , x_n)$, $K-$means construye una partici\'on de las observaciones en $k$ conjuntos con $k\leq n$, $S=\{S_1, S_2, \ldots, S_k\}$ con el fin de minimizar el t\'ermino de error que es la suma de las distancias al cuadrado de cada punto al centro de su cl\'uster, es decir,
@@ -645,83 +703,82 @@ En segundo caso, no hay distintos ente puntos considerados "ruido", ya que todos
 
 Adem\'as, $K-$means es un algoritmo no determin\'istico, debido a la primera fase de asignaci\'on de centros de cl\'usters de manera aleatoria, por lo que no ser\'ia muy fiable.
 
-\subsubsection{Estudio con Weka}
-
-El conjunto de nuestros datos cuenta con datos de $1917$ sujetos diferentes, de los cuales vamos a filtrar aquellas posiciones con informaci\'on relevante, es decir, cuya latitud y longitud no sea nula (es nula porque no se recibe bien la posici\'on). Para ello, ejecutamos la siguiente consulta con el fin de quedarnos con los 5 recursos con datos m\'as representativos.
-
-\begin{lstlisting}[language=sql, basicstyle=\small, columns=fullflexible]
-mysql> SELECT recurso, count(id)
-           FROM posicionesgps
-           WHERE latitud <> 0 and longitud <> 0
-           GROUP BY recurso ORDER BY 2 DESC 
-           LIMIT 5;
-
-\end{lstlisting}
-
-
-\begin{figure}[!htbp]
-	\begin{center}
-		\begin{tabular}{|l | l |}
-			\hline
-		\rowcolor{LightCyan}
-		   \hline
-           recurso & count(id) \\
-           \hline
-           tetra:12082781 & 39839 \\
-           tetra:12082364 & 35858 \\
-           tetra:12086044 & 27532 \\
-           tetra:12082579 & 17574 \\
-		   tetra:12082434 & 15257 \\		
-		   \hline
-		\end{tabular}
-	\caption{Cinco primeros sujetos con m\'as datos sin posiciones err\'oneas}
-	\end{center}
-\end{figure}
-
-
-Vamos a realizar un clustering de \textbf{K-means} utilizando Weka sobre el primer sujeto tetra:12082781, importamos la latitud, longitud y fecha en Weka con la siguiente consulta,
-
-\begin{lstlisting}[language=sql, basicstyle=\small, columns=fullflexible]
-mysql > SELECT latitud, longitud, UNIX_TIMESTAMP(fecha) 
-		FROM posicionesgps
-		WHERE latitud <> 0 and longitud <> 0 
-		AND recurso="tetra:12082781";
-\end{lstlisting}
-
-Una primera previsualizaci\'on de la longitud y la latitud de los datos ser\'ia la siguiente,\\
-
-\begin{figure}[!htbp]
-	\begin{center}
-	\includegraphics[scale=.5]{wekaImportData.png}
-	\end{center}
-	\caption{Datos asociados al recurso tetra:12082781}
-\end{figure}
-
-Contamos con \textbf{39839} datos para realizar un \textbf{K-means}. El problema de este algoritmo es que hay que especificar el n\'umero de cl\'usters desde un principio, aparte de que los primeros puntos centrales de los cl\'usters se eligen de manera aleatoria. Vamos a realizar una aproximaci\'on de que queremos reducir nuestra base de datos a un $20\%$ por lo que fijaremos unos $8000$ cl\'usters. 
-
-
-\begin{figure}[!htbp]
-	\begin{center}
-	\includegraphics[scale=.5]{wekaKMeansParameters.png}
-	\end{center}
-	\caption{Par\'ametros utilizados a la hora de realizar un K-means}
-\end{figure}
-
-La ejecuci\'on del algoritmo nos devuelve una salida de 8000 cl\'usters, indicando cuantos puntos contiene cada uno y el centro de cada uno de \'estos \ref{App:AppendixE}.
-
-Una mejor visualizaci\'on de los resultados se puede ver aqu\'i, aunque lamentablemente s\'olo respecto a una dimensi\'on (latitud o longitud), en la que podemos obsevar como ha funcionado la asignaci\'on de cada posici\'on a su cl\'uster correspondiente,
-
-\begin{figure}[!htbp]
-	\begin{center}
-	\includegraphics[scale=.4]{wekaKMeansResults.png}
-	\end{center}
-	\caption{Resultados del algoritmo \textbf{K-means}}
-\end{figure}
+%\subsubsection{Estudio con Weka}
+%
+%El conjunto de nuestros datos cuenta con datos de $1917$ sujetos diferentes, de los cuales vamos a filtrar aquellas posiciones con informaci\'on relevante, es decir, cuya latitud y longitud no sea nula (es nula porque no se recibe bien la posici\'on). Para ello, ejecutamos la siguiente consulta con el fin de quedarnos con los 5 recursos con datos m\'as representativos.
+%
+%\begin{lstlisting}[language=sql, basicstyle=\small, columns=fullflexible]
+%mysql> SELECT recurso, count(id)
+%           FROM posicionesgps
+%           WHERE latitud <> 0 and longitud <> 0
+%           GROUP BY recurso ORDER BY 2 DESC 
+%           LIMIT 5;
+%
+%\end{lstlisting}
+%
+%
+%\begin{figure}[!htbp]
+%	\begin{center}
+%		\begin{tabular}{|l | l |}
+%			\hline
+%		\rowcolor{LightCyan}
+%		   \hline
+%           recurso & count(id) \\
+%           \hline
+%           tetra:12082781 & 39839 \\
+%           tetra:12082364 & 35858 \\
+%           tetra:12086044 & 27532 \\
+%           tetra:12082579 & 17574 \\
+%		   tetra:12082434 & 15257 \\		
+%		   \hline
+%		\end{tabular}
+%	\caption{Cinco primeros sujetos con m\'as datos sin posiciones err\'oneas}
+%	\end{center}
+%\end{figure}
+%
+%
+%Vamos a realizar un clustering de \textbf{K-means} utilizando Weka sobre el primer sujeto tetra:12082781, importamos la latitud, longitud y fecha en Weka con la siguiente consulta,
+%
+%\begin{lstlisting}[language=sql, basicstyle=\small, columns=fullflexible]
+%mysql > SELECT latitud, longitud, UNIX_TIMESTAMP(fecha) 
+%		FROM posicionesgps
+%		WHERE latitud <> 0 and longitud <> 0 
+%		AND recurso="tetra:12082781";
+%\end{lstlisting}
+%
+%Una primera previsualizaci\'on de la longitud y la latitud de los datos ser\'ia la siguiente,\\
+%
+%\begin{figure}[!htbp]
+%	\begin{center}
+%	\includegraphics[scale=.5]{wekaImportData.png}
+%	\end{center}
+%	\caption{Datos asociados al recurso tetra:12082781}
+%\end{figure}
+%
+%Contamos con \textbf{39839} datos para realizar un \textbf{K-means}. El problema de este algoritmo es que hay que especificar el n\'umero de cl\'usters desde un principio, aparte de que los primeros puntos centrales de los cl\'usters se eligen de manera aleatoria. Vamos a realizar una aproximaci\'on de que queremos reducir nuestra base de datos a un $20\%$ por lo que fijaremos unos $8000$ cl\'usters. 
+%
+%
+%\begin{figure}[!htbp]
+%	\begin{center}
+%	\includegraphics[scale=.5]{wekaKMeansParameters.png}
+%	\end{center}
+%	\caption{Par\'ametros utilizados a la hora de realizar un K-means}
+%\end{figure}
+%
+%La ejecuci\'on del algoritmo nos devuelve una salida de 8000 cl\'usters, indicando cuantos puntos contiene cada uno y el centro de cada uno de \'estos \ref{App:AppendixE}.
+%
+%Una mejor visualizaci\'on de los resultados se puede ver aqu\'i, aunque lamentablemente s\'olo respecto a una dimensi\'on (latitud o longitud), en la que podemos obsevar como ha funcionado la asignaci\'on de cada posici\'on a su cl\'uster correspondiente,
+%
+%\begin{figure}[!htbp]
+%	\begin{center}
+%	\includegraphics[scale=.4]{wekaKMeansResults.png}
+%	\end{center}
+%	\caption{Resultados del algoritmo \textbf{K-means}}
+%\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\pagebreak
 \subsection{DBSCAN}
 
 \textbf{DBSCAN} o \textbf{Density-based spatial clustering of applications with noise} es un algoritmo de \textit{clustering} que dado un conjunto de puntos en un espacio, los agrupa en funci\'on de la densidad de puntos que tengan a su alrededor, dejando a un lado aquellos que tienen una densidad baja. \\
@@ -736,7 +793,7 @@ Se considera un conjunto de puntos a aplicar la t\'ecnica. El algoritmo clasific
 
 Ahora, si $p$ es un punto n\'ucleo, entonces forma un cl\'uster con aquellos puntos que sean alcanzables desde $p$. Cada cl\'uster contiene al menos un punto n\'ucleo; y puntos no n\'ucleo pueden formar parte de \'este, pero formaran lo que parten del \textit{borde}, ya que no permiten \textit{alcanzar} m\'as puntos. \\
 
-\begin{figure}\label{fig:DBSCAN}
+\begin{figure}[H]\label{fig:DBSCAN}
 	\centering
 	\includegraphics[scale=.5]{DBSCAN.png}
 \caption{Diagrama DBSCAN}
@@ -757,7 +814,7 @@ Redefinimos la noci\'on de cl\'uster que previamente hab\'iamos definido. Un cl\
 
 Si uno de los puntos del proceso resulta que es parte de un cl\'uster, su vecindario tambi\'en se a\~nade a \'este. Se reitera este proceso, ya que todos los puntos nuevos a\~nadidos del vecindario anterior, son parte del cl\'uster, luego el vecindario de cada uno es a\~nadido. Este proceso se contin\'ua hasta que se obtiene el cl\'uster densamente conectado. \\
 
-\begin{algorithm}[!htbp]\label{DBSCAN}
+\begin{algorithm}[H]\label{DBSCAN}
 \begin{algorithmic}[1]
 \Function{DBSCAN}{$positions, eps, minPts$}
 	\State{C = 0}
@@ -801,7 +858,6 @@ Si uno de los puntos del proceso resulta que es parte de un cl\'uster, su vecind
 \caption{\label{alg:DBSCAN} Algoritmo DBSCAN}
 \end{algorithm}
 
-
 \subsubsection{Implementaci\'on en Python}
 
 Se encuentra una implementaci\'on bastante eficaz y sencilla en el repositorio de \href{https://github.com/SushantKafle/DBSCAN}{Sushant Kafle} \ref{dbscanPython}.\\
@@ -834,7 +890,7 @@ dbc.dbscan(Data, eps, MinPts)
 
 Notar que hemos tomado como valor de $\varepsilon = 0.0001$ ya que es una aproximaci\'on de la distancia media de toma entre posiciones y $5$ es un buen valor a la hora de hacer una consolidaci\'on. El resultado consiste en algunas posiciones marcadas como ruido y $5$ cl\'usters. Debido a que es un proceso muy costoso, nos hemos limitado en este caso a hacer la consolidaci\'on en unas $1000$ posiciones.\\
 
-\begin{figure}[!htbp]
+\begin{figure}[H]
 	\begin{center}
 	\includegraphics[scale=.7]{dbscan_2_0.png}
 	\end{center}
@@ -842,29 +898,6 @@ Notar que hemos tomado como valor de $\varepsilon = 0.0001$ ya que es una aproxi
 \end{figure}
 
 
-\pagebreak
-\subsection{Canopy}\label{sec:canopy}
-
-El algoritmo de clustering de \textbf{Canopy} se usa generalmente como un preprocesado de los datos para posteriormente aplicar un clustering de tipo \textbf{K-means} o alguna t\'ecnica de agrupamiento jerarquizado\ref{jerar}.\\
-
-La idea se basa en el uso de una medida de distancia aproximada para dividir el conjunto de los datos en subconjuntos que se superponen. A estos subconjuntos los llamaremos \textit{canopies}. Un \textit{canopy} es un subconjunto de puntos que yacen bajo el vecindario de un punto central. Un punto puede pertenecer a varias \textit{canopies} distintas. Los \textit{canopies} son creados con la intenci\'on de que si dos puntos no pertenecen a un \textit{canopy} en com\'un, est\'an bastante lejos de pertenecer a un mismo cl\'uster. \\
-
-Debido a que \textbf{Canopy} no es m\'as que un preprocesado de los datos, se fija una distancia sencilla con el fin de reducir dr\'asticamente el n\'umero de puntos y posteriormente aplicar una t\'ecnica mejor. En nuestro caso, utilizaremos la distancia eucl\'idea como distancia para realizar este proceso. \\
-
-Dada una distancia eucl\'idea, se crean los \textit{canopies} como sigue,
-
-\begin{enumerate}
-	\item Sea $S$ nuestro conjunto de puntos.
-	\item Se fijan dos umbrales para $T_1, T_2$ tal que $T_1 > T_2$. 
-	\item Se toma un punto $p\in S$, \'este ser\'a nuestro primer \textit{canopy}.
-	\item Se colocan todos los puntos $q\in S\setminus{p}$ tal que $d_E(p, q) < T_1$ en el mismo \textit{canopy}. 
-	\item Se eliminan del conjunto inicial $S$ aquellos puntos que est\'en dentro del umbral de distancia $T_2$.
-	\item Se repite hasta que el conjunto inicial est\'e vac\'io.
-\end{enumerate}
-
-La implementaci\'on\ref{App:AppendixD} en Python se puede encontrar en GitHub gracias a \href{https://github.com/gdbassett}{Gabe} \ref{canopyGitHub}.
-
-\pagebreak
 \subsection{DJ-Cluster}
 
 \textbf{Density-Joinable Cl\'uster}\cite{importantPlaces} es un tipo de algoritmo de \textit{clustering} cuya realizaci\'on depende de la distancia elegida, la cual nos generar\'a un tipo de vecindario en concreto. Este algoritmo localiza puntos significativos sobre el conjunto de todos los puntos, es decir, el centro del cl\'uster. No debemos olvidar que nuestro objetivo es encontrar posiciones significativas en todo nuestro conjunto de posiciones GPS, y \'estos centros de cl\'uster que nos generar\'a este algoritmo nos servir\'an para tal prop\'osito. \\
@@ -873,7 +906,7 @@ La idea del algoritmo es la siguiente, para cada punto, calculamos su vecindario
 
 Con este nuevo cl\'uster creado, el siguiente paso es comprobar que este cl\'uster no sea \textit{densamente acoplable} con los que ya llevamos computados. Un cl\'uster es \textit{densamente acoplable} a otro cl\'uster si existe un punto com\'un entre ambos. \\
 
-\begin{figure}[!htbp]
+\begin{figure}[H]
 \centering
 	\includegraphics[scale=.7]{djcluster.png}
 \caption{DJ-Clustering}
@@ -909,39 +942,321 @@ Con respecto al valor de $MinPts$, un valor alto de esta par\'ametro implica que
 La complejidad de este algoritmo es $\mathcal{O}(n\log{}n)$ \ref{importantPlaces}. \\
 
 
+%\subsubsection{Estudio con Weka}
+%
+%Weka tambi\'en permite realizar un \textit{clustering} por DJ-Cluster. Vamos a realizar un primer preprocesado de ratos utilizando la t\'ecnica de \textbf{Canopy}\ref{sec:canoy} que posteriormente est\'a explicada. Como antes, realizaremos primero una consolidaci\'on a unos 8000 cl\'usters y posteriormente aplicaremos \textbf{DJ-Clustering}.\\
+%
+%Los par\'ametros utilizados en este m\'etodo son los siguientes.\\
+%
+%\begin{figure}[!htbp]
+%\centering
+%	\includegraphics[scale=.55]{wekaDJClusterParametersTotal.png}
+%\caption{DJ-Clustering}
+%\end{figure}
+%
+%
+%El resultado del \textit{clustering} muestra una primera clasificaci\'on por \textbf{Canopy} en $8000$ posiciones,\\
+%
+%\begin{verbatim}
+%=== Run information ===
+%
+%Scheme:       weka.clusterers.MakeDensityBasedClusterer -M 0.001 
+%													   -W weka.clusterers.Canopy -- 
+%													   -N 8000 -max-candidates 100 
+%													   -periodic-pruning 10000 
+%													   -min-density 2.0 -t2 -1.0 
+%													   -t1 -1.25 -S 1
+%Relation:     QueryResult
+%Instances:    39839
+%Attributes:   3
+%              latitud
+%              longitud
+%              UNIX_TIMESTAMP(fecha)
+%Test mode:    evaluate on training data
+%
+%
+%=== Clustering model (full training set) ===
+%
+%MakeDensityBasedClusterer: 
+%
+%Wrapped clusterer: 
+%Canopy clustering
+%=================
+%
+%Number of canopies (cluster centers) found: 8000
+%T2 radius: 0,492     
+%T1 radius: 0,615     
+%
+%Cluster 0: -0.224664,-0.67139,1424989490.451634,{28191}
+%Cluster 1: -0.224653,-0.671401,1424267875.663668,{10448} 
+%Cluster 2: -0.226511,-0.670619,1425045583.497826,{460}
+%Cluster 3: -0.225134,-0.66939,1424602410.92381,{210}
+%..........................................................
+%\end{verbatim}
+%
+%
+%Con la distribuci\'on media de cada par\'ametro a analizar por cl\'uster,\\
+%
+%\begin{verbatim}
+%Fitted estimators (with ML estimates of variance):
+%
+%Cluster: 0 Prior probability: 0
+%
+%Attribute: latitud
+%Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+%Attribute: longitud
+%Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+%Attribute: UNIX_TIMESTAMP(fecha)
+%Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+%
+%Cluster: 1 Prior probability: 0
+%
+%Attribute: latitud
+%Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+%Attribute: longitud
+%Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+%Attribute: UNIX_TIMESTAMP(fecha)
+%Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+%
+%Cluster: 2 Prior probability: 0
+%
+%Attribute: latitud
+%Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+%Attribute: longitud
+%Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+%Attribute: UNIX_TIMESTAMP(fecha)
+%Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+%
+%Cluster: 3 Prior probability: 0
+%
+%Attribute: latitud
+%Normal Distribution. Mean = -0.2252 StdDev = 0.001
+%Attribute: longitud
+%Normal Distribution. Mean = -0.6695 StdDev = 0.001
+%Attribute: UNIX_TIMESTAMP(fecha)
+%Normal Distribution. Mean = 1424636974 StdDev = 411992.8182
+%
+%\end{verbatim}
+%
+%Y m\'as adelante visualizamos el \textit{clustering} por DJ-Cluster, en la que podemos observar que se ha realizado una consolidaci\'on m\'as fina.
+%
+%\begin{verbatim}
+%Time taken to build model (full training data) : 105.91 seconds
+%
+%=== Model and evaluation on training set ===
+%
+%Clustered Instances
+%
+%   9          9 (  0%)
+%  10          2 (  0%)
+%  12          3 (  0%)
+%  13          3 (  0%)
+%  --------------------
+%\end{verbatim}
+%
+%Mostramos s\'olamente las primeras instancias, ya que son muchos cl\'usters, pero se observa que los 8 primeros han sido eliminados al igual que el n\'umero 11.
 
-\subsubsection{Comparaci\'on de K-Means con DJ-Cluster}
 
-\subsubsection{Estudio con Weka}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Weka tambi\'en permite realizar un \textit{clustering} por DJ-Cluster. Vamos a realizar un primer preprocesado de ratos utilizando la t\'ecnica de \textbf{Canopy}\ref{sec:canoy} que posteriormente est\'a explicada. Como antes, realizaremos primero una consolidaci\'on a unos 8000 cl\'usters y posteriormente aplicaremos \textbf{DJ-Clustering}.\\
+\pagebreak
+\section{Comparativa de resultados}
 
-Los par\'ametros utilizados en este m\'etodo son los siguientes.\\
+Vamos a realizar un estudio de los m\'etodos estudiados para dos sujetos en concreto. De dos sujetos de nuestra base de datos, tomaremos 2.000 posiciones y veremos c\'omo responden a cada uno de los algoritmos. A la hora de importar los datos a Weka, aplicamos un filtro de Normalizaci\'on, dado que un futuro vamos a estar utilizando la distancia eucl\'idea en nuestros algoritmos, debemos normalizar los datos para que ninguno de estos pese sobre los dem\'as. Como la fecha est\'a representada por un \texttt{timestamp}, \'este tendr\'ia much\'isimo m\'as valor a la hora de realizar la consolidaci\'on.
 
-\begin{figure}[!htbp]
-\centering
-	\includegraphics[scale=.55]{wekaDJClusterParametersTotal.png}
-\caption{DJ-Clustering}
+\begin{figure}[H]
+	\begin{tabular}{| l | l |}
+	\hline
+		Sujeto 1 & tetra:12082781 \\
+		Sujeto 2 & tetra:12082364 \\	
+	\hline
+	\end{tabular}
+\end{figure}
+
+Se puede visualizar a simple vista que los datos son algo dispares entre s\'i, es decir, estamos cogiendo dos sujetos que no siguen con distintos patrones de movimiento. \\
+
+\begin{figure}[H]
+	\includegraphics[scale=.5]{../comparativa/sujeto1.png}
+	\caption{Distribuci\'on de las 2.000 posiciones del Sujeto 1}
+\end{figure}
+
+\begin{figure}[H]
+	\includegraphics[scale=.5]{../comparativa/sujeto2.png}
+	\caption{Distribuci\'on de las 2.000 posiciones del Sujeto 2}
 \end{figure}
 
 
-El resultado del \textit{clustering} muestra una primera clasificaci\'on por \textbf{Canopy} en $8000$ posiciones,\\
+\subsection{Resultados con K-means}
+
+Vamos a realizar un estudio \textbf{K-means} para ambos sujetos con los mismos par\'ametros que previamente hab\'iamos aplicado, pero en vez de realizar una consolidaci\'on al $20\%$, vamos a reducir el n\'umero de posiciones a $500$, es decir, una consolidaci\'on al $25\%$. 
+
+\subsubsection{Sujeto 1}
+
+\begin{verbatim}
+kMeans
+======
+
+Number of iterations: 10
+Within cluster sum of squared errors: 0.15548219897667379
+
+Initial starting points (random):
+
+Cluster 0: 3299150891,tetra:12082781,-0.224687,-0.67137,1424176713
+Cluster 1: 3299151121,tetra:12082781,-0.224684,-0.671368,1424176748
+Cluster 2: 3299184432,tetra:12082781,-0.224685,-0.671368,1424183306
+Cluster 3: 3299175108,tetra:12082781,-0.224682,-0.671373,1424181474
+Cluster 4: 3299044269,tetra:12082781,-0.225253,-0.669394,1424156873
+...
+\end{verbatim}
+
+Se han realizado $10$ iteraciones y se ha llegado a un error cuadr\'atico de $0.15$. Observando el n\'umero de posiciones que ha agrupado por cl\'uster, podemos observar que var\'ian entre $1$ y $9$, lo cual es una buena media, ya que no ha agrupado demasiadas posiciones en un mismo cl\'uster. \\ 
+
+Se puede observar mejor en la gr\'afica. Cada cl\'uster est\'a representado por un color distinto. En la parte superior de esta gr\'afica, podemos observar que ha seguido un camino con respecto al tiempo en una direcci\'on, mientras que en la parte superior ha pasado varias veces por un mismo sitio, y aparece una aglomeraci\'on de colores en un punto. Esto se debe a que para nuestro estudio hemos introducido tambi\'en la variable temporal, por lo que no puede agrupar todas esas posiciones en un mismo cl\'uster, ya que no lo est\'an, debido a que vienen de varios instantes distintos. \\
+
+\begin{figure}[H]
+	\includegraphics[scale=.5]{../comparativa/kMeansSujeto1.png}
+	\caption{Estudio K-means para el Sujeto 1}
+\end{figure}
+
+
+\subsubsection{Sujeto 2}
+
+Realizamos el mismo estudio con el Sujeto 2,\\
+
+\begin{verse}
+=== Model and evaluation on training set ===
+
+Clustered Instances
+
+  0        10 (  1%)
+  1         1 (  0%)
+  2        33 (  2%)
+  3        16 (  1%)
+  4         4 (  0%)
+  5        33 (  2%)
+  6        20 (  1%)
+  7        14 (  1%)
+  8        11 (  1%)
+  9        26 (  1%)
+ 10         1 (  0%)
+ ...
+ 489         2 (  0%)
+490         1 (  0%)
+491         2 (  0%)
+492         1 (  0%)
+493         1 (  0%)
+494         1 (  0%)
+495         1 (  0%)
+496         1 (  0%)
+497         2 (  0%)
+498         2 (  0%)
+499         2 (  0%)
+\end{verse}
+
+Se observa que en este caso la asignaci\'on de cl\'usters es a\'un m\'as dispar que en el sujeto 1, ya que se asignan muchas posiciones para los primeros cl\'usters dejando para los del final casi ninguna (dado que le hemos fijado un resultado final de $500$ cl\'usters). En este sentido, se puede observar que las primeras posiciones (en un contexto temporal) se asignan bien a los cl\'usters, pero esta limitaci\'on de tener que asignar un valor al n\'umero de cl\'usters que deseamos obtener, es la que echa a perder el m\'etodo. Esto que en un principio no deber\'ia ser malo porque nos asegurar\'ia la reducci\'on de espacio en disco que buscamos es la que en el sujeto 2, nos arruina el resultado. Visualmente, las primeras posiciones se encuentran en la franja de abajo a la izquierda, mientras que las finales son las de la franja de arriba a la izquierda. \\
+
+\begin{figure}[H]
+	\includegraphics[scale=.5]{../comparativa/kMeansSujeto2.png}
+	\caption{Estudio K-means para el Sujeto 1}
+\end{figure}
+
+\subsection{Resultados con DBSCAN}
+
+Utilizaremos los mismos par\'ametros utilizados para el m\'etodo \textbf{DBSCAN} previamente estudiado, un valor de $\varepsilon = 0.0001$ y un valor de $minPts = 5$. Tomaremos $1000$ datos de cada sujeto y los compararemos,\\
+
+\subsubsection{Sujeto 1}
+
+\begin{python}
+cur= connect_db("bahia")
+recurso = "tetra:12082781"
+limit = 2000
+cmd = "SELECT latitud, longitud 
+		FROM posicionesgps 
+		WHERE latitud <> 0 and longitud <> 0 and recurso=\"{0}\" 
+		LIMIT {1};".format(recurso, limit)
+cur.execute(cmd)
+
+a=[]
+for pos in cur.fetchall():
+    a.append([pos[0], pos[1]])
+
+Data = a
+eps = 0.0001
+MinPts=5
+
+dbc = dbscanner()
+dbc.dbscan(Data, eps, MinPts)
+\end{python}
+
+\begin{figure}[H]
+	\includegraphics[scale=.7]{../comparativa/dbscanSujeto1.png}
+	\caption{Estudio DBSCAN para el Sujeto 1}
+\end{figure}
+
+Una de las cosas positivas que se puede decir del algoritmo \textbf{DBSCAN} es que identifica puntos como \textit{ruido}, cosa que los algoritmos de \textbf{K-means} y \textbf{DJ-Cluster} no hacen, ya que asignan simplemente esos puntos a un cl\'uster de un \'unico punto.\\
+
+\subsubsection{Sujeto 2}
+
+\begin{python}
+cur= connect_db("bahia")
+recurso = "tetra:12082781"
+limit = 2000
+cmd = "SELECT latitud, longitud 
+		FROM posicionesgps 
+		WHERE latitud <> 0 and longitud <> 0 and recurso=\"{0}\" 
+		LIMIT {1};".format(recurso, limit)
+cur.execute(cmd)
+
+a=[]
+for pos in cur.fetchall():
+    a.append([pos[0], pos[1]])
+
+Data = a
+eps = 0.0001
+MinPts=5
+
+dbc = dbscanner()
+dbc.dbscan(Data, eps, MinPts)
+\end{python}
+
+\begin{figure}[H]
+	\includegraphics[scale=.7]{../comparativa/dbscanSujeto2.png}
+	\caption{Estudio DBSCAN para el Sujeto 2}
+\end{figure}
+
+Otro de los problemas encontrados a la hora de utilizar el algoritmo \textbf{DBSCAN} es que la implementaci\'on utilizada s\'olo involucra las variables latitud y longitud, por lo que la consolidaci\'on no tendr\'a en cuenta si un sujeto pasa repetidas veces por un mismo lugar.\\
+
+\subsection{Resultados con DJ-Cluster}
+
+Realizaremos un estudio \textbf{DJ-Cluster} utilizando un preprocesado de datos \textbf{Canopy} fijando una desviaci\'on m\'inima est\'andar de $0.001$. \\
+
+\subsubsection{Sujeto 1}
+
+Si en el preprocesado de \textbf{Canopy} no especificamos el n\'umero de cl\'usters que queremos conseguir, \'este consolida demasiados datos d\'andonos un resultado de s\'olamente $4$ cl\'usters, lo cual no nos es interesante, ya que se pierde demasiada informaci\'on. \\
+
+Fijaremos pues la variable del n\'umero de cl\'usters en los $500$ que previamente hemos elegido,\\
+
 
 \begin{verbatim}
 === Run information ===
 
-Scheme:       weka.clusterers.MakeDensityBasedClusterer -M 0.001 
-													   -W weka.clusterers.Canopy -- 
-													   -N 8000 -max-candidates 100 
-													   -periodic-pruning 10000 
-													   -min-density 2.0 -t2 -1.0 
-													   -t1 -1.25 -S 1
+Scheme:       weka.clusterers.MakeDensityBasedClusterer 
+					-M 0.001 -W weka.clusterers.Canopy -- 
+					-N 500 -max-candidates 100 -periodic-pruning 10000 
+					-min-density 2.0 -t2 -0.001 -t1 -0.001 
+					-S 1 
 Relation:     QueryResult
-Instances:    39839
-Attributes:   3
+Instances:    2000
+Attributes:   5
               latitud
               longitud
               UNIX_TIMESTAMP(fecha)
+Ignored:
+              id
+              recurso
 Test mode:    evaluate on training data
 
 
@@ -953,89 +1268,123 @@ Wrapped clusterer:
 Canopy clustering
 =================
 
-Number of canopies (cluster centers) found: 8000
-T2 radius: 0,492     
-T1 radius: 0,615     
+Number of canopies (cluster centers) found: 500
+T2 radius: 0,504     
+T1 radius: 0,001     
 
-Cluster 0: -0.224664,-0.67139,1424989490.451634,{28191}
-Cluster 1: -0.224653,-0.671401,1424267875.663668,{10448} 
-Cluster 2: -0.226511,-0.670619,1425045583.497826,{460}
-Cluster 3: -0.225134,-0.66939,1424602410.92381,{210}
-..........................................................
-\end{verbatim}
+Cluster 0: -0.225087,-0.669237,1424157165.818182,{55} <0>
+Cluster 1: -0.224685,-0.671368,1424171523.408413,{1474} <1>
+Cluster 2: -0.224713,-0.671363,1424188821.625571,{438} <2>
+Cluster 3: -0.223987,-0.669914,1424157151.060606,{33} <3>
+....
 
+Clustered Instances
+....
+ 12        14 (  1%)
+ 13         2 (  0%)
+ 14         2 (  0%)
+ 15         2 (  0%)
+ 18         3 (  0%)
+ 19         5 (  0%)
+ 20         4 (  0%)
+....
+\end{verbatim} 
 
-Con la distribuci\'on media de cada par\'ametro a analizar por cl\'uster,\\
+A\'un a pesar del preprocesado por \textit{canopies}, vemos que la asignaci\'on de las posiciones a los cl\'usters ha sido menos suave, ya que podemos encontrarnos gran cantidad de cl\'usters con m\'as de $10$ posiciones agrupadas y bastantes con s\'olo $2$. Sin embargo, visualmente, \\
 
-\begin{verbatim}
-Fitted estimators (with ML estimates of variance):
+\begin{figure}[H]
+	\includegraphics[scale=.5]{../comparativa/djClusterSujeto1.png}
+	\caption{Estudio Dj-Cluster para el Sujeto 1}
+\end{figure}
 
-Cluster: 0 Prior probability: 0
+Podemos observar que la parte de abajo del conglomerado que K-means no llegaba a resolver, DJ-Cluster hace una mejor selecci\'on de cl\'usters en esta zona. \\
 
-Attribute: latitud
-Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
-Attribute: longitud
-Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
-Attribute: UNIX_TIMESTAMP(fecha)
-Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
+\subsubsection{Sujeto 2}
 
-Cluster: 1 Prior probability: 0
-
-Attribute: latitud
-Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
-Attribute: longitud
-Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
-Attribute: UNIX_TIMESTAMP(fecha)
-Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
-
-Cluster: 2 Prior probability: 0
-
-Attribute: latitud
-Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
-Attribute: longitud
-Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
-Attribute: UNIX_TIMESTAMP(fecha)
-Normal Distribution. Mean = 0 StdDev = 1.7976931348623157E308
-
-Cluster: 3 Prior probability: 0
-
-Attribute: latitud
-Normal Distribution. Mean = -0.2252 StdDev = 0.001
-Attribute: longitud
-Normal Distribution. Mean = -0.6695 StdDev = 0.001
-Attribute: UNIX_TIMESTAMP(fecha)
-Normal Distribution. Mean = 1424636974 StdDev = 411992.8182
-
-\end{verbatim}
-
-Y m\'as adelante visualizamos el \textit{clustering} por DJ-Cluster, en la que podemos observar que se ha realizado una consolidaci\'on m\'as fina.
+En el sujeto dos podemos pensar que DJ-Cluster tambi\'en peca de demasiada clusterizaci\'on a\'un a pesar de que hemos indicado que en el preprocesado \textbf{Canopy} utilice $500$ cl\'usters.\\
 
 \begin{verbatim}
-Time taken to build model (full training data) : 105.91 seconds
-
 === Model and evaluation on training set ===
 
 Clustered Instances
 
-   9          9 (  0%)
-  10          2 (  0%)
-  12          3 (  0%)
-  13          3 (  0%)
-  --------------------
+ 14         4 (  0%)
+ 38         8 (  0%)
+ 42      1536 ( 77%)
 \end{verbatim}
 
-Mostramos s\'olamente las primeras instancias, ya que son muchos cl\'usters, pero se observa que los 8 primeros han sido eliminados al igual que el n\'umero 11.
+Pero, si observamos el cl\'uster n\'umero $42$,\\
+
+\begin{verbatim}
+Cluster: 42 Prior probability: 0.0244
+
+Attribute: latitud
+Normal Distribution. Mean = -0.2211 StdDev = 0.002
+Attribute: longitud
+Normal Distribution. Mean = -0.6726 StdDev = 0.0008
+Attribute: fecha
+Normal Distribution. Mean = 2015 StdDev = 0
+\end{verbatim}
+
+Vemos que la probabilidad de que una posici\'on caiga en este cl\'uster es de $0.02\%$. Haciendo unas sencillas consultas en MySQL sobre la regi\'on fuertemente consolidada y la regi\'on final en la que vemos que no ha habido tanta consolidaci\'on,
+
+\begin{lstlisting}[language=sql, columns=fullflexible, basicstyle=\small, frame=tbrl, showstringspaces=false]
+mysql> SELECT id, latitud, longitud 
+	   FROM posicionesgps 
+	   WHERE recurso = 'tetra:12086044' 
+	   LIMIT 130, 5;
+\end{lstlisting}
+
+\begin{figure}[H]
+	\begin{tabular}{| l | l | l |}
+	\hline
+	\rowcolor{LightCyan}
+	\hline
+  		id & latitud & longitud \\
+	\hline
+		3299639690 & -0.22662244737148285 & -0.6721994876861572 \\
+		3299639777 & -0.22662168741226196 & -0.6722030639648438 \\
+		3299639884 & -0.22662168741226196 & -0.6722030639648438 \\
+		3299639985 & -0.22662225365638733 & -0.6721988916397095 \\
+		3299640070 & -0.22662188112735748 & -0.6722032427787781 \\
+	\hline
+	\end{tabular}
+	\caption{Consulta SQL de los resultados fuertemente consolidados}
+\end{figure}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{lstlisting}[language=sql, columns=fullflexible, basicstyle=\small, frame=tbrl, showstringspaces=false]
+mysql> SELECT id, latitud, longitud 
+	   FROM posicionesgps 
+	   WHERE recurso = 'tetra:12086044' 
+	   LIMIT 1990, 5;
+\end{lstlisting}
+
+\begin{figure}[H]
+	\begin{tabular}{| l | l | l |}
+	\hline
+	\rowcolor{LightCyan}
+	\hline
+  		id & latitud & longitud \\
+	\hline
+	3299801551 & -0.2217489778995514 & -0.6714484095573425 \\
+	3299801554 & -0.22178474068641663 & -0.6714062690734863 \\
+	3299801901 & -0.22180871665477753 & -0.6713294982910156 \\
+	3299801938 & -0.2218199521303177 & -0.671276867389679 \\
+	3299802276 & -0.2218736857175827 & -0.6711682677268982 \\
+	\hline
+	\end{tabular}
+	\caption{Consulta SQL de los resultados fuertemente consolidados}
+\end{figure}
+
+Se puede observar que en la primera tabla, las posiciones no han variado mucho, ya que s\'olo se observa variaci\'on a partir del sexto decimal, sin embargo, en la segunda tabla la variaci\'on de la posici\'on es mucho mayor, ya que la empiezan a cambiar a partir del cuarto. Esto representa un mayor movimiento del sujeto, por lo que podemos concluir que \textbf{DJ-Cluster} ha realizado una buena consolidaci\'on.
+
 
 \pagebreak
-\section{Conclusiones}
+\section{Notas y conclusiones}
 
-Podemos distinguir entre los algoritmos 
+Entre estos m\'etodos tambi\'en ha sido valorado el estudiar m\'etodos de \textit{clustering} jerarquizados. Sin embargo, la idea principal que desech\'o el estudio de \'estos fue que la complejidad de un \textit{clustering} aglomerativo jerarquizado es de $\mathcal{O}(n^3)$ y la de \textit{clustering} divisivo tambi\'en jerarquizado es de $\mathcal{O}(2^n)$. \\
+
 
 \pagebreak
 \section{Herramientas utilizadas}
@@ -1043,27 +1392,16 @@ Podemos distinguir entre los algoritmos
 \begin{enumerate}
 	\item \textbf{Weka} (Waikato Environment for Knowledge Analysis, en espa\~nol «entorno para an\'alisis del conocimiento de la Universidad de Waikato») es una plataforma de software para el aprendizaje autom\'atico y la miner\'ia de datos escrito en Java y desarrollado en la Universidad de Waikato. Weka es software libre distribuido bajo la licencia GNU-GPL.\ref{weka}
 	
-	\item \textbf{Implementaci\'on de Canopy} \\ \url{https://gist.github.com/gdbassett/528d816d035f2deaaca1}
-
-	\item \textbf{Implementaci\'on de DBSCAN en Python} \\ \url{https://github.com/SushantKafle/DBSCAN}
+	\item \textbf{Python} se trata de un lenguaje de programaci\'on multiparadigma, ya que soporta orientaci\'on a objetos, programaci\'on imperativa y, en menor medida, programaci\'on funcional. Es un lenguaje interpretado, usa tipado dinámico y es multiplataforma.
 	
-	\item \textbf{R} es un lenguaje y entorno de programación para análisis estadístico y gráfico. \textbf{R} se distribuye bajo la licencia GNU GPL y está disponible para los sistemas operativos Windows, Macintosh, Unix y GNU/Linux.\ref{r}
+	\item \textbf{R} es un lenguaje y entorno de programaci\'on para an\'alisis estad\'istico y gr\'afico. \textbf{R} se distribuye bajo la licencia GNU GPL y est\'a disponible para los sistemas operativos Windows, Macintosh, Unix y GNU/Linux.\ref{r}
 	
 	\item \textbf{GitHub} es una plataforma de desarrollo colaborativo para alojar proyectos utilizando el sistema de control de versiones Git.
 	
-	\item \textbf{MySQL} es un sistema de gestión de bases de datos relacional, multihilo y multiusuario bajo una licencia GNU GPL para uso no comercial.
+	\item \textbf{MySQL} es un sistema de gesti\'on de bases de datos relacional, multihilo y multiusuario bajo una licencia GNU GPL para uso no comercial.
 	
 \end{enumerate}
 
-\pagebreak
-
-\section{¿D\'onde puedo encontrar todo esto?}
-
-El c\'odigo est\'a disponible para bajarse y utilizarse bajo una licencia Creative-Commons (by-nc-sa)\ref{creative}
-en \\ 
-\smallskip
-
-\href{http://pbarbero.github.io/TFM/}{http://pbarbero.github.io/TFM/}
 
 \newpage
 
@@ -1101,11 +1439,11 @@ def ConsolidationByDistance(listPositions, typeOfDistance, eps, t0):
 \end{python}
 
 \newpage
-\section{Impementaci\'on de consolidaci\'on cada cierto n\'umero} \label{App:AppendixB}
+\section{Impementaci\'on de consolidaci\'on por adelgazamiento} \label{App:AppendixB}
 
 \begin{python}
-"Deletes one position every k positions."
-def ConsolidationEachNumber(listPositions, k, j):
+"Consolidation by thinning."
+def ConsolidationByThinning(listPositions, k, j):
 	if k >= j:
 		raise ValueError('K tiene que ser menor que J')
         
@@ -1206,6 +1544,25 @@ def canopy(X, T1, T2, distance_metric='euclidean', filemap=None):
 \end{python}
 
 \newpage
+\section{Impementaci\'on de consolidaci\'on por tiempo} \label{App:AppendixF}
+
+\begin{python}
+"Consolidation by time. Deletes positions too close by time."
+def ConsolidationByTime(listPositions, lapse):
+	i = 0
+	result = []
+	while i < len(listPositions) - 1:
+		if not listPositions[i].is_neighboorhoudByTime(listPositions[i+1], lapse):
+			result.append(listPositions[i])
+		i=i+1
+	#Por defecto anadiremos la ultima posicion, ya que no tiene siguiente con quien comparar
+	result.append(listPositions[len(listPositions) - 1])
+
+	return result
+\end{python}
+
+
+\newpage
 \section{Resulados Algoritmo K-means utilizando Weka} \label{App:AppendixE}
 
 \begin{verbatim}
@@ -1294,29 +1651,29 @@ Clustered Instances
 \begin{thebibliography}{50}
 
 
-\bibitem{lifePatter}\label{lifePatter} \textsc{Mining Individual Life Pattern} \\ \url{http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.361.9085&rep=rep1&type=pdf}
+\bibitem{lifePatter}\label{lifePatter} Yang Ye, Yu Zheng, Yukun Chen, Jianhua Feng, Xing Xie
+\\ \href{http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.361.9085&rep=rep1&type=pdf}{\textit{Mining Individual Life Pattern Based on Location History}}
 
-\bibitem{importantPlaces}\label{importantPlaces} \textsc{Mining Personally Important Places from GPS Track} \\ \url{http://www-users.cs.umn.edu/~czhou/pub/place-important_v3.pdf}
+\bibitem{importantPlaces}\label{importantPlaces} Changqing Zhou, Nupur Bhatnagar, Shashi Shekhar, Loren Terveen
+\\ \href{http://www-users.cs.umn.edu/~czhou/pub/place-important_v3.pdf}{\textit{Mining Personally Important Places from GPS Track}} 
 
-\bibitem{clusteringApproach}\label{clusteringApproach}\textsc{Discovering Personal Gazetteers: An Interactive Clustering Approach} \\ \url{http://files.grouplens.org/papers/zhou-acmgis04.pdf}
+\bibitem{clusteringApproach}\label{clusteringApproach} Changqing Zhou, Dan Frankowski, Pamela Ludford, Shashi Shekhar, Loren Terveen
+\\ \href{http://files.grouplens.org/papers/zhou-acmgis04.pdf}{\textit{Discovering Personal Gazetteers: An Interactive Clustering Approach}}
 
-\bibitem{scikit-learn}\label{scikit-learn} \texttt{scikit-learn} \\ \url{http://scikit-learn.org/stable/auto_examples/cluster/plot_dbscan.html} 
+\bibitem{canopy}\label{canopy} Andrew McCallum, Kamal Nigam, Lyle H. Ungar \\
+\href{http://www.kamalnigam.com/papers/canopy-kdd00.pdf}{\textit{Efficient Clustering of High-Dimensional Data Sets with Application to Reference Matching}}
 
-\bibitem{canopy}\label{canopy} \textsc{Efficient Clustering of High-Dimensional Data Sets with Application to Reference Matching} \\ \url{http://www.kamalnigam.com/papers/canopy-kdd00.pdf}
+\bibitem{canopyGitHub} \label{canopyGitHub} \href{https://github.com/gdbassett}{\textit{Gabe}}'s Gist \\ 
+\href{https://gist.github.com/gdbassett/528d816d035f2deaaca1}{Efficient python implementation of canopy clustering.}
 
-\bibitem{jerar}\label{jerar} \textsc{Hierarchical clustering} \\ \url{https://en.wikipedia.org/wiki/Hierarchical_clustering}
+\bibitem{dbscanPython} \label{dbscanPython} \href{https://github.com/SushantKafle}{\textit{Sushant Kafle}}'s GitHub Repository 
+\\ \href{https://github.com/SushantKafle/DBSCAN}{Implementation of DBSCAN Algorithm in Python.}
 
-\bibitem{canopyGitHub} \label{canopyGitHub} \textsc{Canopy Implementation in Python} \\ \url{https://gist.github.com/gdbassett/528d816d035f2deaaca1}
+\bibitem{weka} \label{weka} Ian H. Witten and Eibe Frank (2005). Data Mining: Practical Machine Learning Tools and Techniques. 2nd Edition, Morgan Kaufmann, San Francisco. \\ \href{http://www.cs.waikato.ac.nz/ml/weka/}{Weka Project}
 
-\bibitem{dbscanPython} \label{dbscanPython} \textsc{DBSCAN Implementation in Python} \\ \url{https://github.com/SushantKafle/DBSCAN}
+\bibitem{r} \label{r} \href{http://www.R-project.org}{R Development Core Team (2008). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. ISBN 3-900051-07-0}
 
-\bibitem{weka} \label{weka} \textsc{Weka} \\ 	\url{http://www.cs.waikato.ac.nz/ml/weka/}
-
-\bibitem{r} \label{r} \textsc{R} \\ \url{https://www.r-project.org/}
-
-\bibitem{creative} \label{creative} \textsc{Creative Commons License} \\ \url{https://creativecommons.org/licenses/by-nc-sa/4.0/}
 \end{thebibliography}
-
 
 
 \end{document}
