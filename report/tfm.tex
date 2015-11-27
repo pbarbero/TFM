@@ -1076,12 +1076,65 @@ Vamos a realizar un estudio de los m\'etodos estudiados para dos sujetos en conc
 	\end{tabular}
 \end{figure}
 
-Se puede visualizar a simple vista que los datos son algo dispares entre s\'i, es decir, estamos cogiendo dos sujetos que no siguen con distintos patrones de movimiento. \\
+Antes de importar las variables a Weka, necesitamos hacer el c\'alculo de su media y su desviaci\'on t\'ipica con el fin de tipificar cada una de las variables y dar la misma importancia a cada una de ellas. \\
+
+Para el primer sujeto, contamos con lo siguiente,\\
+
+\begin{figure}[H]
+	\begin{tabular}{| l | l | l | l |}
+	\hline
+	\rowcolor{LightCyan}
+	\hline
+  		& latitud & longitud & fecha \\
+	\hline
+		Media & -0.223 & -0.665 & 1424174494.89 \\
+		Desv. T\'ipica & 0.022 & 0.065	& 104277.37 \\
+	\hline
+	\end{tabular}
+\end{figure}
+
+Para el primer sujeto, hacemos una importaci\'on de datos a Weka de la siguiente forma,\\
+
+\begin{lstlisting}[language=sql, columns=fullflexible, basicstyle=\small, frame=tblr]
+mysql > SELECT (latitud + 0.223)/0.022 as 'latitudT', 
+(longitud + 0.665)/0.065 as 'longitudT'.
+(UNIX_TIMESTAMP(fecha) - 1424174494.89)/104277.37 as 'time'
+FROM posicionesgps
+WHERE latitud <> 0 AND longitud <> 0 AND recurso='tetra:12082781'
+LIMIT 2000;
+\end{lstlisting}
 
 \begin{figure}[H]
 	\includegraphics[scale=.5]{../comparativa/sujeto1.png}
 	\caption{Distribuci\'on de las 2.000 posiciones del Sujeto 1}
 \end{figure}
+
+Calculamos la desviaci\'on t\'ipica y la media del segundo sujeto,\\
+
+\begin{figure}[H]
+	\begin{tabular}{| l | l | l | l |}
+	\hline
+	\rowcolor{LightCyan}
+	\hline
+  		& latitud & longitud & fecha \\
+	\hline
+		Media & -0.21 &  -0.625 & 1424350386.203 \\
+		Desv. T\'ipica & 0.057 & 0.169 & 41234.453 \\
+	\hline
+	\end{tabular}
+\end{figure}
+
+Para el segundo sujeto, hacemos una importaci\'on de datos a Weka de la siguiente forma,\\
+
+\begin{lstlisting}[language=sql, columns=fullflexible, basicstyle=\small, frame=tblr]
+mysql > SELECT (latitud + 0.21)/0.057 as 'latitudT', 
+(longitud + 0.625)/0.169 as 'longitudT', 
+(UNIX_TIMESTAMP(fecha) - 1424350386.203)/41234.453 as 'time'
+FROM posicionesgps
+WHERE recurso='tetra:12082364' AND latitud<>0 AND longitud<>0
+ORDER BY 3 ASC
+LIMIT 2000;
+\end{lstlisting}
 
 \begin{figure}[H]
 	\includegraphics[scale=.5]{../comparativa/sujeto2.png}
@@ -1091,30 +1144,55 @@ Se puede visualizar a simple vista que los datos son algo dispares entre s\'i, e
 
 \subsection{Resultados con K-means}
 
-Vamos a realizar un estudio \textbf{K-means} para ambos sujetos con los mismos par\'ametros que previamente hab\'iamos aplicado, pero en vez de realizar una consolidaci\'on al $20\%$, vamos a reducir el n\'umero de posiciones a $500$, es decir, una consolidaci\'on al $25\%$. 
+Vamos a realizar un estudio \textbf{K-means} para ambos sujetos con los mismos par\'ametros que previamente hab\'iamos aplicado, pero en vez de realizar una consolidaci\'on al $20\%$, vamos a reducir el n\'umero de posiciones a $500$, es decir, una consolidaci\'on al $25\%$. \\
+
+Realizaremos un preprocesado por \textit{Canopy} y fijaremos el n\'umero de cl\'usters $500$,
 
 \subsubsection{Sujeto 1}
 
 \begin{verbatim}
+=== Run information ===
+
+Scheme:       weka.clusterers.SimpleKMeans -init 2 -max-candidates 100 
+				-periodic-pruning 10000 -min-density 2.0 
+				-t1 -1.25 -t2 -1.0 -N 500 -A "weka.core.EuclideanDistance 
+				-R first-last" -I 500 -num-slots 1 -S 10
+Relation:     QueryResult
+Instances:    2000
+Attributes:   3
+              latitudT
+              longitudT
+              time
+Test mode:    evaluate on training data
+
+
+=== Clustering model (full training set) ===
+
+
 kMeans
 ======
 
-Number of iterations: 10
-Within cluster sum of squared errors: 0.15548219897667379
+Number of iterations: 9
+Within cluster sum of squared errors: 0.11736312393686821
 
-Initial starting points (random):
+Initial starting points (canopy):
 
-Cluster 0: 3299150891,tetra:12082781,-0.224687,-0.67137,1424176713
-Cluster 1: 3299151121,tetra:12082781,-0.224684,-0.671368,1424176748
-Cluster 2: 3299184432,tetra:12082781,-0.224685,-0.671368,1424183306
-Cluster 3: 3299175108,tetra:12082781,-0.224682,-0.671373,1424181474
-Cluster 4: 3299044269,tetra:12082781,-0.225253,-0.669394,1424156873
+T2 radius: 0,504     
+T1 radius: 0,631  
+
+Cluster 0: -0.077067,-0.09795,0.073287
+Cluster 1: -0.076555,-0.097964,-0.092632
+Cluster 2: -0.044869,-0.075594, -0.166324
 ...
+
+Time taken to build model (full training data) : 0.69 seconds
 \end{verbatim}
 
-Se han realizado $10$ iteraciones y se ha llegado a un error cuadr\'atico de $0.15$. Observando el n\'umero de posiciones que ha agrupado por cl\'uster, podemos observar que var\'ian entre $1$ y $9$, lo cual es una buena media, ya que no ha agrupado demasiadas posiciones en un mismo cl\'uster. \\ 
+Se han realizado $10$ iteraciones y se ha llegado a un error cuadr\'atico de $0.117363$. Observando el n\'umero de posiciones que ha agrupado por cl\'uster, podemos observar que var\'ian entre $1$ y $9$, lo cual es una buena media, ya que no ha agrupado demasiadas posiciones en un mismo cl\'uster. \\ 
 
-Se puede observar mejor en la gr\'afica. Cada cl\'uster est\'a representado por un color distinto. En la parte superior de esta gr\'afica, podemos observar que ha seguido un camino con respecto al tiempo en una direcci\'on, mientras que en la parte superior ha pasado varias veces por un mismo sitio, y aparece una aglomeraci\'on de colores en un punto. Esto se debe a que para nuestro estudio hemos introducido tambi\'en la variable temporal, por lo que no puede agrupar todas esas posiciones en un mismo cl\'uster, ya que no lo est\'an, debido a que vienen de varios instantes distintos. \\
+Se puede observar mejor en la gr\'afica. Cada cl\'uster est\'a representado por un color distinto. En la parte superior de esta gr\'afica, podemos observar que ha seguido un camino con respecto al tiempo en una direcci\'on, mientras que en la parte inferior ha pasado varias veces por un mismo sitio, y aparece una aglomeraci\'on de colores en un punto. Esto se debe a que para nuestro estudio hemos introducido tambi\'en la variable temporal, por lo que no puede agrupar todas esas posiciones en un mismo cl\'uster, ya que no lo est\'an, debido a que vienen de varios instantes distintos. \\
+
+El total de cl\'usters es de 500, ya que con $K-$means es necesario prefijarlos.
 
 \begin{figure}[H]
 	\includegraphics[scale=.5]{../comparativa/kMeansSujeto1.png}
@@ -1126,42 +1204,49 @@ Se puede observar mejor en la gr\'afica. Cada cl\'uster est\'a representado por 
 
 Realizamos el mismo estudio con el Sujeto 2,\\
 
-\begin{verse}
-=== Model and evaluation on training set ===
+\begin{verbatim}
+=== Run information ===
 
-Clustered Instances
+Scheme:       weka.clusterers.SimpleKMeans -init 2 -max-candidates 500 -periodic-pruning 10000 -min-density 2.0 -t1 -1.25 -t2 -1.0 -N 500 -A "weka.core.EuclideanDistance -R first-last" -I 500 -num-slots 1 -S 10
+Relation:     QueryResult
+Instances:    2000
+Attributes:   3
+              latitudT
+              longitudT
+              time
+Test mode:    evaluate on training data
 
-  0        10 (  1%)
-  1         1 (  0%)
-  2        33 (  2%)
-  3        16 (  1%)
-  4         4 (  0%)
-  5        33 (  2%)
-  6        20 (  1%)
-  7        14 (  1%)
-  8        11 (  1%)
-  9        26 (  1%)
- 10         1 (  0%)
- ...
- 489         2 (  0%)
-490         1 (  0%)
-491         2 (  0%)
-492         1 (  0%)
-493         1 (  0%)
-494         1 (  0%)
-495         1 (  0%)
-496         1 (  0%)
-497         2 (  0%)
-498         2 (  0%)
-499         2 (  0%)
-\end{verse}
 
-Se observa que en este caso la asignaci\'on de cl\'usters es a\'un m\'as dispar que en el sujeto 1, ya que se asignan muchas posiciones para los primeros cl\'usters dejando para los del final casi ninguna (dado que le hemos fijado un resultado final de $500$ cl\'usters). En este sentido, se puede observar que las primeras posiciones (en un contexto temporal) se asignan bien a los cl\'usters, pero esta limitaci\'on de tener que asignar un valor al n\'umero de cl\'usters que deseamos obtener, es la que echa a perder el m\'etodo. Esto que en un principio no deber\'ia ser malo porque nos asegurar\'ia la reducci\'on de espacio en disco que buscamos es la que en el sujeto 2, nos arruina el resultado. Visualmente, las primeras posiciones se encuentran en la franja de abajo a la izquierda, mientras que las finales son las de la franja de arriba a la izquierda. \\
+=== Clustering model (full training set) ===
+
+
+kMeans
+======
+
+Number of iterations: 24
+Within cluster sum of squared errors: 0.2079975699953984
+
+Initial starting points (canopy):
+
+T2 radius: 0,439     
+T1 radius: 0,548     
+
+Cluster 0: -0.278213,-0.272406,0.032468,
+Cluster 1: -0.236123,-0.267776,-0.148367
+......
+
+Time taken to build model (full training data) : 1.38 seconds
+\end{verbatim}
+
 
 \begin{figure}[H]
 	\includegraphics[scale=.5]{../comparativa/kMeansSujeto2.png}
 	\caption{Estudio K-means para el Sujeto 1}
 \end{figure}
+
+En la siguiente figura, se observa una asignaci\'on un poco rara de los cl\'usters. En la secci\'on de abajo se pueden observar distintos colores, como si varios puntos muy cercanos se hubieran asingados a cl\'usteres distintos, pero esto es debido a que no son seguidos en el tiempo, es decir, el sujeto est\'a volviendo a pasar por el mismo sitio. Si nos volvemos a fijar en la representaci\'on sin clusterizar, se puede observar que existe un trozo donde el naranja y el azul se superponen, es decir, son instantes dinstantes temporalmente.\\
+
+El error cuadr\'atico es de $0.207997$, un poco peor que con el sujeto 1, y el tiempo de ejecuci\'on es de $1.38$ segundos.\\
 
 \subsection{Resultados con DBSCAN}
 
@@ -1233,30 +1318,74 @@ Otro de los problemas encontrados a la hora de utilizar el algoritmo \textbf{DBS
 
 Realizaremos un estudio \textbf{DJ-Cluster} utilizando un preprocesado de datos \textbf{Canopy} fijando una desviaci\'on m\'inima est\'andar de $0.001$. \\
 
+
 \subsubsection{Sujeto 1}
 
-Si en el preprocesado de \textbf{Canopy} no especificamos el n\'umero de cl\'usters que queremos conseguir, \'este consolida demasiados datos d\'andonos un resultado de s\'olamente $4$ cl\'usters, lo cual no nos es interesante, ya que se pierde demasiada informaci\'on. \\
-
-Fijaremos pues la variable del n\'umero de cl\'usters en los $500$ que previamente hemos elegido,\\
-
+Notar que si utilizamos un preprocesado de \textit{Canopy} sin fijar el n\'umero de cl\'usters previo, \'este nos consolida demasiado la informaci\'on (tal y como pasa en el DBSCAN), lo cual no es muy interesante.
 
 \begin{verbatim}
 === Run information ===
 
-Scheme:       weka.clusterers.MakeDensityBasedClusterer 
-					-M 0.001 -W weka.clusterers.Canopy -- 
-					-N 500 -max-candidates 100 -periodic-pruning 10000 
-					-min-density 2.0 -t2 -0.001 -t1 -0.001 
-					-S 1 
+Scheme:       weka.clusterers.MakeDensityBasedClusterer -M 0.001 -W weka.clusterers.Canopy -- -N -1 -max-candidates 100 -periodic-pruning 10000 -min-density 2.0 -t2 -1.0 -t1 -1.25 -S 1
 Relation:     QueryResult
 Instances:    2000
-Attributes:   5
-              latitud
-              longitud
-              UNIX_TIMESTAMP(fecha)
-Ignored:
-              id
-              recurso
+Attributes:   3
+              latitudT
+              longitudT
+              time
+Test mode:    evaluate on training data
+
+
+=== Clustering model (full training set) ===
+
+MakeDensityBasedClusterer: 
+
+Wrapped clusterer: 
+Canopy clustering
+=================
+
+Number of canopies (cluster centers) found: 4
+T2 radius: 0,504     
+T1 radius: 0,631     
+
+Cluster 0: -0.094874,-0.065178,-0.166183,{55} <0>
+Cluster 1: -0.076573,-0.097976,-0.028496,{1474} <1,2>
+Cluster 2: -0.077869,-0.097886,0.137391,{438} <1,2>
+Cluster 3: -0.044869,-0.075594,-0.166324,{33} <3>
+
+Time taken to build model (full training data) : 0.03 seconds
+
+=== Model and evaluation on training set ===
+
+Clustered Instances
+
+0        51 (  3%)
+1      1170 ( 59%)
+2       742 ( 37%)
+3        37 (  2%)
+
+
+Log likelihood: 9.34996
+\end{verbatim}
+
+\begin{figure}[H]
+	\includegraphics[scale=.5]{../comparativa/djClusterPruebaCanopySin.png}
+	\caption{Estudio DBSCAN para el Sujeto 2}
+\end{figure}
+
+
+Realizaremos un preprocesado \textit{Canopy} de $500$ cl\'usters,\\
+
+\begin{verbatim}
+=== Run information ===
+
+Scheme:       weka.clusterers.MakeDensityBasedClusterer -M 0.001 -W weka.clusterers.Canopy -- -N 500 -max-candidates 100 -periodic-pruning 10000 -min-density 2.0 -t2 -1.0 -t1 -1.25 -S 1
+Relation:     QueryResult
+Instances:    2000
+Attributes:   3
+              latitudT
+              longitudT
+              time
 Test mode:    evaluate on training data
 
 
@@ -1270,115 +1399,103 @@ Canopy clustering
 
 Number of canopies (cluster centers) found: 500
 T2 radius: 0,504     
-T1 radius: 0,001     
+T1 radius: 0,631     
 
-Cluster 0: -0.225087,-0.669237,1424157165.818182,{55} <0>
-Cluster 1: -0.224685,-0.671368,1424171523.408413,{1474} <1>
-Cluster 2: -0.224713,-0.671363,1424188821.625571,{438} <2>
-Cluster 3: -0.223987,-0.669914,1424157151.060606,{33} <3>
-....
+Cluster 0: -0.094874,-0.065178,-0.166183,
+Cluster 1: -0.076573,-0.097976,-0.028496
+...
+\end{verbatim}
+
+El cual nos consigue un preprocesado de $500$ cl\'usters con Canopy, sin embargo, al aplicar DJ-Cluser, se nos reduce a $22$ cl\'usters \\,
+
+\begin{verbatim}
+Time taken to build model (full training data) : 0.37 seconds
+
+=== Model and evaluation on training set ===
 
 Clustered Instances
-....
- 12        14 (  1%)
- 13         2 (  0%)
- 14         2 (  0%)
- 15         2 (  0%)
- 18         3 (  0%)
- 19         5 (  0%)
- 20         4 (  0%)
-....
-\end{verbatim} 
 
-A\'un a pesar del preprocesado por \textit{canopies}, vemos que la asignaci\'on de las posiciones a los cl\'usters ha sido menos suave, ya que podemos encontrarnos gran cantidad de cl\'usters con m\'as de $10$ posiciones agrupadas y bastantes con s\'olo $2$. Sin embargo, visualmente, \\
+  0         3 (  0%)
+ 12       605 ( 30%)
+ 58         7 (  0%)
+142       449 ( 22%)
+165         3 (  0%)
+209        57 (  3%)
+230       188 (  9%)
+287         8 (  0%)
+295        32 (  2%)
+345        17 (  1%)
+353         9 (  0%)
+369        68 (  3%)
+373         3 (  0%)
+380         6 (  0%)
+385         2 (  0%)
+386        10 (  1%)
+458         7 (  0%)
+459         3 (  0%)
+464         3 (  0%)
+473         9 (  0%)
+474         1 (  0%)
+493       510 ( 26%)
+
+
+Log likelihood: 9.05128
+\end{verbatim}
+
 
 \begin{figure}[H]
 	\includegraphics[scale=.5]{../comparativa/djClusterSujeto1.png}
-	\caption{Estudio Dj-Cluster para el Sujeto 1}
+	\caption{Estudio DJ-Cluster para el Sujeto 1}
 \end{figure}
 
-Podemos observar que la parte de abajo del conglomerado que K-means no llegaba a resolver, DJ-Cluster hace una mejor selecci\'on de cl\'usters en esta zona. \\
+
+TODO COMENTAR
 
 \subsubsection{Sujeto 2}
 
-En el sujeto dos podemos pensar que DJ-Cluster tambi\'en peca de demasiada clusterizaci\'on a\'un a pesar de que hemos indicado que en el preprocesado \textbf{Canopy} utilice $500$ cl\'usters.\\
+Con el sujeto 2 ocurre lo mismo que con el sujeto 1, con el preprocesado de \textit{Canopy} obtenemos una consolidaci\'on en $500$ cl\'usters, sin embargo, al aplicar DJ-Cluster, obtenemos una consolidaci\'on a 27 cl\'usters.\\
 
 \begin{verbatim}
 === Model and evaluation on training set ===
 
 Clustered Instances
 
- 14         4 (  0%)
- 38         8 (  0%)
- 42      1536 ( 77%)
+  0         6 (  0%)
+  2         5 (  0%)
+  3         1 (  0%)
+  4         2 (  0%)
+ 76         5 (  0%)
+ 91         6 (  0%)
+ 96        36 (  2%)
+107         1 (  0%)
+133         6 (  0%)
+142        91 (  5%)
+146        68 (  3%)
+159         4 (  0%)
+166        19 (  1%)
+173         1 (  0%)
+211        17 (  1%)
+214         2 (  0%)
+288         8 (  0%)
+329      1669 ( 83%)
+354         5 (  0%)
+370         1 (  0%)
+381         1 (  0%)
+386         5 (  0%)
+387        10 (  1%)
+391         1 (  0%)
+459         4 (  0%)
+474        16 (  1%)
+475        10 (  1%)
+
+
+Log likelihood: 10.83917
 \end{verbatim}
 
-Pero, si observamos el cl\'uster n\'umero $42$,\\
-
-\begin{verbatim}
-Cluster: 42 Prior probability: 0.0244
-
-Attribute: latitud
-Normal Distribution. Mean = -0.2211 StdDev = 0.002
-Attribute: longitud
-Normal Distribution. Mean = -0.6726 StdDev = 0.0008
-Attribute: fecha
-Normal Distribution. Mean = 2015 StdDev = 0
-\end{verbatim}
-
-Vemos que la probabilidad de que una posici\'on caiga en este cl\'uster es de $0.02\%$. Haciendo unas sencillas consultas en MySQL sobre la regi\'on fuertemente consolidada y la regi\'on final en la que vemos que no ha habido tanta consolidaci\'on,
-
-\begin{lstlisting}[language=sql, columns=fullflexible, basicstyle=\small, frame=tbrl, showstringspaces=false]
-mysql> SELECT id, latitud, longitud 
-	   FROM posicionesgps 
-	   WHERE recurso = 'tetra:12086044' 
-	   LIMIT 130, 5;
-\end{lstlisting}
-
 \begin{figure}[H]
-	\begin{tabular}{| l | l | l |}
-	\hline
-	\rowcolor{LightCyan}
-	\hline
-  		id & latitud & longitud \\
-	\hline
-		3299639690 & -0.22662244737148285 & -0.6721994876861572 \\
-		3299639777 & -0.22662168741226196 & -0.6722030639648438 \\
-		3299639884 & -0.22662168741226196 & -0.6722030639648438 \\
-		3299639985 & -0.22662225365638733 & -0.6721988916397095 \\
-		3299640070 & -0.22662188112735748 & -0.6722032427787781 \\
-	\hline
-	\end{tabular}
-	\caption{Consulta SQL de los resultados fuertemente consolidados}
+	\includegraphics[scale=.5]{../comparativa/djClusterSujeto2.png}
+	\caption{Estudio DJ-Cluster para el Sujeto 2}
 \end{figure}
-
-
-\begin{lstlisting}[language=sql, columns=fullflexible, basicstyle=\small, frame=tbrl, showstringspaces=false]
-mysql> SELECT id, latitud, longitud 
-	   FROM posicionesgps 
-	   WHERE recurso = 'tetra:12086044' 
-	   LIMIT 1990, 5;
-\end{lstlisting}
-
-\begin{figure}[H]
-	\begin{tabular}{| l | l | l |}
-	\hline
-	\rowcolor{LightCyan}
-	\hline
-  		id & latitud & longitud \\
-	\hline
-	3299801551 & -0.2217489778995514 & -0.6714484095573425 \\
-	3299801554 & -0.22178474068641663 & -0.6714062690734863 \\
-	3299801901 & -0.22180871665477753 & -0.6713294982910156 \\
-	3299801938 & -0.2218199521303177 & -0.671276867389679 \\
-	3299802276 & -0.2218736857175827 & -0.6711682677268982 \\
-	\hline
-	\end{tabular}
-	\caption{Consulta SQL de los resultados fuertemente consolidados}
-\end{figure}
-
-Se puede observar que en la primera tabla, las posiciones no han variado mucho, ya que s\'olo se observa variaci\'on a partir del sexto decimal, sin embargo, en la segunda tabla la variaci\'on de la posici\'on es mucho mayor, ya que la empiezan a cambiar a partir del cuarto. Esto representa un mayor movimiento del sujeto, por lo que podemos concluir que \textbf{DJ-Cluster} ha realizado una buena consolidaci\'on.
-
 
 \pagebreak
 \section{Notas y conclusiones}
@@ -1389,7 +1506,9 @@ Los segundos algoritmos expuestos son de un nivel superior, ya que est\'an pensa
 
 Entre estos m\'etodos tambi\'en ha sido valorado el estudiar m\'etodos de \textit{clustering} jerarquizados. Sin embargo, la raz\'on principal que desech\'o el estudio de \'estos fue que la complejidad de un \textit{clustering} aglomerativo jerarquizado es de $\mathcal{O}(n^3)$ y la de \textit{clustering} divisivo tambi\'en jerarquizado es de $\mathcal{O}(2^n)$, bastante grandes en comparaci\'n a la complejidad computacional computacional de $\mathcal{O}(n log n)$ de \textbf{DJ-Cluster}.\\
 
-Entre estos \'ultimos, \textbf{$K-$means}, \textbf{DJ-Cluster} y \textbf{DBSCAN} no se encuentran muchas diferencias. Obviamente, $K-$means es un algoritmo de mayor simpleza, pero se puede comprobar que es bastante eficaz a la hora de resolver nuestro problema. Notar que DBSCAN es un algoritmo que tiene la propiedad de etiquetar algunas posiciones como \textit{ruido}, lo cual ni $K-$means ni DJ-Cluster realizan, as\'i que ser\'ia un punto a favor para utilizar DBSCAN.
+Entre estos \'ultimos, \textbf{$K-$means}, \textbf{DJ-Cluster} y \textbf{DBSCAN} no se encuentran muchas diferencias. Obviamente, $K-$means es un algoritmo de mayor simpleza, pero se puede comprobar que es bastante eficaz a la hora de resolver nuestro problema. Notar que DBSCAN es un algoritmo que tiene la propiedad de etiquetar algunas posiciones como \textit{ruido}, lo cual ni $K-$means ni DJ-Cluster realizan, as\'i que ser\'ia un punto a favor para utilizar DBSCAN.\\
+
+Otro punto a notar en favor de \textbf{DJ-Cluster} es a la hora de realizar una reconstrucci\'on de la traza de movimiento a partir de los datos centralizados. TODO
 
 
 \pagebreak
