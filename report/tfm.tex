@@ -465,7 +465,7 @@ donde $p$ es un punto con latitud $lat_{p}$ y longitud $long_{p}$.
 Su implementaci\'on en Python es la siguiente,
 
 \begin{python}
-        def IsInneighborhoodByEUSimple(self, q, eps):
+        def IsInNeighEUSimple(self, q, eps):
                 return self.distance_eu(q) < eps
 \end{python}
 
@@ -476,13 +476,13 @@ En el momento que se toma la posici\'on $p_0$, aparte de la latidud y su longitu
 
 $$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \epsilon \cdot vel_{p_0} $$
 
-donde $vel_{p_0}$ es la velocidad instant\'anea de nuestro punto centro.
+donde $vel_{p_0}$ es la velocidad instant\'anea de nuestro punto centro.\\
 
 
-Su implementaci\'on en Python es la siguiente,
+Su implementaci\'on en Python es la siguiente,\\
 
 \begin{python}
-        def IsInNeighborhoodT0Reachable(self, q, eps):
+        def IsInNeighSpeedRelative(self, q, eps):
                 return self.distance_eu(q) < eps * self.speed
 \end{python}
 
@@ -513,7 +513,7 @@ $$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < v
 Su implementaci\'on en Python es la siguiente,\\
 
 \begin{python}
-        def is_in_neighborhoodT0Reachable(self, q, t0):
+        def IsInNeighT0Reachable(self, q, t0):
                 return self.distance_eu(q) < t0 * self.speed
 \end{python}
 
@@ -628,7 +628,7 @@ Se puede dar el caso que la consolidaci\'on por distancia no sea lo suficienteme
 	\EndFor
 \EndFunction
 \end{algorithmic}
-\caption{\label{alg:consolidationByEach} Algoritmo de consolidaci\'on por adelgazamiento}
+\caption{\label{alg:consolidationByThinning} Algoritmo de consolidaci\'on por adelgazamiento}
 \end{algorithm}
 
 Una sencilla implementaci\'on en Python se encuentra en el ap\'endice \ref{App:AppendixB}.\\
@@ -657,7 +657,7 @@ Es posible que la toma de posiciones se tome de manera muy pr\'oxima en el tiemp
 	\EndIf
 \EndFunction
 \end{algorithmic}
-\caption{\label{alg:consolidationByEach} Algoritmo de consolidaci\'on por tiempo}
+\caption{\label{alg:consolidationByTime} Algoritmo de consolidaci\'on por tiempo}
 \end{algorithm}
 
 Una implementaci\'on en Python se puede encontrar en el ap\'endice \ref{App:AppendixF}.\\
@@ -1383,7 +1383,13 @@ Se puede observar que en la primera tabla, las posiciones no han variado mucho, 
 \pagebreak
 \section{Notas y conclusiones}
 
-Entre estos m\'etodos tambi\'en ha sido valorado el estudiar m\'etodos de \textit{clustering} jerarquizados. Sin embargo, la idea principal que desech\'o el estudio de \'estos fue que la complejidad de un \textit{clustering} aglomerativo jerarquizado es de $\mathcal{O}(n^3)$ y la de \textit{clustering} divisivo tambi\'en jerarquizado es de $\mathcal{O}(2^n)$. \\
+Se debe notar que entre los resultados de este texto, se encuentran dos tipos de algoritmos analizados e implementados. Los algoritmos de consolidaci\'on que hemos definido como "simples", que no realizan un estudio a partir de los datos, sino que parten de distintas nociones de distancia tanto espacial como temporal y realizan una consolidaci\'on en funci\'on de \'esta. La ventaja de estos algoritmos es que son eficaces, cumplen el papel que prometen y liberan la memoria necesaria en disco para poder seguir con una inserci\'on en base de datos. La desventaja principal de \'estos es que a nivel estad\'istico no realizan un estudio de las propias caracter\'isticas del dato en s\'i, como los algoritmos de \textit{clustering}.\\
+
+Los segundos algoritmos expuestos son de un nivel superior, ya que est\'an pensados para cualquier tipo de dato, no necesariamente ordenado en una magnitud temporal. Con \'estos aseguramos una menor p\'erdida de informaci\'on, aunque si que resultan de mayor coste computacional que los anteriores. En un futuro, esto queda a criterio de la persona que implementar\'ia estos algoritmos directamente en la aplicaci\'on a utilizar. \\
+
+Entre estos m\'etodos tambi\'en ha sido valorado el estudiar m\'etodos de \textit{clustering} jerarquizados. Sin embargo, la raz\'on principal que desech\'o el estudio de \'estos fue que la complejidad de un \textit{clustering} aglomerativo jerarquizado es de $\mathcal{O}(n^3)$ y la de \textit{clustering} divisivo tambi\'en jerarquizado es de $\mathcal{O}(2^n)$, bastante grandes en comparaci\'n a la complejidad computacional computacional de $\mathcal{O}(n log n)$ de \textbf{DJ-Cluster}.\\
+
+Entre estos \'ultimos, \textbf{$K-$means}, \textbf{DJ-Cluster} y \textbf{DBSCAN} no se encuentran muchas diferencias. Obviamente, $K-$means es un algoritmo de mayor simpleza, pero se puede comprobar que es bastante eficaz a la hora de resolver nuestro problema. Notar que DBSCAN es un algoritmo que tiene la propiedad de etiquetar algunas posiciones como \textit{ruido}, lo cual ni $K-$means ni DJ-Cluster realizan, as\'i que ser\'ia un punto a favor para utilizar DBSCAN.
 
 
 \pagebreak
@@ -1407,6 +1413,8 @@ Entre estos m\'etodos tambi\'en ha sido valorado el estudiar m\'etodos de \texti
 
 
 \appendix
+
+
 \section{Impementaci\'on de consolidaci\'on por distancia} \label{App:AppendixA}
 
 \begin{python}
@@ -1417,15 +1425,15 @@ def ConsolidationByDistance(listPositions, typeOfDistance, eps, t0):
 	while i < len(listPositions) - 1:
 		# Neighborhood: Distance EU simple
 		if typeOfDistance == 0:
-			if not listPositions[i].is_in_neighborhoodByEUSimple(listPositions[i+1], eps):
+			if not listPositions[i].IsInNeighEUSimple(listPositions[i+1], eps):
 				result.append(listPositions[i])
 		# Neighborhood: Distance EU relative to speed
 		elif typeOfDistance == 1:
-			if not listPositions[i].is_in_neighborhoodByEURelativeSpeed(listPositions[i+1], eps):
+			if not listPositions[i].IsInNeighSpeedRelative(listPositions[i+1], eps):
 				result.append(listPositions[i])
 		# Neighborhood t0 reachable
 		elif typeOfDistance == 2:
-			if not listPositions[i].is_in_neighborhoodT0Reachable(listPositions[i+1], t0):
+			if not listPositions[i].IsInNeighT0Reachable(listPositions[i+1], t0):
 				result.append(listPositions[i])
 		else:
 			raise ValueError('That distance does not exist')
@@ -1555,90 +1563,11 @@ def ConsolidationByTime(listPositions, lapse):
 		if not listPositions[i].is_neighboorhoudByTime(listPositions[i+1], lapse):
 			result.append(listPositions[i])
 		i=i+1
-	#Por defecto anadiremos la ultima posicion, ya que no tiene siguiente con quien comparar
 	result.append(listPositions[len(listPositions) - 1])
 
 	return result
 \end{python}
 
-
-\newpage
-\section{Resulados Algoritmo K-means utilizando Weka} \label{App:AppendixE}
-
-\begin{verbatim}
-
-=== Run information ===
-
-Scheme:       weka.clusterers.SimpleKMeans -init 0 -max-candidates 100 
-										  -periodic-pruning 10000 
-										  -min-density 2.0 -t1 -1.25 
-										  -t2 -1.0 -N 8000 
-										  -A "weka.core.EuclideanDistance 
-										  -R first-last" -I 500 
-										  -num-slots 1 -S 10
-Relation:     QueryResult
-Instances:    39839
-Attributes:   3
-              latitud
-              longitud
-              UNIX_TIMESTAMP(fecha)
-Test mode:    evaluate on training data
-
-
-=== Clustering model (full training set) ===
-
-
-kMeans
-======
-
-Number of iterations: 19
-Within cluster sum of squared errors: 0.6346425074677955
-
-Initial starting points (random):
-
-Cluster 0: -0.224685,-0.671374,1424274995
-Cluster 1: -0.224541,-0.671549,1424233683
-Cluster 2: -0.224685,-0.671371,1424506207
-Cluster 3: -0.224684,-0.671368,1424533080
-Cluster 4: -0.224685,-0.67137,1424937795
-Cluster 5: -0.225005,-0.671538,1425054445
-Cluster 6: -0.224681,-0.671371,1425364201
-Cluster 7: -0.224511,-0.671435,1424547762
-Cluster 8: -0.224685,-0.671372,1425445944
-Cluster 9: -0.224512,-0.67143,1424593627
-Cluster 10: -0.224688,-0.671369,1424801082
-Cluster 11: -0.224542,-0.671549,1424212221
-Cluster 12: -0.224685,-0.671368,1424177841
-Cluster 13: -0.224686,-0.67137,1425101454
-Cluster 14: -0.224681,-0.671372,1424250539
-Cluster 15: -0.224685,-0.67137,1424250305
-............................................
-
-Time taken to build model (full training data) : 240.83 seconds
-
-=== Model and evaluation on training set ===
-
-Clustered Instances
-
-   0          3 (  0%)
-   1          2 (  0%)
-   2          1 (  0%)
-   3          3 (  0%)
-   4          4 (  0%)
-   5          4 (  0%)
-   6          4 (  0%)
-   7          2 (  0%)
-   8          2 (  0%)
-   9          5 (  0%)
-  10          3 (  0%)
-  11          3 (  0%)
-  12          7 (  0%)
-  13          6 (  0%)
-  14         13 (  0%)
-  15         13 (  0%)
-............................................
-
-\end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

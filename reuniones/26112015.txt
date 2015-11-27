@@ -1,0 +1,13 @@
+adelgazamiento  = keachj DONE
+preprocesado añadir canopy DONE
+consolidacion por tiempo DONE
+
+qué es un analisis cluster pequeño parrafo de introduccion de data mining (tecnica de aprendizaje no supervisado) DONE
+
+paquete para introducir figuras en el sitio necesario !H (float package) DONE
+
+por qué utilizamos dj-cluster y dbscan frente a otros.
+
+algoritmos jerarquicos ¿por qué no? (o sí)
+
+citaciones bibliográficas DONE
