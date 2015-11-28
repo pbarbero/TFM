@@ -1508,7 +1508,7 @@ Entre estos m\'etodos tambi\'en ha sido valorado el estudiar m\'etodos de \texti
 
 Entre estos \'ultimos, \textbf{$K-$means}, \textbf{DJ-Cluster} y \textbf{DBSCAN} no se encuentran muchas diferencias. Obviamente, $K-$means es un algoritmo de mayor simpleza, pero se puede comprobar que es bastante eficaz a la hora de resolver nuestro problema. Notar que DBSCAN es un algoritmo que tiene la propiedad de etiquetar algunas posiciones como \textit{ruido}, lo cual ni $K-$means ni DJ-Cluster realizan, as\'i que ser\'ia un punto a favor para utilizar DBSCAN.\\
 
-Otro punto a notar en favor de \textbf{DJ-Cluster} es a la hora de realizar una reconstrucci\'on de la traza de movimiento a partir de los datos centralizados. TODO
+Otro punto a notar en favor de \textbf{DJ-Cluster} es a la hora de realizar una reconstrucci\'on de la traza de movimiento a partir de los datos centralizados. El algoritmo $K-$means no asegura encontrar los mejores centroides de los cl\'usters. El resultado depende de la elecci\'on inicial de los centros de los cl\'usters, la cual es al azar en el caso de $K-$means. Ser\'ia a lo mejor recomendable lanzar el algoritmo varias veces con el fin de minimizar el error en cada una y elegir la que mejor se ajustara, pero en este caso es mejor utilizar un DJ-Cluster. 
 
 
 \pagebreak
