@@ -16,26 +16,26 @@ DBSCAN:
     Sujeto 1:
         Canopy No
         Iteraciones 111
-        Tiempo de ejecución
+        Tiempo de ejecución 2min 30''
         Clusters: 9
 
     Sujeto 2:
         Canopy No
         Iteraciones
-        Tiempo de ejecución
+        Tiempo de ejecución 2 min 20''  
         Clusters 9
 
 DJ-CLUSTER:
     Sujeto 1:
         Canpopy Sí
         Clusters: 500 en canopy, 22
-        Squared Error: 0.117363
         Tiempo: 0.37 secs
+        Verosimilitud: 9.34996
 
     Sujeto 2:
-        Canpopy Sí
+        Canopy Sí
         Clusters: 500 en canopy, 27
-        Squared Error: 0.117363
         Tiempo: 0.37 secs
+        Verosimilitud: 10.83917
         
         
