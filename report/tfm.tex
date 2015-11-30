@@ -39,7 +39,7 @@
      urlcolor     = blue,
 }
 
-\newcommand*{\plogo}{\includegraphics[scale=.45]{unizar.png}} 
+\newcommand*{\plogo}{\includegraphics[scale=.5]{unizar.png}} 
 
 
 
@@ -73,7 +73,13 @@ Tom\'as Alcal\'a Nalvaiz \par % Editor list
 
 \vfill % Whitespace between editor names and publisher logo
 
-\plogo \\[0.3\baselineskip] % Publisher logo
+\begin{multicols}{2}
+\plogo 
+\columnbreak
+\includegraphics[scale=.3]{ciencias.png}
+\end{multicols}
+
+%\\[0.3\baselineskip] % Publisher logo
 
 \endgroup}
 
@@ -710,8 +716,7 @@ Adem\'as, $K-$means es un algoritmo no determin\'istico, debido a la primera fas
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{DBSCAN}
-
-\textbf{DBSCAN}\cite{importantPlaces} o \textbf{Density-based spatial clustering of applications with noise} es un algoritmo de \textit{clustering} que dado un conjunto de puntos en un espacio, los agrupa en funci\'on de la densidad de puntos que tengan a su alrededor, dejando a un lado aquellos que tienen una densidad baja. \\
+\textbf{DBSCAN}\cite{importantPlaces} o \textbf{Density-based spatial clustering of applications with noise} es un algoritmo de \textit{clustering} basado en la densidad por lo que encuentra el n\'umero de cl\'usters comenzando por una estimaci\'on de la distribuci\'on de densidad de los nodos correspondientes. Dado un conjunto de puntos en un espacio, los agrupa en funci\'on de la densidad de puntos que tengan a su alrededor, dejando a un lado aquellos que tienen una densidad baja. \\
 
 Se considera un conjunto de puntos a aplicar la t\'ecnica. El algoritmo clasificar\'a los puntos en tres grupos: 
 
@@ -965,7 +970,7 @@ LIMIT 2000;
 
 La importaci\'on de datos para poder utilizar los algoritmos que se han desarrollado en la secci\'on \ref{sec:simple} es parecida a la utilizada en el algoritmo \textbf{DBSCAN}.\\ 
 
-Utilizaremos la clase \texttt{db} que hemos creado para conectarnos a la base de datos donde almacenamos las posiciones:
+Utilizaremos la clase \texttt{db} que hemos creado para conectarnos a la base de datos donde almacenamos las posiciones:\\
 
 \begin{python}
 cur_sal = connect_db("bahia")
@@ -976,6 +981,7 @@ cmd = "SELECT * FROM posicionesgps WHERE latitud<>0
 cur_sal.execute(cmd)
 \end{python}
 
+\bigskip
 Y crearemos una lista de posiciones con la implementaci\'on previa que hemos desarrollado:\\
 
 \begin{python}
@@ -992,6 +998,7 @@ for row in cur_sal.fetchall():
 	list_pos.append(q)
 \end{python}
 
+\smallskip
 Tipificaremos las variables como anteriormente hemos hecho, calculando su media y su desviaci\'on t\'ipica:\\
 
 \begin{python}
@@ -1011,26 +1018,32 @@ devLon = np.std(longs)
 latsTyp = []
 longsTyp = []
 for pos in list_pos:
-	q = Position(pos.id
-	, pos.resource
+	q = Position(pos.id, pos.resource
 	, (pos.lat - meanLat)/devLat
 	, (pos.lon - meanLon)/devLon
-	, pos.speed
-	, pos.track
-	, pos.date
-	)
+	, pos.speed, pos.track, pos.date)
 	listPosTyp.append(q)
 	latsTyp.append(q.lat)
 	longsTyp.append(q.lon)
 \end{python}
 
+\bigskip
+Utilizaremos el c\'odigo definido en el anexo \ref{App:AppendixB} para realizar las consolidaciones por adelgazamiento, tiempo y distancia.\\
+
+\begin{python}
+import consolidation as cs
+\end{python}
+
 \pagebreak
 \subsubsection{Consolidaci\'on por adelgazamiento}
+
 Y vamos a realizar una primera consolidaci\'on por adelgazamiento, se mantienen 2 posiciones de cada 5:\\
-\bigskip
+
 \begin{python}
 result = cs.ConsolidationByThinning(list_pos, 2, 5)
 \end{python}
+
+\bigskip
 
 Utilizando \texttt{matplotlib}, dibujamos los resultados.\\
 
@@ -1044,7 +1057,7 @@ Los puntos rojos son los eliminados porque se han consolidado y los azules son l
 \pagebreak
 \subsubsection{Consolidaci\'on por tiempo}
 
-Realizaremos una consolidaci\'on por tiempo, eliminaremos las posiciones que tengan entre ellas un lapso menor que $20$:
+Realizaremos una consolidaci\'on por tiempo, eliminaremos las posiciones que tengan entre ellas un lapso menor que $20$:\\
 
 \begin{python}
 result = cs.ConsolidationByTime(list_pos, 20)
@@ -1058,7 +1071,7 @@ result = cs.ConsolidationByTime(list_pos, 20)
 En este caso se mantienen 507 posiciones.
 
 \pagebreak
-\subsubsection{Consolidaci\'on por distancia}
+\subsubsection{Consolidaci\'on por distancia simple}
 
 Se realiza una consolidaci\'on por distancia simple, es decir, por distancia eucl\'idea dando un radio de $\varepsilon = 0.0001$:\\
 
@@ -1067,36 +1080,31 @@ result = cs.ConsolidationByDistance(list_pos, 0, 0.0001, 1)
 \end{python}
 
 \begin{figure}[H]
-	\includegraphics[scale=.45]{../comparativa/byTimeSuj1.png}
+	\includegraphics[scale=.45]{../comparativa/distanceEuEps10-4.png}
 	\caption{Resultado consolidaci\'on por distancia con $\varepsilon=0.0001$ sobre el Sujeto 1}
 \end{figure}
 
-Se realiza una consolidaci\'on por distancia $t_0$-alcanzable:
+Se han reducido el n\'umero de puntos a 21.\\
+
+\subsubsection{Consolidaci\'on por distancia t0-alcanzable}
 
 \begin{python}
 cs.ConsolidationByDistance(list_pos, 2, 0.001, 1)
 \end{python}
-
 
 \begin{figure}[H]
 	\includegraphics[scale=.45]{../comparativa/t0Sujet1.png}
 	\caption{Resultado consolidaci\'on por distancia con la distancia $t_0-$alcanzable fijada a 0.001}
 \end{figure}
 
-%Esta consolidaci\'on, tiene en cuenta la distancia del sujeto, debido a la velocidad que lleva \'este a la hora de realizar la traza, nuestro algoritmo ha identificado todos los puntos en los que est\'a en movimiento como uno s\'olo ya que al utilizar este tipo de vecindario, el rango se ampl\'ia y m\'as puntos caben en este.\\
-
 Esta consolidaci\'on, que tiene en cuenta la velocidad instant\'anea del sujeto, realiza una consolidaci\'on m\'as severa en aquellos puntos en los cuales el sujeto posee velocidad, es decir, el vecindario de \'estos puntos es superior al vecindario de los puntos donde no posee velocidad. Esta es la raz\'on por la cual la traza superior (en la que el sujeto tiene una mayor velocidad) ha sido consolidada s\'olo al punto inicial. \\
 
-Esta consolidaci\'on ha mantenido 21 puntos.\\
+Esta consolidaci\'on ha mantenido 1786 puntos.\\
 
 \pagebreak
 \subsection{Resultados con K-means}
 
-Se va a realizar un estudio \textbf{K-means} para ambos sujetos con los mismos par\'ametros que previamente hab\'iamos aplicado, vamos a reducir el n\'umero de posiciones a $500$, es decir, una consolidaci\'on al $25\%$. \\
-
-En ambos experimentos se ha tomado una distancia eucl\'idea por simplicidad.\\
-
-Se aplicar\'a un preprocesado de \textit{Canopy} y fijaremos el n\'umero de cl\'usters a $500$: \\
+Se va a realizar un estudio \textbf{K-means} para ambos sujetos con los mismos par\'ametros que previamente hab\'iamos aplicado, vamos a reducir el n\'umero de posiciones a $500$, es decir, una consolidaci\'on al $25\%$. En ambos experimentos se ha tomado una distancia eucl\'idea por simplicidad. Se aplicar\'a un preprocesado de \textit{Canopy} y fijaremos el n\'umero de cl\'usters a $500$: \\
 
 \subsubsection{Sujeto 1}
 
@@ -1138,16 +1146,17 @@ Cluster 2: -0.044869,-0.075594, -0.166324
 Time taken to build model (full training data) : 0.69 seconds
 \end{verbatim}
 
-Se han realizado $10$ iteraciones y se ha llegado a un error cuadr\'atico de $0.117363$. Observando el n\'umero de posiciones que ha agrupado por cl\'uster, podemos observar que var\'ian entre $1$ y $9$, lo cual es una buena media, ya que no ha agrupado demasiadas posiciones en un mismo cl\'uster. Debemos recordar que nuestro objetivo no es conseguir una cantidad de cl\'usters muy peque\~na, sino conseguir que cada cl\'uster cuente con un n\'umero m\'as o menos equilibrado de posiciones, para poder asignar cada posici\'on a su centro del cl\'uster.\\ 
-
-Se puede observar mejor en la gr\'afica. Cada cl\'uster est\'a representado por un color distinto. En la parte superior de esta gr\'afica, podemos observar que ha seguido un camino con respecto al tiempo en una direcci\'on, mientras que en la parte inferior ha pasado varias veces por un mismo sitio, y aparece una aglomeraci\'on de colores en un punto. Esto se debe a que para nuestro estudio hemos introducido tambi\'en la variable temporal, por lo que no puede agrupar todas esas posiciones en un mismo cl\'uster, ya que no lo est\'an, debido a que vienen de varios instantes distintos. \\
-
-El total de cl\'usters es de 500, ya que con $K-$means es necesario prefijarlos.
 
 \begin{figure}[H]
 	\includegraphics[scale=.5]{../comparativa/kMeansSujeto1.png}
 	\caption{Estudio K-means para el Sujeto 1}
 \end{figure}
+
+Se han realizado $10$ iteraciones y se ha llegado a un error cuadr\'atico de $0.117363$. Observando el n\'umero de posiciones que ha agrupado por cl\'uster, podemos observar que var\'ian entre $1$ y $9$, lo cual es una buena media, ya que no ha agrupado demasiadas posiciones en un mismo cl\'uster. Debemos recordar que nuestro objetivo no es conseguir una cantidad de cl\'usters muy peque\~na, sino conseguir que cada cl\'uster cuente con un n\'umero m\'as o menos equilibrado de posiciones, para poder asignar cada posici\'on a su centro del cl\'uster.\\ 
+
+Se puede observar mejor en la gr\'afica. Cada cl\'uster est\'a representado por un color distinto. En la parte superior de esta gr\'afica, podemos observar que ha seguido un camino con respecto al tiempo en una direcci\'on, mientras que en la parte inferior ha pasado varias veces por un mismo sitio, y aparece una aglomeraci\'on de colores en un punto. Esto se debe a que para nuestro estudio hemos introducido tambi\'en la variable temporal, por lo que no puede agrupar todas esas posiciones en un mismo cl\'uster, ya que no lo est\'an, debido a que vienen de varios instantes distintos. \\
+
+El total de cl\'usters es de 500, ya que con $K-$means es necesario prefijarlos.
 
 
 \subsubsection{Sujeto 2}
@@ -1230,17 +1239,22 @@ dbc = dbscanner()
 dbc.dbscan(Data, eps, MinPts)
 \end{python}
 
-\begin{figure}[H]
-	\includegraphics[width=15cm]{../comparativa/dbscanSujeto1.png}
-	\caption{Estudio DBSCAN para el Sujeto 1}
-\end{figure}
+\bigskip
 
 Una de las cosas positivas que se puede decir del algoritmo \textbf{DBSCAN} es que identifica puntos como \textit{ruido}, cosa que los algoritmos de \textbf{K-means} y \textbf{DJ-Cluster} no hacen, ya que asignan simplemente esos puntos a un cl\'uster de un \'unico punto.\\
 
 El resultado de DBSCAN ha sido una divisi\'on de nuestro conjunto inicial de $1000$ posiciones en 6 cl\'usters y algunas posiciones etiquetadas como ruido.
 
 
+\begin{figure}[H]
+	\includegraphics[width=15cm]{../comparativa/dbscanSujeto1.png}
+	\caption{Estudio DBSCAN para el Sujeto 1}
+\end{figure}
+
+
 \subsubsection{Sujeto 2}
+
+Utilizaremos los mismos par\'ametros utilizados para el sujeto 1:\\
 
 \begin{python}
 cur= connect_db("bahia")
@@ -1269,18 +1283,21 @@ dbc.dbscan(Data, eps, MinPts)
 	\caption{Estudio DBSCAN para el Sujeto 2}
 \end{figure}
 
-DBSCAN es un algoritmo de \textit{clustering} basado en la densidad por lo que encuentra el n\'umero de cl\'usters comenzando por una estimaci\'on de la distribuci\'on de densidad de los nodos correspondientes.\\
+Obtenemos 5 cl\'usters en un tiempo de ejecuci\'on de 2 minutos, 20 segundos. En esta ejecucci\'on, ha etiquetado muchas posiciones como ruido, probablemente son las posiciones en las cuales el sujeto se encuentra en movimiento. De haber utilizado aqu\'i una consolidaci\'on en la cual se hubiera introducido una distancia que involucrara la velocidad, habr\'iamos consolidado en esa zona superior derecha de ruido un nuevo cl\'uster. \\
 
-Ventajas con respecto a $K-$means:
+Haciendo un peque\~no cambio en el c\'odigo que podemos encontrar de la implementaci\'on de DBSCAN en el ap\'endice \ref{App:AppendixG}.\\
 
-\begin{itemize}
-	\item No necesita de prefijar el n\'umero de cl\'usters.
-	\item DBSCAN tiene la noci\'on de ruido, as\'i que no es necesario aplicar un post-filtro para encontrar aquellos puntos aislados. 
-\end{itemize}
+\begin{python}
+def regionQuery(self,P,eps):
+	P = Position(None, None, P.X, P.Y, P.Speed, None, None)
+	for d in self.dataSet:
+		d = Position(None, none, d.X, d.Y, d.Speed, None, None)
+		if d.is_in_neighborhoodByEURelativeSpeed(P, 0.001):
+			result.append(d)
+	return result
+\end{python}
 
-Sin embargo, \textit{DBSCAN} no es un algoritmo determinista, los puntos borde que son alcanzables desde m\'as de un s\'olo cl\'uster pueden asignarse a cualquiera de \'estos. Sin embargo, esta situaci\'on no es usual, y en nuestro problema, s\'olo nos interesan realmente los puntos n\'ucleo y los puntos aislados. \\
-
-DBSCAN es personalizable, es posible utilizar alguna de las distancias personalizables que hemos utilizado. 
+As\'i estar\'iamos utilizando la distancia que hemos implementado que involucra la velocidad.
 
 \subsection{Resultados con DJ-Cluster}
 
@@ -1483,7 +1500,7 @@ Log likelihood: 10.83917
 
 \begin{center}
 \begin{figure}[H]
-	\begin{tabular}{| l | l | l |}
+	\begin{tabular}{|p{2.5cm}|l|l|}
 	\hline
   		\cellcolor{blue!25}\textbf{Algoritmo} 
   		& \cellcolor{blue!25}\textbf{SUJETO 1} 
@@ -1537,6 +1554,34 @@ Log likelihood: 10.83917
 			Tiempo de ejecuci\'on & 1.56 secs
 		\end{tabular}\\
 		\hline
+		\textbf{Por adelgazamiento} & 
+		\begin{tabular}{ll}
+			Canopy: & No \\
+			Iteraciones: & N. de posiciones \\
+			Cl\'usters: & 800\\
+		\end{tabular} & \\
+		\hline
+		\textbf{Por tiempo} & 
+		\begin{tabular}{ll}
+			Canopy: & No \\
+			Iteraciones: & N. de posiciones \\
+			Cl\'usters: & 507\\
+		\end{tabular} & \\
+		\hline
+		\textbf{Por distancia simple} & 
+		\begin{tabular}{ll}
+			Canopy: & No \\
+			Iteraciones: & N. de posiciones \\
+			Cl\'usters: & 21\\
+		\end{tabular} & \\
+		\hline
+		\textbf{Por distancia $t_0$-alcanzable} & 
+		\begin{tabular}{ll}
+			Canopy: & No \\
+			Iteraciones: & N. de posiciones \\
+			Cl\'usters: & 1786\\
+		\end{tabular} & \\
+		\hline
 	\end{tabular}
 	\caption{Comparativa entre los disintos m\'etodos}
 \end{figure}
@@ -1545,7 +1590,16 @@ Log likelihood: 10.83917
 
 Se puede observar que claramente el algoritmo \textbf{DBSCAN} es el m\'as lento de todos, adem\'as del que m\'as iteraciones realiza. Sin embargo, \'este es el que menos cl\'usters obtiene, es decir, el que realiza una consolidaci\'on mayor. Esto es debido a que no lleva un preprocesado \textit{Canopy} previo, no como \textbf{K-means} y \textbf{DJ-Cluster}. Ambos llevan un preprocesado previo de \textit{Canopy}, el cual les marca un n\'umero m\'inimo de cl\'usters que dejar a la hora de realizarlo, sin embargo, podemos observar que \textbf{K-means} se queda en los $500$ cl\'usters que le hemos fijado desde el principio, mientras que \textbf{DJ-Cluster} consigue rebajar este n\'umero incluso m\'as. Con respecto al tiempo de ejecuci\'on, \textbf{DJ-Cluster} es much\'isimo m\'as efectivo, aunque su error cuadr\'atico es peor, comparado con \textbf{K-means}.\\
 
-La comparativa de \'estos m\'etodos m\'as avanzados con los propios es algo dif\'icil de realizar. Un primer punto ser\'ia hacer notar que la complejidad algor\'itmica de los algoritmos por consolidaci\'on simple vistos en \ref{sec:simple} es mucho mayor que los algoritmos posteriormente estudiados. Sin embargo, la principal ventaja del uso de \'estos sobre los avanzados ser\'ia la posibilidad de una utilizaci\'on de otra definici\'on de distancia, cosa que utilizando alguna implementaci\'on ya realizada en Weka es imposible.\\
+\textbf{DBSCAN} tiene algunas ventajas con respecto a sus dem\'as compa\~neros:
+
+\begin{itemize}
+	\item No necesita de prefijar el n\'umero de cl\'usters.
+	\item DBSCAN tiene la noci\'on de ruido, as\'i que no es necesario aplicar un post-filtro para encontrar aquellos puntos aislados. 
+\end{itemize}
+
+Sin embargo, \textit{DBSCAN} no es un algoritmo determinista, los puntos borde que son alcanzables desde m\'as de un s\'olo cl\'uster pueden asignarse a cualquiera de \'estos. Sin embargo, esta situaci\'on no es usual, y en nuestro problema, s\'olo nos interesan realmente los puntos n\'ucleo y los puntos aislados. \\
+
+La comparativa de \'estos m\'etodos m\'as avanzados con los propios simples definidos en \ref{sec:simple} es algo dif\'icil de realizar. Un primer punto ser\'ia hacer notar que la complejidad algor\'itmica de los algoritmos por consolidaci\'on simple vistos en \ref{sec:simple} es mucho mayor que los algoritmos posteriormente estudiados. Sin embargo, la principal ventaja del uso de \'estos sobre los avanzados ser\'ia la posibilidad de una utilizaci\'on de otra definici\'on de distancia, cosa que utilizando alguna implementaci\'on ya realizada en Weka es imposible.\\
 
 
 \pagebreak
@@ -1811,6 +1865,97 @@ class Cluster:
 		return self
 \end{python}
 
+
+\newpage
+\section{Impementaci\'on de DBSCAN en Python} \label{App:AppendixG}
+
+\begin{python}
+'''
+Created on Feb 13, 2014
+
+@author: sushant
+'''
+
+from cluster import *
+from pylab import *
+
+class dbscanner:
+    
+	dataSet = []
+	count = 0
+	visited = []
+	member = []
+	Clusters = []
+    
+	def dbscan(self,D,eps,MinPts):
+		self.dataSet = D
+        
+		title(r'DBSCAN Algorithm', fontsize=18)
+		xlabel(r'Dim 1',fontsize=17)
+		ylabel(r'Dim 2', fontsize=17)
+		plt.figure(figsize=(15,10))
+        
+		C = -1
+		Noise = cluster('Noise')
+		numit = 0
+		for point in D:
+			if point not in self.visited:
+				self.visited.append(point)
+				NeighbourPoints = self.regionQuery(point,eps)
+                
+				if len(NeighbourPoints) < MinPts:
+					Noise.addPoint(point)
+				else:
+					name = 'Cluster'+str(self.count)
+					C = cluster(name)
+					self.count+=1
+					self.expandCluster(point,NeighbourPoints,C,eps,MinPts)
+                    
+					plot(C.getX(),C.getY(),'o',label=name)
+					hold(True)
+
+       
+		if len(Noise.getPoints())!=0:
+			plot(Noise.getX(),Noise.getY(),'x',label='Noise')
+            
+		hold(False)
+		legend(loc='lower left')
+		grid(True)
+		show()
+    
+	def expandCluster(self,point,NeighbourPoints,C,eps,MinPts):
+        
+		C.addPoint(point)
+        
+		for p in NeighbourPoints:
+			if p not in self.visited:
+				self.visited.append(p)
+				np = self.regionQuery(p,eps)
+				if len(np) >= MinPts:
+					for n in np:
+						if n not in NeighbourPoints:
+							NeighbourPoints.append(n)
+                    
+			for c in self.Clusters:
+				if not c.has(p):
+					if not C.has(p):
+						C.addPoint(p)
+                        
+			if len(self.Clusters) == 0:
+				if not C.has(p):
+					C.addPoint(p)
+                        
+		self.Clusters.append(C)                 
+                
+                     
+	def regionQuery(self,P,eps):
+		result = []
+		for d in self.dataSet:
+			if (((d[0]-P[0])**2 + (d[1] - P[1])**2)**0.5)<=eps:
+				result.append(d)
+		return result            
+    
+\end{python}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

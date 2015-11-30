@@ -6,6 +6,8 @@ Created on Feb 13, 2014
 
 from cluster import *
 from pylab import *
+from position import Position
+from algorithms.db import connect_db
 
 class dbscanner:
     
@@ -21,7 +23,7 @@ class dbscanner:
         title(r'DBSCAN Algorithm', fontsize=18)
         xlabel(r'Dim 1',fontsize=17)
         ylabel(r'Dim 2', fontsize=17)
-	plt.figure(figsize=(20,30))
+	plt.figure(figsize=(15,10))
         
         C = -1
         Noise = cluster('Noise')
@@ -87,11 +89,30 @@ class dbscanner:
                 
                      
     def regionQuery(self,P,eps):
-        result = []
-        for d in self.dataSet:
-            if (((d[0]-P[0])**2 + (d[1] - P[1])**2)**0.5)<=eps:
-                result.append(d)
-        return result
+#        result = []
+#        for d in self.dataSet:
+#            if (((d[0]-P[0])**2 + (d[1] - P[1])**2)**0.5)<=eps:
+#                result.append(d)
+#        return result
+	# connect db
+	cur = connect_db("bahia")
+	consult = "SELECT id, recurso, latitud, longitud, velocidad, orientacion, UNIX_TIMESTAMP(fecha) FROM posicionesgps WHERE latitud = {0} AND longitud={1};"
+	cmd = consult.format(P[1], P[0])
+	print cmd
+	cur.execute(cmd)
+	
+        pos = cur.fetchall()[0]
+	P = Position(pos[0], pos[1], pos[2], pos[3], pos[4], pos[5], pos[6])
+	
+	for d in self.dataSet:
+	     cmd = consult.format(d.getX(), d.getY())
+	     cur.execute(cmd)
+	     pos = cur.fetchall()[0]
+	     d = Position(pos[0], pos[1], pos[2], pos[3], pos[4], pos[5], pos[6])
+	     if d.is_in_neighborhoodByEURelativeSpeed(P, 0.001):
+		result.append(d)
+	return result
+
     
             
             
