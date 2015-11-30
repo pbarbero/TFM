@@ -21,10 +21,11 @@ class dbscanner:
         title(r'DBSCAN Algorithm', fontsize=18)
         xlabel(r'Dim 1',fontsize=17)
         ylabel(r'Dim 2', fontsize=17)
+	plt.figure(figsize=(20,30))
         
         C = -1
         Noise = cluster('Noise')
-       
+        numit = 0
         for point in D:
             if point not in self.visited:
                 self.visited.append(point)
@@ -40,6 +41,10 @@ class dbscanner:
                     
                     plot(C.getX(),C.getY(),'o',label=name)
                     hold(True)
+		numit = numit +1
+
+	print "NUMERO DE ITERACIONES"
+	print numit
         
         if len(Noise.getPoints())!=0:
             plot(Noise.getX(),Noise.getY(),'x',label='Noise')

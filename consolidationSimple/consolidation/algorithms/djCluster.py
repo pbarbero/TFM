@@ -13,11 +13,6 @@ def DjCluster(setPoints, typeDistance, eps, minPoints, t0):
 		# Calculamos el vecindario N(p) y el minimo de puntos indicado
 		np = computeNeighborhood(p, setPoints, typeDistance, minPoints, eps, t0)
 
-		# DEBUG
-		if np is not None:
-			print np.toString()
-		# END DEBUG
-
 		# Si N(p) es nulo (es decir, N(p) no esta en un cluster)
 		if np is None:
 			listNoises.append(p) # etiquetamos el punto como ruido
@@ -50,7 +45,3 @@ def computeNeighborhood(p, setPoints, typeDistance, minPoints, eps, t0):
 		return None
 	else:
 		return Cluster(p, pointsOfCluster)
-
-	
-	
-			

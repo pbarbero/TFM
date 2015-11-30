@@ -1,0 +1,7 @@
+maxima de velocidad de 255
+30GB, tamaño en la introduccion?
+referencias de cada explicación
+referencias a aprendizaje no supervisado en la sección 6
+por qué no hemos utilizado la velocidad en DBSCAN, DJ-CLuster, K-means
+
+

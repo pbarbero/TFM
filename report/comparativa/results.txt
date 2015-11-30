@@ -1,0 +1,41 @@
+K-means
+    Sujeto 1:
+        Canpopy Sí
+        Clusters: 500
+        Iteraciones 9
+        Squared Error: 0.117363
+        Tiempo: 0.69 secs
+    Sujeto 2:
+        Canopy Sí
+        Clusters: 500
+        Iteraciones 24
+        Squared Error: 0.208997
+        Tiempo: 1.38
+
+DBSCAN:
+    Sujeto 1:
+        Canopy No
+        Iteraciones 111
+        Tiempo de ejecución
+        Clusters: 9
+
+    Sujeto 2:
+        Canopy No
+        Iteraciones
+        Tiempo de ejecución
+        Clusters 9
+
+DJ-CLUSTER:
+    Sujeto 1:
+        Canpopy Sí
+        Clusters: 500 en canopy, 22
+        Squared Error: 0.117363
+        Tiempo: 0.37 secs
+
+    Sujeto 2:
+        Canpopy Sí
+        Clusters: 500 en canopy, 27
+        Squared Error: 0.117363
+        Tiempo: 0.37 secs
+        
+        

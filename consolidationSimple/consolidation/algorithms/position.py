@@ -26,17 +26,17 @@ class Position:
 		
 	"Neighboorhoud EU involving speed module."
 	def is_in_neighborhoodByEURelativeSpeed(self, q, eps):
-		return self.distance_eu(q) < eps * self.speed
+		if self.speed == 0:
+			return False
+		else:
+			return self.distance_eu(q) < eps * self.speed
 		
 	"Neighboorhoud t0-reachable using distance EU and speed module."
 	def is_in_neighborhoodT0Reachable(self, q, t0):
-		return self.distance_eu(q) < t0 * self.speed
-
-	"Neighboorhoud EU involving speed and orientation."
-	def is_in_neighborhoodByEURelativeSpeedOrientation(self, q, eps):
-		# TODO :Obtain orientation from self.orientation
-		# return distance_eu(self, q) < eps * self.speed 
-		return NotImplemented
+		if self.speed == 0:
+			return False
+		else:
+			return self.distance_eu(q) < t0 * self.speed
 
 
 	"Is it in neighboorhood by time?"
