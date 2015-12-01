@@ -13,7 +13,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\documentclass[a4paper, 12pt]{article}
+\documentclass[a4paper, 12pt, spanish]{article}
+\usepackage[spanish]{babel} 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{listings}
@@ -27,10 +28,17 @@
 \usepackage{glossaries}
 \usepackage{float}
 \usepackage[dvipsnames]{xcolor}
+\usepackage{framed}
 \graphicspath{ {images/} }
 \usepackage{indentfirst}
 
+\usepackage[superscript,biblabel]{cite}
 
+\makeatletter
+\renewcommand*{\ALG@name}{Algoritmo}
+\makeatother
+
+\renewcommand{\lstlistingname}{C\'odigo}
 
 \hypersetup{
      colorlinks   = true,
@@ -169,7 +177,7 @@ Contamos con datos proporcionados por una empresa de telecomunicaciones de sede 
 
 Se encuentra entonces un problema de almacenamiento de datos. Estos datos, cada vez m\'as numerosos, empiezan a poblar la base de datos de una manera err\'atica, es decir, un sujeto puede permanecer mucho tiempo en un sitio y seguir transmitiendo una posici\'on constante a base. Nos lleva a plantearnos la siguiente pregunta, ¿es \'esto necesario? ¿No ser\'ia m\'as eficiente almacenar s\'olo una muestra de \'esta? Al fin y al cabo, el objetivo del almacenamiento de estas posiciones es el ser posicionadas en un mapa, por lo que no necesitamos de varias instancias de una misma. \\
 
-Surge el concepto de \textit{consolidaci\'on}. Este concepto nos lleva a que si un sujeto se ha movido muy poco o nada en una zona del espacio, sea posible eliminar de nuestra base de datos estas posiciones, qued\'andonos con una central. A este proceso lo llamaremos consolidaci\'on y deberemos averiguar, dados los datos suministrados, las variables que nos son \'utiles a la hora de realizar este estudio.\\
+Surge el concepto de \textit{consolidaci\'on}. Este concepto nos lleva a que si un sujeto se ha movido muy poco o nada en una zona del espacio, sea posible eliminar de nuestra base de datos estas posiciones, qued\'andonos con una central.\\
 
 Nos planteamos que tanto la terminal personal que lleva cada sujeto como la base centralizada pueden llegar a l\'imite no deseado, provocando que este se sature e no permita la inserci\'on de nuevos datos. Con el fin de impedir esto, se va a realizar un estudio de distintas t\'ecnicas de \textit{consolidaci\'on} con el fin de almacenar el m\'inimo de datos pero con la m\'axima informaci\'on posible. \\
 
@@ -177,10 +185,11 @@ Este trabajo realiza una comparaci\'on entre diferentes t\'ecnicas de \textit{cl
 
 El c\'odigo est\'a disponible para bajarse y utilizarse bajo una licencia GNU GPL en:\\
 
-\begin{center}\label{pbarbero}
-	\href{http://pbarbero.github.io/TFM/}{\texttt{http://pbarbero.github.io/TFM/}}
-\end{center}
+\begin{center}
+	\href{http://pbarbero.github.io/TFM/}{\textsf{http://pbarbero.github.io/TFM/}}
 
+	\framebox[1.05\width]{\includegraphics[scale=.5]{introd.png}}
+\end{center}
 
 \pagebreak
 
@@ -242,7 +251,6 @@ Se nos suministran dos bases de datos correspondientes a dos ciudades brasile\~n
 \end{center}
 
 
-\pagebreak
 \subsection{An\'alisis de los datos}
 
 Vamos a utilizar \textbf{R} con el IDE \textit{Rstudio} para realizar un an\'alisis previo de los datos recibidos. Para ellos necesitamos de algunas librer\'ias a la hora de conectarnos a la base de datos importada:\\
@@ -383,7 +391,7 @@ mysql> SELECT table_schema as `Database`,
 
 \end{lstlisting}
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\begin{tabular}{| l | l | l |}
 	\hline
@@ -677,7 +685,7 @@ class Cluster:
 \pagebreak
 \subsection{K-means}
 
-\textbf{K-means}\cite{importantPlaces} es un m\'etodo eficiente de \textit{clustering} que tiene como objetivo la partici\'on de un conjunto de $n$ elementos en $k$ grupos distintos. Dado un cojunto de datos $(x_1, x_2, \ldots , x_n)$, $K-$means construye una partici\'on de las observaciones en $k$ conjuntos con $k\leq n$, $S=\{S_1, S_2, \ldots, S_k\}$ con el fin de minimizar el t\'ermino de error que es la suma de las distancias al cuadrado de cada punto al centro de su cl\'uster, es decir:\\
+\textbf{K-means}\cite{importantPlaces} es un m\'etodo eficiente de \textit{clustering} que tiene como objetivo la partici\'on de un conjunto de $n$ elementos en $k$ grupos distintos. Dado un cojunto de datos $(x_1, x_2, \ldots , x_n)$, \textbf{K-means} construye una partici\'on de las observaciones en $k$ conjuntos con $k\leq n$, $S=\{S_1, S_2, \ldots, S_k\}$ con el fin de minimizar el t\'ermino de error que es la suma de las distancias al cuadrado de cada punto al centro de su cl\'uster, es decir:\\
 
 $$ E=\sum_{i=1}^{n} \sum_{x\in S_i} d(x, m_i) $$
 
@@ -687,11 +695,11 @@ Inicialmente, el algoritmo asigna cada punto a su cl\'uster de manera aleatoria.
 
 Este algoritmo, aunque eficiente, tiene algunos inconvenientes con respecto a la consolidaci\'on de datos que se busca.\\
 
-La primera de todas, es que se debe fijar un n\'umero de cl\'usters a obtener desde el principio, lo que a priori no ser\'ia malo en nuestro caso, no es interesante en t\'erminos de eficiencia y de mantener la m\'axima informaci\'on posible. En todo caso, $K-$means ser\'ia interesante para un primer procesado de datos en el cual la base de datos necesitara urgentemente un descenso de cantidad de posiciones almacenadas. \\
+La primera de todas, es que se debe fijar un n\'umero de cl\'usters a obtener desde el principio, lo que a priori no ser\'ia malo en nuestro caso, no es interesante en t\'erminos de eficiencia y de mantener la m\'axima informaci\'on posible. En todo caso, \textbf{K-means} ser\'ia interesante para un primer procesado de datos en el cual la base de datos necesitara urgentemente un descenso de cantidad de posiciones almacenadas. \\
 
 En segundo caso, no hay distintos ente puntos considerados "ruido", ya que todos los puntos se consideran en los cl\'usters resultado. Esto introducir\'ia muchos errores a la hora de intentar minimizar el t\'ermino del error, ya que f\'acilmente se podr\'ian etiquetar posiciones no significativas como ruido y no introducirlas en el proceso.\\
 
-Adem\'as, $K-$means es un algoritmo no determin\'istico, debido a la primera fase de asignaci\'on de centros de cl\'usters de manera aleatoria, por lo que no ser\'ia muy fiable.\\
+Adem\'as, \textbf{K-means} es un algoritmo no determin\'istico, debido a la primera fase de asignaci\'on de centros de cl\'usters de manera aleatoria, por lo que no ser\'ia muy fiable.\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -717,7 +725,7 @@ Ahora, si $p$ es un punto n\'ucleo, entonces forma un cl\'uster con aquellos pun
 
 En el diagrama, se puede observar que si fijamos la variable $minPts$ a 3, el punto $A$ y los dem\'as puntos rojos son puntos n\'ucleo, ya que al menos est\'an rodeados de $3$ puntos en su vecindario de radio $\varepsilon$. Como son densamente alcanzables unos con otros, forman un cl\'uster. Los puntos $B$ y $C$ no son puntos n\'ucleo, pero s\'i que son alcanzables desde $A$, por lo que tambi\'en pertenecen al cl\'uster. El punto $N$ es calificiado como aislado o \textit{ruido} ya que no es ni punto n\'ucleo ni densamente alcanzable. \\
 
-La alcanzabilidad no es una relaci\'on sim\'etrica ya que, por definici\'on, ningu\'un punto puede ser alcanzable por un punto no n\'ucleo (un punto no n\'ucleo puede ser alcanzable, pero no puedo \textit{"alcanzar"}). Es necesario definir una noci\'on m\'as fuerte de \textit{conectividad}. Decimos que $p$ y $q$ est\'an densamente conectados si existe un punto $o$ tal que $p$ y $q$ son densamente alcanzables. Esta noci\'on de \textit{densamente conectados} s\'i que es sim\'etrica.\\
+La alcanzabilidad no es una relaci\'on sim\'etrica ya que, por definici\'on, ningu\'un punto puede ser alcanzable por un punto no n\'ucleo (un punto no n\'ucleo puede ser alcanzable, pero no puedo \textit{alcanzar}). Es necesario definir una noci\'on m\'as fuerte de \textit{conectividad}. Decimos que $p$ y $q$ est\'an densamente conectados si existe un punto $o$ tal que $p$ y $q$ son densamente alcanzables. Esta noci\'on de \textit{densamente conectados} s\'i que es sim\'etrica.\\
 
 Redefinimos la noci\'on de cl\'uster que previamente hab\'iamos definido. Un cl\'uster debe satisfacer dos propiedades:\\
 
@@ -778,6 +786,7 @@ Si uno de los puntos del proceso resulta que es parte de un cl\'uster, su vecind
 
 Se encuentra una implementaci\'on bastante eficaz y sencilla en el repositorio de \href{https://github.com/SushantKafle/DBSCAN}{Sushant Kafle} \cite{dbscanPython}.\\
 
+\begin{figure}[H]
 \begin{python}
 from dbscanner import dbscanner
 from algorithms.db import connect_db
@@ -803,6 +812,8 @@ MinPts= 5
 dbc = dbscanner()
 dbc.dbscan(Data, eps, MinPts)
 \end{python}
+\caption{Ejemplo de uso de la implementaci\'on de \textbf{DBSCAN}}
+\end{figure}
 \bigskip
 Notar que hemos tomado como valor de $\varepsilon = 0.0001$ ya que es una aproximaci\'on de la distancia media de toma entre posiciones y $5$ es un buen valor a la hora de hacer una consolidaci\'on. El resultado consiste en algunas posiciones marcadas como ruido y $5$ cl\'usters. Debido a que es un proceso muy costoso, nos hemos limitado en este caso a hacer la consolidaci\'on en unas $1000$ posiciones.\\
 
@@ -850,7 +861,7 @@ Durante el proceso, se recorren todos los puntos del conjunto a analizar, calcul
 
 Al final de cada iteraci\'on puede ser que el n\'umero de cl\'usters no cambie, porque no existe un nuevo cl\'uster o porque el nuevo cl\'uster sea mergeado con alguno de los ya existentes.\\
 
-El valor de los par\'ametros $\varepsilon$ y $MinPts$ es el que determina el tama\~no de nuestros clusters. En nuestro caso, no buscamos grandes n\'umeros de cl\'usters, sino perder el m\'inimo de informaci\'on posible, por lo que nos convendr\'ia tomar unos valores de $\varepsilon$ y $MinPts$ peque\~nos \ref{clusteringApproach}.\\
+El valor de los par\'ametros $\varepsilon$ y $MinPts$ es el que determina el tama\~no de nuestros clusters. En nuestro caso, no buscamos grandes n\'umeros de cl\'usters, sino perder el m\'inimo de informaci\'on posible, por lo que nos convendr\'ia tomar unos valores de $\varepsilon$ y $MinPts$ peque\~nos \cite{clusteringApproach}.\\
 
 El valor de la variable $\varepsilon$ debe tomarse\cite{clusteringApproach} en funci\'on de la precisi\'on de los aparatos que toman las posiciones. Podemos estimar este par\'amero por unos $20$ metros, que es la precisi\'on de un GPS convencional. \\
 
@@ -887,7 +898,7 @@ Para el primer sujeto, contamos con lo siguiente:
 	\hline
 	\rowcolor{LightCyan}
 	\hline
-  		& latitud & longitud & fecha \\
+  		& latitud &  longitud & fecha \\
 	\hline
 	\hline
 		Media & -0.223 & -0.665 & 1424174494.89 \\
@@ -1133,14 +1144,14 @@ Time taken to build model (full training data) : 0.69 seconds
 
 \begin{figure}[H]
 	\includegraphics[scale=.5]{../comparativa/kMeansSujeto1.png}
-	\caption{Estudio \textbf{K-means} para el Sujeto 1}
+	\caption{Resultado de \textbf{K-means} para el Sujeto 1}
 \end{figure}
 
 Se han realizado $10$ iteraciones y se ha llegado a un error cuadr\'atico de $0.117363$. Observando el n\'umero de posiciones que ha agrupado por cl\'uster, podemos observar que var\'ian entre $1$ y $9$, lo cual es una buena media, ya que no ha agrupado demasiadas posiciones en un mismo cl\'uster. Debemos recordar que nuestro objetivo no es conseguir una cantidad de cl\'usters muy peque\~na, sino conseguir que cada cl\'uster cuente con un n\'umero m\'as o menos equilibrado de posiciones, para poder asignar cada posici\'on a su centro del cl\'uster.\\ 
 
 Se puede observar mejor en la gr\'afica. Cada cl\'uster est\'a representado por un color distinto. En la parte superior de esta gr\'afica, podemos observar que ha seguido un camino con respecto al tiempo en una direcci\'on, mientras que en la parte inferior ha pasado varias veces por un mismo sitio, y aparece una aglomeraci\'on de colores en un punto. Esto se debe a que para nuestro estudio hemos introducido tambi\'en la variable temporal, por lo que no puede agrupar todas esas posiciones en un mismo cl\'uster, ya que no lo est\'an, debido a que vienen de varios instantes distintos. \\
 
-El total de cl\'usters es de 500, ya que con $K-$means es necesario prefijarlos.
+El total de cl\'usters es de 500, ya que con \textbf{K-means} es necesario prefijarlos.
 
 
 \subsubsection{Sujeto 2}
@@ -1188,7 +1199,7 @@ Time taken to build model (full training data) : 1.38 seconds
 
 \begin{figure}[H]
 	\includegraphics[scale=.5]{../comparativa/kMeansSujeto2.png}
-	\caption{Estudio \textbf{K-means} para el Sujeto 1}
+	\caption{Resultado de \textbf{K-means} para el Sujeto 1}
 \end{figure}
 
 En la siguiente figura, se observa una asignaci\'on un poco rara de los cl\'usters. En la secci\'on de abajo se pueden observar distintos colores, como si varios puntos muy cercanos se hubieran asingados a cl\'usteres distintos, pero esto es debido a que no son seguidos en el tiempo, es decir, el sujeto est\'a volviendo a pasar por el mismo sitio. Si nos volvemos a fijar en la representaci\'on sin clusterizar, se puede observar que existe un trozo donde el naranja y el azul se superponen, es decir, son instantes distantes temporalmente.\\
@@ -1233,7 +1244,7 @@ El resultado de DBSCAN ha sido una divisi\'on de nuestro conjunto inicial de $10
 
 \begin{figure}[H]
 	\includegraphics[width=15cm]{../comparativa/dbscanSujeto1.png}
-	\caption{Estudio \textbf{DBSCAN} para el Sujeto 1}
+	\caption{Resultado de \textbf{DBSCAN} para el Sujeto 1}
 \end{figure}
 
 
@@ -1265,7 +1276,7 @@ dbc.dbscan(Data, eps, MinPts)
 
 \begin{figure}[H]
 	\includegraphics[width=15cm]{../comparativa/dbscanSujeto2.png}
-	\caption{Estudio \textbf{DBSCAN} para el Sujeto 2}
+	\caption{Resultado de \textbf{DBSCAN} para el Sujeto 2}
 \end{figure}
 
 Obtenemos 5 cl\'usters en un tiempo de ejecuci\'on de 2 minutos, 20 segundos. En esta ejecucci\'on, ha etiquetado muchas posiciones como ruido, probablemente son las posiciones en las cuales el sujeto se encuentra en movimiento. De haber utilizado aqu\'i una consolidaci\'on en la cual se hubiera introducido una distancia que involucrara la velocidad, habr\'iamos consolidado en esa zona superior derecha de ruido un nuevo cl\'uster. \\
@@ -1345,7 +1356,7 @@ Log likelihood: 9.34996
 
 \begin{figure}[H]
 	\includegraphics[scale=.5]{../comparativa/djClusterPruebaCanopySin.png}
-	\caption{Estudio \textbf{DBSCAN} para el Sujeto 2}
+	\caption{Resultado de \textbf{DBSCAN} para el Sujeto 2}
 \end{figure}
 
 
@@ -1424,7 +1435,7 @@ Log likelihood: 9.05128
 
 \begin{figure}[H]
 	\includegraphics[scale=.5]{../comparativa/djClusterSujeto1.png}
-	\caption{Estudio \textbf{DJ-Cluster} para el Sujeto 1}
+	\caption{Resultado de \textbf{DJ-Cluster} para el Sujeto 1}
 \end{figure}
 
 Este resultado se puede interpretar como algo bastante positivo, ya que hemos reducido considerablemente el tama\~no de nuestra base de datos, e incluso podemos etiquetar algunos cl\'usters como ruido, es decir, aquellos que s\'olo se nos han producido a partir de una o dos posiciones como es el caso. Ser\'ia necessario hacer un \textit{post-procesado} de datos para eliminar todas estas posiciones aisladas.
@@ -1476,7 +1487,7 @@ Log likelihood: 10.83917
 
 \begin{figure}[H]
 	\includegraphics[scale=.5]{../comparativa/djClusterSujeto2.png}
-	\caption{Estudio \textbf{DJ-Cluster} para el Sujeto 2}
+	\caption{Resultado de \textbf{DJ-Cluster} para el Sujeto 2}
 \end{figure}
 
 
@@ -1498,7 +1509,7 @@ Log likelihood: 10.83917
 			N. Cl\'usters & 500 \\
 			Iteraciones & 9 \\
 			Error cuadr\'atico & 0.117363 \\
-			Tiempo de ejecuci\'on & 0.69 secs
+			T. de ejecuci\'on & 0.69 secs
 		\end{tabular} &
 		\begin{tabular}{l l}
 			Canopy & S\'i\\
@@ -1529,7 +1540,7 @@ Log likelihood: 10.83917
 			Cl\'usters: & 22\\
 			Error cuadr\'atico: & 0.140929\\
 			Verosimilitud: & 9.34996	\\
-			Tiempo de ejecuci\'on & 0.03 secs
+			T. de ejecuci\'on & 0.37 secs
 		\end{tabular} & 
 		\begin{tabular}{l l}
 			Canopy: & S\'i \\
@@ -1537,7 +1548,7 @@ Log likelihood: 10.83917
 			N. Cl\'usters: & 27\\
 			Error cuadr\'atico: & 0.209090\\
 			Verosimilitud: & 10.83638\\
-			Tiempo de ejecuci\'on & 1.56 secs
+			T. de ejecuci\'on & 1.56 secs
 		\end{tabular}\\
 		\hline
 		\textbf{Por adelgazamiento} & 
@@ -1545,6 +1556,7 @@ Log likelihood: 10.83917
 			Canopy: & No \\
 			Iteraciones: & N. de posiciones \\
 			Cl\'usters: & 800\\
+			T. de ejecuci\'on: & < 0.01 sec
 		\end{tabular} & \\
 		\hline
 		\textbf{Por tiempo} & 
@@ -1552,6 +1564,7 @@ Log likelihood: 10.83917
 			Canopy: & No \\
 			Iteraciones: & N. de posiciones \\
 			Cl\'usters: & 507\\
+			T. de ejecuci\'on: & < 0.01 sec
 		\end{tabular} & \\
 		\hline
 		\textbf{Por distancia simple} & 
@@ -1559,6 +1572,7 @@ Log likelihood: 10.83917
 			Canopy: & No \\
 			Iteraciones: & N. de posiciones \\
 			Cl\'usters: & 21\\
+			T. de ejecuci\'on: & < 0.01 sec
 		\end{tabular} & \\
 		\hline
 		\textbf{Por distancia $t_0$-alcanzable} & 
@@ -1566,6 +1580,7 @@ Log likelihood: 10.83917
 			Canopy: & No \\
 			Iteraciones: & N. de posiciones \\
 			Cl\'usters: & 1786\\
+			T. de ejecuci\'on: & < 0.01 sec
 		\end{tabular} & \\
 		\hline
 	\end{tabular}
@@ -1595,14 +1610,15 @@ Entre los resultados de este texto, se encuentran dos tipos de algoritmos analiz
 
 Los segundos algoritmos expuestos son de un nivel superior, ya que est\'an pensados para cualquier tipo de dato, no necesariamente ordenado en una magnitud temporal. Con \'estos aseguramos una menor p\'erdida de informaci\'on, aunque s\'i que resultan de mayor coste mayor tanto computacional como de implementaci\'on que los anteriores. En un futuro, esto queda a criterio de la persona que desarrollara estos algoritmos directamente en la aplicaci\'on a utilizar. \\
 
-Entre estos m\'etodos de "alto nivel" tambi\'en ha sido valorado el estudiar m\'etodos de \textit{clustering} jerarquizados. Sin embargo, la raz\'on principal que desech\'o el estudio de \'estos fue que la complejidad de un \textit{clustering} aglomerativo jerarquizado es de $\mathcal{O}(n^3)$ y la de \textit{clustering} divisivo tambi\'en jerarquizado es de $\mathcal{O}(2^n)$, bastante grandes en comparaci\'n a la complejidad computacional computacional de $\mathcal{O}(n log n)$ de \textbf{DJ-Cluster}.\\
+Entre estos m\'etodos de "alto nivel" tambi\'en ha sido valorado el estudiar m\'etodos de \textit{clustering} jerarquizados. Sin embargo, la raz\'on principal que desech\'o el estudio de \'estos fue que la complejidad de un \textit{clustering} aglomerativo jerarquizado es de $\mathcal{O}(n^3)$ y la de \textit{clustering} divisivo tambi\'en jerarquizado es de $\mathcal{O}(2^n)$, bastante grandes en comparaci\'n a la complejidad computacional computacional de $\mathcal{O}(n \text{ log}(n))$ de \textbf{DJ-Cluster}.\\
 
 Entre estos \'ultimos, \textbf{K-means}, \textbf{DJ-Cluster} y \textbf{DBSCAN} no se encuentran muchas diferencias. Obviamente, \textbf{K-means} es un algoritmo de mayor simpleza, pero se puede comprobar que es bastante eficaz a la hora de resolver nuestro problema. Notar que \textbf{DBSCAN} es un algoritmo que tiene la propiedad de etiquetar algunas posiciones como \textit{ruido}, lo cual las implementaciones de Weka de \textbf{K-means} y \textbf{DJ-Cluster} no realizan, as\'i que ser\'ia un punto a favor para utilizar \textbf{DBSCAN}.\\
 
 A la hora de realizar una reconstrucci\'on de la traza de movimiento a partir de los datos centralizados, es rese\~nable el uso del algoritmo \textbf{DJ-Cluster} ya que el algoritmo \textbf{K-means} no asegura encontrar los mejores centroides de los cl\'usters. El resultado depende de la elecci\'on inicial de los centros de los cl\'usters, la cual es al azar en el caso de \textbf{K-means}. Ser\'ia a lo mejor recomendable lanzar el algoritmo varias veces con el fin de minimizar el error en cada una y elegir la que mejor se ajustara, pero en este caso es mejor utilizar un \textbf{DJ-Cluster}. \\
 
-Quedar\'ia como trabajo a futuro la inserci\'on de la velocidad en los algoritmos de \textbf{K-means}, \textbf{DJ-Cluster} y \textbf{DBSCAN}. La definici\'on de un nuevo concepto de distancia ha sido realizada para los algoritmos de consolidaci\'on simple, sin embargo, la realizaci\'on de pruebas sobre los dem\'as m\'etodos ha sido realizada con el software Weka, el cual no permite el uso de distancias personalizable. El n\'umero de iteraciones en este caso es lineal, es decir, es el n\'umero de posiciones iniciales que mandamos consolidar.\\
+La definici\'on de un nuevo concepto de distancia ha sido realizada para los algoritmos de consolidaci\'on simple, sin embargo, la realizaci\'on de pruebas sobre los dem\'as m\'etodos ha sido realizada con el software Weka, el cual no permite el uso de distancias personalizable. El n\'umero de iteraciones en este caso es lineal, es decir, es el n\'umero de posiciones iniciales que mandamos consolidar.\\
 
+Quedar\'ia como trabajo a futuro la inclusi\'on de la orientaci\'on en los algoritmos de \textbf{K-means}, \textbf{DJ-Cluster} y \textbf{DBSCAN} como un elemento m\'as a la hora de definir las nociones de vecindario. \\
 
 \pagebreak
 \section{Herramientas utilizadas}
@@ -1732,7 +1748,7 @@ def canopy(X, T1, T2, distance_metric='euclidean', filemap=None):
 
 
 
-\newpage
+\pagebreak
 
 \begin{python}[caption=DJ-Cluster]\label{App:DJCluster}
 from position import Position, Cluster
@@ -1776,9 +1792,7 @@ def computeNeighborhood(p, setPoints, typeDistance, minPoints, eps, t0):
 	else:
 		return Cluster(p, pointsOfCluster)
 
-\end{python}
-\bigskip
-\begin{python}
+
 class Cluster:
 	"Cluster of points, basically set of points with a center"
 	def __init__(self, center, points):
@@ -1804,7 +1818,7 @@ class Cluster:
 \end{python}
 
 
-\newpage
+\pagebreak
 \begin{python}[caption=DBSCAN]\label{App:DBSCAN}
 '''
 Created on Feb 13, 2014
@@ -1928,5 +1942,5 @@ class dbscanner:
 %\end{thebibliography}
 
 \bibliography{bibReport}{}
-\bibliographystyle{plain}
+\bibliographystyle{unsrtnat}
 \end{document}
