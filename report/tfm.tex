@@ -34,12 +34,6 @@
 
 \usepackage[superscript,biblabel]{cite}
 
-\makeatletter
-\renewcommand*{\ALG@name}{Algoritmo}
-\makeatother
-
-\renewcommand{\lstlistingname}{C\'odigo}
-
 \hypersetup{
      colorlinks   = true,
      linkcolor    = RoyalPurple,
@@ -149,10 +143,18 @@ columns=fullflexible,
 
 \renewcommand{\contentsname}{\'Indice}
 \renewcommand{\refname}{Bibliograf\'ia}
-\renewcommand{\listfigurename}{Lista de tablas y figuras}
+%\renewcommand{\listfigurename}{\'Indice de tablas y figuras}
+\renewcommand*{\listalgorithmname}{\'Indice de algoritmos} 
+
+\makeatletter
+\renewcommand*{\ALG@name}{Algoritmo}
+\makeatother
+
+\renewcommand{\lstlistingname}{C\'odigo}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
-
 
 
 \titleGP % This command includes the title page
@@ -161,8 +163,6 @@ columns=fullflexible,
 \newpage\null\thispagestyle{empty}\newpage
 
 \tableofcontents
-\listoffigures
-
 
 \pagebreak
 
@@ -188,7 +188,7 @@ El c\'odigo est\'a disponible para bajarse y utilizarse bajo una licencia GNU GP
 \begin{center}
 	\href{http://pbarbero.github.io/TFM/}{\textsf{http://pbarbero.github.io/TFM/}}
 
-	\framebox[1.05\width]{\includegraphics[scale=.5]{introd.png}}
+	\framebox{\href{http://pbarbero.github.io/TFM/}{\includegraphics[scale=.5]{introd.png}}}
 \end{center}
 
 \pagebreak
@@ -227,9 +227,8 @@ Se nos suministran dos bases de datos correspondientes a dos ciudades brasile\~n
 	\begin{figure}[H]
 	\begin{tabular}{|l|l|l|l|l|}
 	\hline
-	\rowcolor{LightCyan}
 	\hline
-	Field & Type & Null & Key & Default \\
+  		\cellcolor{LightCyan}Field & \cellcolor{LightCyan}Type & \cellcolor{LightCyan}Null & \cellcolor{LightCyan}Key & \cellcolor{LightCyan}Default \\
 	\hline
 	\hline
 	id & bigint(10) & NO &  PRI & 0  \\
@@ -396,9 +395,9 @@ mysql> SELECT table_schema as `Database`,
 	\begin{tabular}{| l | l | l |}
 	\hline
 	\hline
-	\cellcolor{green!25}Database & 
-	\cellcolor{green!25}Table & 
-	\cellcolor{green!25}Size in KB \\
+	\cellcolor{LightCyan}Database & 
+	\cellcolor{LightCyan}Table & 
+	\cellcolor{LightCyan}Size in KB \\
 	\hline
 	\hline
 	rio & posicionesgps & 120564000 \\
@@ -719,7 +718,7 @@ Ahora, si $p$ es un punto n\'ucleo, entonces forma un cl\'uster con aquellos pun
 
 \begin{figure}[H]\label{fig:DBSCAN}
 	\centering
-	\includegraphics[scale=.5]{DBSCAN.png}
+	\includegraphics[scale=.4]{DBSCAN.png}
 \caption{Diagrama \textbf{DBSCAN}}
 \end{figure}
 
@@ -821,7 +820,7 @@ Notar que hemos tomado como valor de $\varepsilon = 0.0001$ ya que es una aproxi
 	\begin{center}
 	\includegraphics[scale=.7]{dbscan_2_0.png}
 	\end{center}
-	\caption{Ejemplo del algoritmo \textbf{DBSCAN}}
+	\caption{Resultado \textbf{DBSCAN}}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -891,21 +890,18 @@ Antes de aplicar los m\'etodos, es necesario aplicar un filtro de Normalizaci\'o
 
 Antes de importar las variables de nuestra base de datos, necesitamos hacer el c\'alculo de su media y su desviaci\'on t\'ipica con el fin de tipificar cada una de las variables y dar la misma importancia a cada una de ellas. \\
 
-Para el primer sujeto, contamos con lo siguiente:
+Para el primer sujeto, contamos con lo siguiente:\\
 
-\begin{figure}[H]
-	\begin{tabular}{| l | l | l | l |}
-	\hline
+	\begin{tabular}{l|l|l|l}
 	\rowcolor{LightCyan}
 	\hline
-  		& latitud &  longitud & fecha \\
-	\hline
+		& latitud & longitud & fecha\\
 	\hline
 		Media & -0.223 & -0.665 & 1424174494.89 \\
 		Desv. T\'ipica & 0.022 & 0.065	& 104277.37 \\
-	\hline
 	\end{tabular}
-\end{figure}
+	
+\bigskip
 
 Hacemos una importaci\'on de datos a Weka de la siguiente forma:\\
 
@@ -927,21 +923,18 @@ mysql > SELECT (latitud + 0.223)/0.022 as 'latitudT',
 
 Se hace una distinci\'on de colores azules y naranjas en funci\'on del tiempo. Se puede observar la traza de movimiento del sujeto, que empieza en la esquina superior izquierda y acaba en la parte inferior de la gr\'afica. \\
 
-Calculamos la desviaci\'on t\'ipica y la media del segundo sujeto, del mismo modo que con el sujeto 1.
+Calculamos la desviaci\'on t\'ipica y la media del segundo sujeto, del mismo modo que con el sujeto 1.\\
 
-\begin{figure}[H]
-	\begin{tabular}{| l | l | l | l |}
-	\hline
+	\begin{tabular}{l|l|l|l}
 	\rowcolor{LightCyan}
+		& latitud & longitud & fecha\\
 	\hline
-  		& latitud & longitud & fecha \\
-	\hline
-	\hline
-		Media & -0.21 &  -0.625 & 1424350386.203 \\
+		Media & -0.21 & -0.625 & 1424350386.203 \\
 		Desv. T\'ipica & 0.057 & 0.169 & 41234.453 \\
-	\hline
 	\end{tabular}
-\end{figure}
+
+	
+	\bigskip
 
 Para el segundo sujeto, hacemos una importaci\'on de datos a partir de nuestra base de datos de la siguiente forma:\\
 
@@ -1282,6 +1275,8 @@ dbc.dbscan(Data, eps, MinPts)
 Obtenemos 5 cl\'usters en un tiempo de ejecuci\'on de 2 minutos, 20 segundos. En esta ejecucci\'on, ha etiquetado muchas posiciones como ruido, probablemente son las posiciones en las cuales el sujeto se encuentra en movimiento. De haber utilizado aqu\'i una consolidaci\'on en la cual se hubiera introducido una distancia que involucrara la velocidad, habr\'iamos consolidado en esa zona superior derecha de ruido un nuevo cl\'uster. \\
 
 Haciendo un peque\~no cambio en el c\'odigo que podemos encontrar de la implementaci\'on de DBSCAN en el ap\'endice \ref{App:AppendixB}.\\
+
+\pagebreak
 
 \begin{python}
 def regionQuery(self,P,eps):
@@ -1638,7 +1633,6 @@ Quedar\'ia como trabajo a futuro la inclusi\'on de la orientaci\'on en los algor
 
 
 \newpage
-
 \appendix
 
 \section{Implementaci\'on de algoritmos de consolidaci\'on simple}\label{App:AppendixA}
@@ -1822,10 +1816,8 @@ class Cluster:
 \begin{python}[caption=DBSCAN]\label{App:DBSCAN}
 '''
 Created on Feb 13, 2014
-
 @author: sushant
 '''
-
 from cluster import *
 from pylab import *
 
@@ -1909,37 +1901,15 @@ class dbscanner:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
 
-\addcontentsline{toc}{section}{Bibliograf\'ia}
-%\begin{thebibliography}{50}
-%
-%%\bibitem{lifePatter}\label{lifePatter} Yang Ye, Yu Zheng, Yukun Chen, Jianhua Feng, Xing Xie
-%%\\ \href{http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.361.9085&rep=rep1&type=pdf}{\textit{Mining Individual Life Pattern Based on Location History}}
-%
-%\bibitem{lifePatter}\label{lifePatter} Yukun Chen, Jianhua Feng, Xing Xie, Yang Ye, Yu Zheng
-%\\ \href{http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.361.9085&rep=rep1&type=pdf}{\textit{Mining Individual Life Pattern Based on Location History}}
-%
-%\bibitem{importantPlaces}\label{importantPlaces} Changqing Zhou, Nupur Bhatnagar, Shashi Shekhar, Loren Terveen
-%\\ \href{http://www-users.cs.umn.edu/~czhou/pub/place-important_v3.pdf}{\textit{Mining Personally Important Places from GPS Track}} 
-%
-%\bibitem{clusteringApproach}\label{clusteringApproach} Changqing Zhou, Dan Frankowski, Pamela Ludford, Shashi Shekhar, Loren Terveen
-%\\ \href{http://files.grouplens.org/papers/zhou-acmgis04.pdf}{\textit{Discovering Personal Gazetteers: An Interactive Clustering Approach}}
-%
-%\bibitem{canopy}\label{canopy} Andrew McCallum, Kamal Nigam, Lyle H. Ungar \\
-%\href{http://www.kamalnigam.com/papers/canopy-kdd00.pdf}{\textit{Efficient Clustering of High-Dimensional Data Sets with Application to Reference Matching}}
-%
-%\bibitem{canopyGitHub} \label{canopyGitHub} \href{https://github.com/gdbassett}{\textit{Gabe}}'s Gist \\ 
-%\href{https://gist.github.com/gdbassett/528d816d035f2deaaca1}{Efficient python implementation of canopy clustering.}
-%
-%\bibitem{dbscanPython} \label{dbscanPython} \href{https://github.com/SushantKafle}{\textit{Sushant Kafle}}'s GitHub Repository 
-%\\ \href{https://github.com/SushantKafle/DBSCAN}{Implementation of DBSCAN Algorithm in Python.}
-%
-%\bibitem{weka} \label{weka} Ian H. Witten and Eibe Frank (2005). Data Mining: Practical Machine Learning Tools and Techniques. 2nd Edition, Morgan Kaufmann, San Francisco. \\ \href{http://www.cs.waikato.ac.nz/ml/weka/}{Weka Project}
-%
-%\bibitem{r} \label{r} \href{http://www.R-project.org}{R Development Core Team (2008). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. ISBN 3-900051-07-0}
-%
-%\end{thebibliography}
+\newpage
+\addcontentsline{toc}{section}{\listfigurename}
+\listoffigures
+\addcontentsline{toc}{section}{\listalgorithmname}
+\listofalgorithms
+
+\newpage
+\addcontentsline{toc}{section}{Referencias}
 
 \bibliography{bibReport}{}
 \bibliographystyle{unsrtnat}
