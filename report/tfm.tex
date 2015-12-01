@@ -532,7 +532,7 @@ Vamos a fijar una cantidad m\'inima de distancia, un $\varepsilon_0$, y comparar
 
 \subsection{Canopy}\label{sec:canopy}
 
-El algoritmo de clustering de \textbf{Canopy} se usa generalmente como un preprocesado de los datos para posteriormente aplicar un clustering de tipo \textbf{K-means} o alguna t\'ecnica de agrupamiento jerarquizado.\\
+El algoritmo de clustering de \textbf{Canopy}\cite{canopy} se usa generalmente como un preprocesado de los datos para posteriormente aplicar un clustering de tipo \textbf{K-means} o alguna t\'ecnica de agrupamiento jerarquizado.\\
 
 La idea se basa en el uso de una medida de distancia aproximada para dividir el conjunto de los datos en subconjuntos que se superponen. A estos subconjuntos los llamaremos \textit{canopies}. Un \textit{canopy} es un subconjunto de puntos que yacen bajo el vecindario de un punto central. Un punto puede pertenecer a varias \textit{canopies} distintas. Los \textit{canopies} son creados con la intenci\'on de que si dos puntos no pertenecen a un \textit{canopy} en com\'un, est\'an bastante lejos de pertenecer a un mismo cl\'uster. \\
 
@@ -549,7 +549,7 @@ Dada una distancia eucl\'idea, se crean los \textit{canopies} como sigue:\\
 	\item Se repite hasta que el conjunto inicial est\'e vac\'io.
 \end{enumerate}
 
-La implementaci\'on en Python se puede encontrar en el ap\'endice \ref{App:AppendixD}.\\
+La implementaci\'on\cite{canopyGitHub} en Python se puede encontrar en el ap\'endice \ref{App:AppendixB}.\\
 
 \pagebreak
 \section{Algoritmos de consolidaci\'on simples}\label{sec:simple}
@@ -600,6 +600,7 @@ Utilizando los tres tipos de vecindarios que hemos definido, definimos el siguie
 \caption{\label{alg:consolidationByDinstace} Algoritmo de consolidaci\'on simple por distancia}
 \end{algorithm}
 
+Una implementaci\'on simple se puede encontrar en el ap\'endice \ref{App:AppendixA}
 \pagebreak
 \subsection{Consolidaci\'on por adelgazamiento}
 
@@ -620,7 +621,7 @@ Se puede dar el caso que la consolidaci\'on por distancia no sea lo suficienteme
 \caption{\label{alg:consolidationByThinning} Algoritmo de consolidaci\'on por adelgazamiento}
 \end{algorithm}
 
-Una sencilla implementaci\'on en Python se encuentra en el ap\'endice \ref{App:AppendixB}.\\
+Una sencilla implementaci\'on en Python se encuentra en el ap\'endice \ref{App:AppendixA}.\\
 \pagebreak
 \subsection{Consolidaci\'on por tiempo}
 
@@ -649,7 +650,7 @@ Una alternativa a una t\'ecnia de consolidaci\'on por adelgazamiento ser\'ia una
 \caption{\label{alg:consolidationByTime} Algoritmo de consolidaci\'on por tiempo}
 \end{algorithm}
 
-Una implementaci\'on en Python se puede encontrar en el ap\'endice \ref{App:AppendixE}.\\
+Una implementaci\'on en Python se puede encontrar en el ap\'endice \ref{App:AppendixA}.\\
 
 
 \pagebreak
@@ -775,7 +776,7 @@ Si uno de los puntos del proceso resulta que es parte de un cl\'uster, su vecind
 
 \subsubsection{Implementaci\'on en Python}
 
-Se encuentra una implementaci\'on bastante eficaz y sencilla en el repositorio de \href{https://github.com/SushantKafle/DBSCAN}{Sushant Kafle} \ref{dbscanPython}.\\
+Se encuentra una implementaci\'on bastante eficaz y sencilla en el repositorio de \href{https://github.com/SushantKafle/DBSCAN}{Sushant Kafle} \cite{dbscanPython}.\\
 
 \begin{python}
 from dbscanner import dbscanner
@@ -857,7 +858,7 @@ Con respecto al valor de $MinPts$, un valor alto de esta par\'ametro implica que
 
 La complejidad de este algoritmo es $\mathcal{O}(n\log{}n)$ \cite{importantPlaces}.\\
 
-En los pr\'oximos resultados utilizaremos una implementaci\'on en Weka para lanzar un estudio, sin embargo, se ha desarrollado en Python el algoritmo de \textbf{DJ-Cl\'uster} de manera parecida al de \textbf{DBSCAN}. Se puede consultar una implementaci\'on en el anexo \ref{App:AppendixF}.
+En los pr\'oximos resultados utilizaremos una implementaci\'on en Weka para lanzar un estudio, sin embargo, se ha desarrollado en Python el algoritmo de \textbf{DJ-Cl\'uster} de manera parecida al de \textbf{DBSCAN}. Se puede consultar una implementaci\'on en el anexo \ref{App:AppendixB}.
 
 
 \pagebreak
@@ -1269,7 +1270,7 @@ dbc.dbscan(Data, eps, MinPts)
 
 Obtenemos 5 cl\'usters en un tiempo de ejecuci\'on de 2 minutos, 20 segundos. En esta ejecucci\'on, ha etiquetado muchas posiciones como ruido, probablemente son las posiciones en las cuales el sujeto se encuentra en movimiento. De haber utilizado aqu\'i una consolidaci\'on en la cual se hubiera introducido una distancia que involucrara la velocidad, habr\'iamos consolidado en esa zona superior derecha de ruido un nuevo cl\'uster. \\
 
-Haciendo un peque\~no cambio en el c\'odigo que podemos encontrar de la implementaci\'on de DBSCAN en el ap\'endice \ref{App:AppendixG}.\\
+Haciendo un peque\~no cambio en el c\'odigo que podemos encontrar de la implementaci\'on de DBSCAN en el ap\'endice \ref{App:AppendixB}.\\
 
 \begin{python}
 def regionQuery(self,P,eps):
@@ -1624,10 +1625,9 @@ Quedar\'ia como trabajo a futuro la inserci\'on de la velocidad en los algoritmo
 
 \appendix
 
+\section{Implementaci\'on de algoritmos de consolidaci\'on simple}\label{App:AppendixA}
 
-\section{Impementaci\'on de consolidaci\'on por distancia} \label{App:AppendixA}
-
-\begin{python}
+\begin{python}[caption=Consolidaci\'on por distancia]\label{App:ConsByDistance}
 "Consolidation By distance"
 def ConsolidationByDistance(listPositions, typeOfDistance, eps, t0):
 	i = 0
@@ -1656,10 +1656,10 @@ def ConsolidationByDistance(listPositions, typeOfDistance, eps, t0):
 
 \end{python}
 
-\newpage
-\section{Impementaci\'on de consolidaci\'on por adelgazamiento} \label{App:AppendixB}
 
-\begin{python}
+\newpage
+
+\begin{python}[caption=Consolidaci\'on por adelgazamiento]\label{App:ConsByThinnig}
 "Consolidation by thinning."
 def ConsolidationByThinning(listPositions, k, j):
 	if k >= j:
@@ -1678,59 +1678,28 @@ def ConsolidationByThinning(listPositions, k, j):
 	return result
 \end{python}
 
-
 \newpage
-\section{Impementaci\'on de DJ-Cluster} \label{App:AppendixC}
 
-\begin{python}
-from position import Position, Cluster
+\begin{python}[caption=Consolidaci\'on por tiempo]\label{App:ConsByTime}
+"Consolidation by time. Deletes positions too close by time."
+def ConsolidationByTime(listPositions, lapse):
+	i = 0
+	result = []
+	while i < len(listPositions) - 1:
+		if not listPositions[i].is_neighboorhoudByTime(listPositions[i+1], lapse):
+			result.append(listPositions[i])
+		i=i+1
+	result.append(listPositions[len(listPositions) - 1])
 
-"Dj-Clustering Algorithm"
-def DjCluster(setPoints, typeDistance, eps, minPoints, t0):
-
-	listClusters = []
-	listNoises = []
-
-	for p in setPoints:
-		np = computeNeighborhood(p, setPoints, typeDistance, minPoints, eps, t0)
-
-		if np is None:
-			listNoises.append(p) 
-		else:
-			result = np.isDensityJoinable(listClusters)
-
-			if result is None:
-				listClusters.append(np) 
-			else:
-				result.mergeCluster(np)
-
-	return [listClusters, listNoises]
-
-"Compute Neighborhood"
-def computeNeighborhood(p, setPoints, typeDistance, minPoints, eps, t0):
-	pointsOfCluster = []
-	for q in setPoints:
-		if typeDistance == 0:
-			if p.is_in_neighborhoodByEUSimple(q, eps):
-				pointsOfCluster.append(q)
-		elif typeDistance == 1:
-			if p.is_in_neighborhoodEURelativeSpeed(q, eps):
-				pointsOfCluster.append(q)
-		elif typeDistance == 2:
-			if p.is_in_neighborhoodT0Reachable(q, t0):
-				pointsOfCluster.append(q)
-
-	if len(pointsOfCluster) < minPoints:
-		return None
-	else:
-		return Cluster(p, pointsOfCluster)			
-
+	return result
 \end{python}
 
-\newpage
-\section{Impementaci\'on de Canopy} \label{App:AppendixD}
 
-\begin{python}
+
+\newpage
+\section{Implementaci\'on de algoritmos de consolidaci\'on asociados a m\'etodos de clustering}\label{App:AppendixB}
+
+\begin{python}[caption=Preprocesado de Canopy]\label{App:Canopy}
 from sklearn.metrics.pairwise import pairwise_distances
 import numpy as np
 
@@ -1761,27 +1730,11 @@ def canopy(X, T1, T2, distance_metric='euclidean', filemap=None):
 
 \end{python}
 
-\newpage
-\section{Impementaci\'on de consolidaci\'on por tiempo} \label{App:AppendixE}
 
-\begin{python}
-"Consolidation by time. Deletes positions too close by time."
-def ConsolidationByTime(listPositions, lapse):
-	i = 0
-	result = []
-	while i < len(listPositions) - 1:
-		if not listPositions[i].is_neighboorhoudByTime(listPositions[i+1], lapse):
-			result.append(listPositions[i])
-		i=i+1
-	result.append(listPositions[len(listPositions) - 1])
-
-	return result
-\end{python}
 
 \newpage
-\section{Impementaci\'on propia de Dj-Cluster} \label{App:AppendixF}
 
-\begin{python}
+\begin{python}[caption=DJ-Cluster]\label{App:DJCluster}
 from position import Position, Cluster
 
 "Dj-Clustering Algorithm"
@@ -1852,9 +1805,7 @@ class Cluster:
 
 
 \newpage
-\section{Impementaci\'on de DBSCAN en Python} \label{App:AppendixG}
-
-\begin{python}
+\begin{python}[caption=DBSCAN]\label{App:DBSCAN}
 '''
 Created on Feb 13, 2014
 
@@ -1946,37 +1897,36 @@ class dbscanner:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 
-\listoffigures
-
-\newpage
-
 \addcontentsline{toc}{section}{Bibliograf\'ia}
-\begin{thebibliography}{50}
+%\begin{thebibliography}{50}
+%
+%%\bibitem{lifePatter}\label{lifePatter} Yang Ye, Yu Zheng, Yukun Chen, Jianhua Feng, Xing Xie
+%%\\ \href{http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.361.9085&rep=rep1&type=pdf}{\textit{Mining Individual Life Pattern Based on Location History}}
+%
+%\bibitem{lifePatter}\label{lifePatter} Yukun Chen, Jianhua Feng, Xing Xie, Yang Ye, Yu Zheng
+%\\ \href{http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.361.9085&rep=rep1&type=pdf}{\textit{Mining Individual Life Pattern Based on Location History}}
+%
+%\bibitem{importantPlaces}\label{importantPlaces} Changqing Zhou, Nupur Bhatnagar, Shashi Shekhar, Loren Terveen
+%\\ \href{http://www-users.cs.umn.edu/~czhou/pub/place-important_v3.pdf}{\textit{Mining Personally Important Places from GPS Track}} 
+%
+%\bibitem{clusteringApproach}\label{clusteringApproach} Changqing Zhou, Dan Frankowski, Pamela Ludford, Shashi Shekhar, Loren Terveen
+%\\ \href{http://files.grouplens.org/papers/zhou-acmgis04.pdf}{\textit{Discovering Personal Gazetteers: An Interactive Clustering Approach}}
+%
+%\bibitem{canopy}\label{canopy} Andrew McCallum, Kamal Nigam, Lyle H. Ungar \\
+%\href{http://www.kamalnigam.com/papers/canopy-kdd00.pdf}{\textit{Efficient Clustering of High-Dimensional Data Sets with Application to Reference Matching}}
+%
+%\bibitem{canopyGitHub} \label{canopyGitHub} \href{https://github.com/gdbassett}{\textit{Gabe}}'s Gist \\ 
+%\href{https://gist.github.com/gdbassett/528d816d035f2deaaca1}{Efficient python implementation of canopy clustering.}
+%
+%\bibitem{dbscanPython} \label{dbscanPython} \href{https://github.com/SushantKafle}{\textit{Sushant Kafle}}'s GitHub Repository 
+%\\ \href{https://github.com/SushantKafle/DBSCAN}{Implementation of DBSCAN Algorithm in Python.}
+%
+%\bibitem{weka} \label{weka} Ian H. Witten and Eibe Frank (2005). Data Mining: Practical Machine Learning Tools and Techniques. 2nd Edition, Morgan Kaufmann, San Francisco. \\ \href{http://www.cs.waikato.ac.nz/ml/weka/}{Weka Project}
+%
+%\bibitem{r} \label{r} \href{http://www.R-project.org}{R Development Core Team (2008). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. ISBN 3-900051-07-0}
+%
+%\end{thebibliography}
 
-
-\bibitem{lifePatter}\label{lifePatter} Yang Ye, Yu Zheng, Yukun Chen, Jianhua Feng, Xing Xie
-\\ \href{http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.361.9085&rep=rep1&type=pdf}{\textit{Mining Individual Life Pattern Based on Location History}}
-
-\bibitem{importantPlaces}\label{importantPlaces} Changqing Zhou, Nupur Bhatnagar, Shashi Shekhar, Loren Terveen
-\\ \href{http://www-users.cs.umn.edu/~czhou/pub/place-important_v3.pdf}{\textit{Mining Personally Important Places from GPS Track}} 
-
-\bibitem{clusteringApproach}\label{clusteringApproach} Changqing Zhou, Dan Frankowski, Pamela Ludford, Shashi Shekhar, Loren Terveen
-\\ \href{http://files.grouplens.org/papers/zhou-acmgis04.pdf}{\textit{Discovering Personal Gazetteers: An Interactive Clustering Approach}}
-
-\bibitem{canopy}\label{canopy} Andrew McCallum, Kamal Nigam, Lyle H. Ungar \\
-\href{http://www.kamalnigam.com/papers/canopy-kdd00.pdf}{\textit{Efficient Clustering of High-Dimensional Data Sets with Application to Reference Matching}}
-
-\bibitem{canopyGitHub} \label{canopyGitHub} \href{https://github.com/gdbassett}{\textit{Gabe}}'s Gist \\ 
-\href{https://gist.github.com/gdbassett/528d816d035f2deaaca1}{Efficient python implementation of canopy clustering.}
-
-\bibitem{dbscanPython} \label{dbscanPython} \href{https://github.com/SushantKafle}{\textit{Sushant Kafle}}'s GitHub Repository 
-\\ \href{https://github.com/SushantKafle/DBSCAN}{Implementation of DBSCAN Algorithm in Python.}
-
-\bibitem{weka} \label{weka} Ian H. Witten and Eibe Frank (2005). Data Mining: Practical Machine Learning Tools and Techniques. 2nd Edition, Morgan Kaufmann, San Francisco. \\ \href{http://www.cs.waikato.ac.nz/ml/weka/}{Weka Project}
-
-\bibitem{r} \label{r} \href{http://www.R-project.org}{R Development Core Team (2008). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. ISBN 3-900051-07-0}
-
-\end{thebibliography}
-
-
+\bibliography{bibReport}{}
+\bibliographystyle{plain}
 \end{document}
