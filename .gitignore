@@ -6,6 +6,23 @@
 *.pdf
 *.gz
 *.out
+*.bbl
+*.blg
+*.dvi
+*.glo
+*.glsdefs
+*.ist
+*.loa
+*.lof
+*.lot
+*.xdy
+
+# Beamer #
+##########
+*.nav
+*.snm
+*.vrb
+
 # Python #
 ##########
 *.pyc
