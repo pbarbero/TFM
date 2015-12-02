@@ -1,45 +1,34 @@
-'''
-Created on Feb 13, 2014
+#!/usr/bin/python
 
-@author: sushant
-'''
-
+import sys
 from dbscanner import *
-import csv
-import re
+import numpy as np
+from algorithms.db import connect_db
 
-#configPath = '/home/sushant/config'
-#dataPath = '/home/sushant/abc.csv'
-configPath = 'config'
-dataPath = 'abc.csv'
 
 def main():
-    [Data,eps,MinPts]= getData()
-    dbc= dbscanner()
-    print "eps is {0}".format(eps)
-    print "MinPts is {0}".format(MinPts)
-    print "Howmany is {0}".format(len(Data))
-    dbc.dbscan(Data, eps, MinPts)
-    
-def getData():
-    Data = []
+	if len(sys.argv) != 4:
+		print 'Args: eps, minPts and how many data you want'
+	else:
+		eps=sys.argv[1]
+		MinPts=sys.argv[2]
+		limit = sys.argv[3]
+		print "eps is {0}".format(eps)
+		print "minPts is {0}".format(MinPts)
+		print "howmany is {0}".format(limit)
+		
+		cur= connect_db("bahia")
+		recurso = "tetra:12082781"
+		cmd = "SELECT latitud, longitud FROM posicionesgps WHERE latitud <> 0 and longitud <> 0 and recurso=\"{0}\" ORDER BY fecha ASC LIMIT {1};".format(recurso, limit)
+		cur.execute(cmd)
 
-    with open(dataPath,'rb') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            #row = re.split(r'\t+',row[0])
-            Data.append([float(row[0]),float(row[1])])
+		a=[]
+		for pos in cur.fetchall():
+		    a.append([pos[0], pos[1]])
 
-    f = open(configPath,'r')
-    
-    [eps,MinPts] = parse(f.readline())
-    
-    return [Data,eps,MinPts]
+		Data = a
 
-def parse(line):
-    data = line.split(" ")
-    return [int(data[0]),int(data[1])]
-    
-            
-    
-main()    
+		dbc = dbscanner()
+		dbc.dbscan(Data, eps, MinPts)
+	
+main()

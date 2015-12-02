@@ -1,3 +1,0 @@
-http://code.google.com/p/scipy-cluster/
-http://docs.scipy.org/doc/scipy/reference/cluster.html
-http://scikit-learn.org/stable/modules/clustering.html#hierarchical-clustering
