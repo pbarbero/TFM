@@ -143,7 +143,7 @@ columns=fullflexible,
 
 \renewcommand{\contentsname}{\'Indice}
 \renewcommand{\refname}{Bibliograf\'ia}
-%\renewcommand{\listfigurename}{\'Indice de tablas y figuras}
+\renewcommand{\listfigurename}{\'Indice de tablas y figuras}
 \renewcommand*{\listalgorithmname}{\'Indice de algoritmos} 
 
 \makeatletter
@@ -393,16 +393,16 @@ mysql> SELECT table_schema as `Database`,
 
 \begin{figure}[H]
 	\centering
-	\begin{tabular}{| l | l | l |}
+	
+	\begin{tabular}{|l | l |}
+	\hline
+	\rowcolor{LightCyan}
+	\hline
+  		\multicolumn{2}{|l|}{Size in KB} \\
 	\hline
 	\hline
-	\cellcolor{LightCyan}Database & 
-	\cellcolor{LightCyan}Table & 
-	\cellcolor{LightCyan}Size in KB \\
-	\hline
-	\hline
-	rio & posicionesgps & 120564000 \\
-	bahia & posicionesgps & 96142000 \\
+	rio & 120564000 \\
+	bahia &  96142000 \\
 	\hline
 	\end{tabular}
 	\caption{Tama\~no de la base de datos}
@@ -893,14 +893,19 @@ Antes de importar las variables de nuestra base de datos, necesitamos hacer el c
 
 Para el primer sujeto, contamos con lo siguiente:\\
 
-	\begin{tabular}{l|l|l|l}
+	\begin{tabular}{|l|l|l|l|}
 	\rowcolor{LightCyan}
 	\hline
 		& latitud & longitud & fecha\\
 	\hline
 		Media & -0.223 & -0.665 & 1424174494.89 \\
 		Desv. T\'ipica & 0.022 & 0.065	& 104277.37 \\
+	\hline
 	\end{tabular}
+	
+%	\begin{tabular}{l|}
+%	
+%	\end{tabular}
 	
 \bigskip
 
@@ -926,14 +931,16 @@ Se hace una distinci\'on de colores azules y naranjas en funci\'on del tiempo. S
 
 Calculamos la desviaci\'on t\'ipica y la media del segundo sujeto, del mismo modo que con el sujeto 1.\\
 
-	\begin{tabular}{l|l|l|l}
+
+	\begin{tabular}{|l|l|l|l|}
 	\rowcolor{LightCyan}
+	\hline
 		& latitud & longitud & fecha\\
 	\hline
 		Media & -0.21 & -0.625 & 1424350386.203 \\
 		Desv. T\'ipica & 0.057 & 0.169 & 41234.453 \\
+	\hline
 	\end{tabular}
-
 	
 	\bigskip
 
@@ -1494,9 +1501,10 @@ Log likelihood: 10.83917
 \begin{figure}[H]
 	\begin{tabular}{|p{2.5cm}|l|l|}
 	\hline
-  		\cellcolor{blue!25}\textbf{Algoritmo} 
-  		& \cellcolor{blue!25}\textbf{SUJETO 1} 
-  		& \cellcolor{blue!25}\textbf{SUJETO 2} \\
+	\rowcolor{blue!25}
+  		\textbf{Algoritmo} 
+  		& \textbf{SUJETO 1} 
+  		& \textbf{SUJETO 2} \\
 	\hline
 	\hline
 		K-\textbf{means} & 
@@ -1904,12 +1912,14 @@ class dbscanner:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newpage
+\phantomsection
 \addcontentsline{toc}{section}{\listfigurename}
 \listoffigures
-\addcontentsline{toc}{section}{\listalgorithmname}
+\addcontentsline{toc}{section}{\'Indice de algoritmos}
 \listofalgorithms
 
 \newpage
+\phantomsection
 \addcontentsline{toc}{section}{Referencias}
 
 \bibliography{bibReport}{}
