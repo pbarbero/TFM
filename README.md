@@ -1,4 +1,5 @@
-# TFM
+# Identificación de patrones y algoritmos de consolidación en bases de datos de posicionamiento
+
 Trabajo Fin de Máster Modelización e Investigación Matemática, Estadística y Computación
 
 Hoy en día, muchos dispositivos cuentan con un sistema de geolocalización GPS que nos permite conocer la localización de un sujeto en tiempo real. Con el fin de obtener la mayor información posible en todo momento, estas posiciones recogidas se guardan en una base de datos que puede ser temporal o permanente. En el caso de ser permanente, nos encontraremos con el problema de que la base de datos puede crecer hasta un límite desmesurado en el que dispositivo que recoge y almacena esta información llene su memoria, impidiendo almacenar posiciones nuevas. 

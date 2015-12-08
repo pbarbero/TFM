@@ -1,3 +1,0 @@
-- Colocar los ejectuables en /usr/bin/ u otro path desde donde se ejecutarian al ser llamados desde cron
-- Crear tarea cron con distintos tipos de consolidaciones
-- ¿Servicio?
