@@ -12,6 +12,11 @@
 \usepackage{float}
 \graphicspath{ {images/} }
 
+%% COLOR
+\usepackage{color, colortbl}
+\definecolor{Gray}{gray}{0.9}	
+\definecolor{LightCyan}{rgb}{0.88,1,1}
+
 \title{Identificaci\'on de patrones y algoritmos de consolidaci\'on en bases de datos de posicionamiento}
 \date{\today}
 \author{Pilar Barbero Iriarte}
@@ -55,7 +60,8 @@ Problemas:
 
 %%OBJETIVO
 \begin{frame}[fragile]
-  \frametitle{Introducci\'n}
+  \frametitle{Introducci\'on}
+  Objetivo:
   \begin{itemize}
   	  \item Eliminar posiciones repetidas.
   	  \item Eliminar posiciones que no aporten informaci\'on.
@@ -64,7 +70,9 @@ Problemas:
 
 \section{An\'alisis de los datos}
 
-\begin{frame}{An\'alisis de los datos}
+
+\begin{frame}[fragile]
+\frametitle{An\'alisis de los datos}
   \begin{itemize}[<+- | alert@+>]    
 \item \textbf{Id}: Identificador num\'erico
 \item \textbf{IdServidor}: Identificador num\'erico del servidor que realiza la inserci\'on
@@ -79,69 +87,102 @@ Problemas:
 \end{frame}
 
 \section{¿C\'omo abordar el problema?}
-\begin{frame}{¿C\'omo abordar el problema?}
+\begin{frame}[fragile]
+\frametitle{¿C\'omo abordar el problema?}
+\begin{itemize}
 
-T\'enicas a analizar:
+\item Desarrollo de algoritmos de consolidaci\'on a trav\'es de nociones de distancia y tiempo.
 
-  \begin{columns}[T,onlytextwidth]
-    \column{0.5\textwidth}
-    \metroset{block=fill}
-    
-      \begin{exampleblock}{Consolidaci\'on simple}
-        Consolidaci\'on por distancia\\
-        Consolidaci\'on por adelgazamiento\\
-        Consolidaci\'on por tiempo
-      \end{exampleblock}
+\item Uso de algoritmos de \textit{clustering} con el fin de identificar varias posiciones con su centro del cl\'uster y consolidarlas en \'esta.
 
-    \column{0.5\textwidth}
-
-      \metroset{block=fill}
-      \begin{exampleblock}{Algoritmos de \textit{clustering}}
-        K-means\\
-        DBSCAN\\
-        DJ-Cl\'uster
-      \end{exampleblock}
-
-  \end{columns}
+\end{itemize}
 
 
 \end{frame}
 
 
 \subsection{M\'etodos simples}
-\begin{frame}
+\begin{frame}[fragile]
+\frametitle{Consolidaci\'on por distancia}
+\end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Consolidaci\'on por adelgazamiento}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Consolidaci\'on por tiempo}
 \end{frame}
 
 \subsection{M\'etodos avanzados}
-\begin{frame}
+\begin{frame}[fragile]
+\frametitle{K-means}
+\end{frame}
 
+\begin{frame}[fragile]
+\frametitle{DBSCAN}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{DJ-Cl\'uster}
 \end{frame}
 
 
 \section{Comparativa casos estudiados}
+\begin{frame}[fragile]
+\frametitle{Comparativa t\'ecnicas clustering}
+\begin{center}
+\begin{tabular}{|l|l|l|l|}
+	\hline
+	\rowcolor{Gray}
+	M\'etodo & Tiempo & N. & Iteraciones\\
+	\hline	
+	K-means & 0.69 secs & 500 & 9\\
+	\hline
+	DBSCAN &  2 min 30 secs & 9 & 111 \\
+	\hline
+	DJ-Cluster &  0.37 secs & 22  & 11\\
+	\hline
+\end{tabular}
+\end{center}
 
-\begin{frame}
+\begin{itemize}
+	\item DBSCAN m\'as lento de todos.
+	\item DBSCAN consolidaci\'on mayor.
+	\item K-means se queda en 500 cl\'usters.
+	\item DJ-Cl\'uster baja de los 500.
+	\item DJ-Cl\'uster menor tiempo de ejecuci\'on.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Comparativa t\'ecnicas simples}
+
+\begin{center}
 \begin{tabular}{|l|l|l|}
 	\hline
-	M\'etodo & Tiempo & N. consolidaciones \\
+	\rowcolor{Gray}
+	M\'etodo & Tiempo & N. \\
+	\hline	
+	Cons. por adelgazamiento &  <0.01 sec & 800 \\
+	\hline 
+	Cons. por distancia simple &  <0.01 sec & 507 \\
 	\hline
-	Consolidaci\'on distancia &  & \\
+	Cons. por distancia $t_0-$alcanzable  &  <0.01 sec  & 21\\
 	\hline
-	Consolidaci\'on adelgazamiento &  & \\
+	Cons. por tiempo &  <0.01 sec  & 1786\\
 	\hline
-	Consolidaci\'on tiempo &  & \\
-	\hline
-	K-means &  & \\
-	\hline
-	DBSCAN &  & \\
-	\hline
-	DJ-Cluster &  & \\
 \end{tabular}
+\end{center}
+
+\begin{itemize}
+	\item Alternar distintos tipos de consolidaci\'on en funci\'on del espacio cr\'itico en ese momento.
+\end{itemize}
 \end{frame}
 
 \section{Conclusiones}
-\begin{frame}
+\begin{frame}[fragile]
 \begin{itemize}[<+- | alert@+>]
 	\item Algoritmos de consolidaci\'on simples son \textit{simples}, pero eficaces.
 	\item Noci\'on de vecindario distinto al eucl\'ideo implementada en algoritmos de consolidaci\'on simple.
@@ -153,15 +194,14 @@ T\'enicas a analizar:
 \end{frame}
 
 \section{Demostraci\'on}
-\begin{frame}
-
-\end{frame}
 
 \section{Preguntas}
 
-\begin{frame}
+\begin{frame}[fragile]
+	\frametitle{C\'odigo}
 	\begin{center}
 		\href{http://github.com/pbarbero/TFM}{http://github.com/pbarbero/TFM}
+		\includegraphics[scale=.3]{github.png}
 	\end{center}
 \end{frame}
 
