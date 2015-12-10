@@ -430,7 +430,7 @@ Resultados:
 \begin{itemize}
 \item 10 iteraciones 
 \item Error cuadr\'atico: 0,117363
-\item número de posiciones que ha agrupado por clúster entre 1 y 9
+\item n\'umero de posiciones que ha agrupado por cl\'uster entre 1 y 9
 \end{itemize}
 
 \bigskip
@@ -450,7 +450,7 @@ Inconvenientes:
 
 \begin{frame}[fragile]
 \frametitle{DBSCAN}
-\textbf{DBSCAN}  es un algoritmo de clustering basado en la densidad por lo que encuentra el número de clústers comenzando por una estimación de la distribución
+\textbf{DBSCAN}  es un algoritmo de clustering basado en la densidad por lo que encuentra el n\'umero de cl\'usters comenzando por una estimación de la distribución
 de densidad de los nodos correspondientes. \\
 
 \begin{itemize}
@@ -502,6 +502,76 @@ Mismos datos que para \textbf{K-means}, sujeto con $2000$ posiciones.
 
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{DJ-Cluster}
+\textbf{Density-Joinable Cl\'uster} es un tipo de algoritmo de clustering basado en densidades de puntos.\\
+
+\bigskip
+
+\begin{algorithmic}[1]
+	\For{\textbf{each} $p$ in set $S$}
+		\State{Compute neighborhood $N(p)$ for $\varepsilon$ and $MinPts$}
+		\If{$N(p)$ is null ($|N(p)| < MinPts$ for $\varepsilon$)}
+			\State{Label $p$ as noise}
+		\ElsIf{$N(p)$ is density-joinable to an existing cluster} 
+			\State{Merge $N(p)$ with the cluster which is density-joinable}
+		\Else
+			\State{Create a new cluster $C$ based on $N(p)$}
+		\EndIf
+	\EndFor
+\end{algorithmic}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Experimento con DJ-Cluster}
+Utilizando \texttt{Weka} dado un $\varepsilon=0.0001$ y $minPts = 2$:\\
+
+\begin{figure}[H]
+	\includegraphics[scale=.43]{djClusterSujeto1.png}
+	\caption{Resultado de \textbf{DJ-Cluster}}
+\end{figure}
+
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Comparativa t\'ecnicas simples}
+
+\begin{center}
+\begin{tabular}{|l|l|l|}
+	\hline
+	\rowcolor{Gray}
+	M\'etodo & Tiempo & N. \\
+	\hline	
+	Cons. por adelgazamiento &  <0.01 sec & 800 \\
+	\hline 
+	Cons. por distancia simple &  <0.01 sec & 507 \\
+	\hline
+	Cons. por distancia $t_0-$alcanzable  &  <0.01 sec  & 21\\
+	\hline
+	Cons. por tiempo &  <0.01 sec  & 1786\\
+	\hline
+\end{tabular}
+\end{center}
+
+\begin{itemize}
+	\item Alternar distintos tipos de consolidaci\'on en funci\'on del espacio cr\'itico en ese momento.
+\end{itemize}
+\end{frame}
 
 %\section{Comparativa casos estudiados}
 \begin{frame}[fragile]
@@ -531,30 +601,7 @@ Mismos datos que para \textbf{K-means}, sujeto con $2000$ posiciones.
 
 \end{frame}
 
-\begin{frame}[fragile]
-\frametitle{Comparativa t\'ecnicas simples}
 
-\begin{center}
-\begin{tabular}{|l|l|l|}
-	\hline
-	\rowcolor{Gray}
-	M\'etodo & Tiempo & N. \\
-	\hline	
-	Cons. por adelgazamiento &  <0.01 sec & 800 \\
-	\hline 
-	Cons. por distancia simple &  <0.01 sec & 507 \\
-	\hline
-	Cons. por distancia $t_0-$alcanzable  &  <0.01 sec  & 21\\
-	\hline
-	Cons. por tiempo &  <0.01 sec  & 1786\\
-	\hline
-\end{tabular}
-\end{center}
-
-\begin{itemize}
-	\item Alternar distintos tipos de consolidaci\'on en funci\'on del espacio cr\'itico en ese momento.
-\end{itemize}
-\end{frame}
 
 %\section{Conclusiones}
 \begin{frame}[fragile]
