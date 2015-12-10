@@ -82,7 +82,7 @@ columns=fullflexible,
   \tableofcontents[hideallsubsections]
 \end{frame}
 
-\section{Introducci\'on}
+%\section{Introducci\'on}
 
 %%Introducci\'on
 \begin{frame}[fragile]
@@ -117,7 +117,7 @@ Problemas:
    \end{itemize}
 \end{frame}
 
-\section{An\'alisis de los datos}
+%\section{An\'alisis de los datos}
 
 
 \begin{frame}[fragile]
@@ -135,7 +135,7 @@ Problemas:
   \end{itemize}
 \end{frame}
 
-\section{¿C\'omo abordar el problema?}
+%\section{¿C\'omo abordar el problema?}
 \begin{frame}[fragile]
 \frametitle{¿C\'omo abordar el problema?}
 \begin{itemize}
@@ -145,11 +145,43 @@ Problemas:
 \item Uso de algoritmos de \textit{clustering} con el fin de identificar varias posiciones con su centro del cl\'uster y consolidarlas en \'esta.
 
 \end{itemize}
+\end{frame}
 
+%\section{Noci\'on de posici\'on y cl\'uster}
+
+\begin{frame}[fragile]
+\frametitle{Posici\'on}
+Se define la clase \texttt{Position} en Python de la siguiente manera:\\
+\bigskip
+\begin{python}
+class Position:
+    def __init__(self, id, resource, lat, lon, speed, track, date):
+        self.id = id
+        self.resource = resource
+        self.lat = lat
+        self.lon = lon
+        self.speed = speed
+        self.track = track
+        self.date = date
+\end{python}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Cl\'uster}
+Se define la clase de \texttt{Cl\'uster} en Python de la siguiente manera:\\
+\bigskip
+\begin{python}
+class Cluster:
+	"Cluster of points"
+	def __init__(self, center, points):
+		self.center = center
+		self.points = points
+\end{python}
 
 \end{frame}
 
-\subsection{M\'etodos simples}
+
+%\section{M\'etodos simples}
 
 \begin{frame}[fragile]
 \frametitle{Nociones de vecindario}
@@ -292,9 +324,36 @@ Se puede recurrir a un tipo de consolidaci\'on en la cual dada una lista de posi
 \end{algorithmic}
 \end{frame}
 
-\subsection{M\'etodos avanzados}
+%\section{M\'etodos avanzados}
 \begin{frame}[fragile]
 \frametitle{K-means}
+\textbf{K-means} es un m\'etodo eficiente de \textit{clustering} que tiene como objetivo la partici\'on de un conjunto de $n$ elementos en $k$ grupos distintos. Datao un conjunto de $n$ elementos, se construye dicha partici\'on $S=\{S_1, S_2, \ldots, S_k\}$ con el fin de minimizar el t\'ermino del error cuadr\'atico:
+
+$$ \sum_{i=1}^{n} \sum_{x\in S_i} \text{d}(x,m_i)$$
+
+donde $m_i$ es el centro de cada cl\'uster $S_i$ y $\text{d}(x, m_i)$ es la distancia definida entre el punto $x$ y $m_i$.
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{K-means}
+Se procede:
+\begin{enumerate}
+	\item Se prefija un n\'umero de cl\'usters.
+	\item Se asigna cada punto a su cl\'uster de manera aleatoria.
+	\item Se itera sobre cada punto, encuentra el centro de cl\'uster m\'as cercano y se lo asigna a dicho cl\'uster.
+	\item Se calcula el error y se reitera hasta que este error se minimiza o estabiliza.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{K-means}
+Inconvenientes:
+\begin{itemize}
+	\item N\'umero de cl\'usters prefijado.
+	\item K-means no determin\'istico.
+	\item No hay puntos considerados ruidos, s\'olo cl\'usters unipuntuales.
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -306,7 +365,7 @@ Se puede recurrir a un tipo de consolidaci\'on en la cual dada una lista de posi
 \end{frame}
 
 
-\section{Comparativa casos estudiados}
+%\section{Comparativa casos estudiados}
 \begin{frame}[fragile]
 \frametitle{Comparativa t\'ecnicas clustering}
 \begin{center}
@@ -359,7 +418,7 @@ Se puede recurrir a un tipo de consolidaci\'on en la cual dada una lista de posi
 \end{itemize}
 \end{frame}
 
-\section{Conclusiones}
+%\section{Conclusiones}
 \begin{frame}[fragile]
 \begin{itemize}[<+- | alert@+>]
 	\item Algoritmos de consolidaci\'on simples son \textit{simples}, pero eficaces.
@@ -371,9 +430,19 @@ Se puede recurrir a un tipo de consolidaci\'on en la cual dada una lista de posi
 \end{itemize}
 \end{frame}
 
-\section{Demostraci\'on}
+%\section{Demostraci\'on}
 
-\section{Preguntas}
+\begin{frame}[fragile]
+\frametitle{Demo}
+Demostraci\'on
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Preguntas}
+Preguntas
+\end{frame}
+
+%\section{Preguntas}
 
 \begin{frame}[fragile]
 	\frametitle{C\'odigo}
