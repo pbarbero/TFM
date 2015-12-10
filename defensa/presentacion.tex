@@ -12,6 +12,10 @@
 \usepackage{float}
 \graphicspath{ {images/} }
 
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{listings}
+
 %% COLOR
 \usepackage{color, colortbl}
 \definecolor{Gray}{gray}{0.9}	
@@ -22,6 +26,51 @@
 \author{Pilar Barbero Iriarte}
 \institute{Universidad de Zaragoza}
 \titlegraphic{\hfill\includegraphics[height=1.5cm]{unizar.png}}
+
+%%%%%%%%%%%%%%%%%%%%PYTHON CODING
+
+% Default fixed font does not support bold face
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{11} % for bold
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{11}  % for normal
+
+% Custom colors
+\usepackage{color}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+% Python style for highlighting
+\newcommand\pythonstyle{\lstset{
+language=Python,
+basicstyle=\ttm,
+otherkeywords={self},             % Add keywords here
+keywordstyle=\ttb\color{deepblue},
+emph={MyClass,__init__},          % Custom highlighting
+emphstyle=\ttb\color{deepred},    % Custom highlighting style
+stringstyle=\color{deepgreen},
+frame=tb,                         % Any extra options here
+showstringspaces=false,           % 
+basicstyle=\small,
+columns=fullflexible,
+}}
+
+
+% Python environment
+\lstnewenvironment{python}[1][]
+{
+\pythonstyle
+\lstset{#1}
+}
+{}
+
+% Python for external files
+\newcommand\pythonexternal[2][]{{
+\pythonstyle
+\lstinputlisting[#1]{#2}}}
+
+% Python for inline
+\newcommand\pythoninline[1]{{\pythonstyle\lstinline!#1!}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 
@@ -100,18 +149,147 @@ Problemas:
 
 \end{frame}
 
-
 \subsection{M\'etodos simples}
+
 \begin{frame}[fragile]
-\frametitle{Consolidaci\'on por distancia}
+\frametitle{Nociones de vecindario}
+
+Distintas nociones de vecindario para los algoritmos de consolidaci\'on simple,
+\begin{itemize}
+	\item Vecindario utilizando la distancia eucl\'idea
+	\item Vecindario involucrando velocidad
+	\item Vecindad $t_0-$alcanzable
+	\item Vecindad involucrando el tiempo
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Vecindario utilizando la distancia eucl\'idea}
+
+Utilizando la distancia eucl\'idea, definimos un vecindario de la siguiente manera:\\
+
+$$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \varepsilon $$
+
+donde $p$ es un punto con latitud $lat_{p}$ y longitud $long_{p}$.\\
+
+\bigskip
+\begin{python}
+        def IsInNeighEUSimple(self, q, eps):
+                return self.distance_eu(q) < eps
+\end{python}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Vecindario involucrando velocidad}
+
+En el momento que se toma la posici\'on $p_0$, aparte de la latidud y su longitud, se toma la velocidad instant\'anea del sujeto.
+A mayor velocidad, puntos m\'as alejados de lo que considerar\'iamos en el primer caso (fuera de nuestro vecindario simple), podr\'ian estar dentro de nuestro nuevo radio, que depender\'ia de la velocidad instant\'anea.
+
+$$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \varepsilon \cdot vel_{p_0} $$
+
+\bigskip
+\begin{python}
+	def IsInNeighSpeedRelative(self, q, eps):
+			if self.speed != 0:
+				return self.distance_eu(q) < eps * self.speed	
+			else:
+				return False
+\end{python}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Vecindad $t_0-$alcanzable}
+
+Fijando un intervalo de tiempo $t_0$, se define una vecindad $t_0$-alcanzable como aquellos puntos que nuestro sujeto puede alcanzar en un tiempo $t_0$. Un sujeto que se desplace a velocidad reducida, tendr\'a una vecindad $t_0$-alcanzable m\'as reducida que otro que se desplace a una velocidad superior. Redefiniremos el radio de nuestro vecindario a trav\'es de la velocidad instant\'anea que lleve nuesto sujeto, es decir, $vel_{p_0}\cdot t_0$.  \\
+
+$$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < vel_{p_0} \cdot t_0 $$
+
+\'Este es un caso concreto del vecindario involucrando la velocidad. \\
+
+\bigskip
+\begin{python}
+        def IsInNeighT0Reachable(self, q, t0):
+                return self.distance_eu(q) < t0 * self.speed
+\end{python}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+\frametitle{Vecindad involucrando el tiempo}
+Las posiciones de nuestros sujetos vienen muestreadas adem\'as con el instante en el que fueron tomadas. Podemos considerar que el tiempo entre tomas tambi\'en es una distancia y definir un vecindario. Definimos esta distancia temporal como la resta de ambos instantes, y el vecindario como: 
+
+$$ d_T(p_0, p) = time_p - time_{p_0} < \delta $$
+
+\bigskip
+
+\begin{python}
+	def is_neighboorhoudByTime(self, q, lapse):
+		time1 = time.mktime(self.date.timetuple())
+		time2 = time.mktime(q.date.timetuple())
+		return abs(time1 - time2) < lapse
+\end{python}
+
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Consolidaci\'on por adelgazamiento}
+\frametitle{Consolidaci\'on por distancia}
+Utilizando los tres tipos de vecindarios que hemos definido, definimos el
+siguiente método que realizará la consolidación del tipo que le indiquemos:\\
+
+\bigskip
+
+\begin{algorithmic}[1]
+\Function{ConsolidationByDistance}{$positions, typeOfDistance, eps, t0$}
+\For{\textbf{each} pos \textbf{in} positions}
+        \If{$pos.IsInNeighBorhood(typeOfDistance, next(pos), eps)$}
+        		\State{Remove position in DB}
+        \Else
+        		\State{Maintain position in DB}
+        \EndIf
+\EndFor
+\EndFunction
+\end{algorithmic}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Consolidaci\'on por tiempo}
+
+Se fija un lapso de tiempo que se debe cumplir entre posici\'on y posici\'on, y se eliminan todas aquellas que est\'en cuya distancia temporal con su siguiente est\'e por debajo de este lapso fijado.\\
+
+\bigskip
+\begin{algorithmic}[1]
+\Function{ConsolidationByTime}{$positions, lapse$}
+	\For{\textbf{each} pos in positions}
+		\State{$nextpos = pos++$}
+		\If{$IsInNeighboorhodByTime(nextpos, pos, lapse)$}
+			\State{Remove pos}
+		\EndIf
+	\EndFor
+\EndFunction
+\end{algorithmic}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Consolidaci\'on por adelgazamiento}
+Se puede recurrir a un tipo de consolidaci\'on en la cual dada una lista de posiciones normalmente antiguas, se elimine un subconjunto de estas, por ejemplo, 3 de cada 5.\\
+\bigskip
+\begin{algorithmic}[1]
+\Function{ConsolidationByThinning}{$positions, j, k$}\Comment{$j < k$}
+	\For{\textbf{each} pos in positions}
+		\If{$position.Index \% k == 0$}
+			\For{$i = 0; i < k; i++$}
+				\State{Remove position with index == position.Index}
+			\EndFor
+		\EndIf
+	\EndFor
+\EndFunction
+\end{algorithmic}
 \end{frame}
 
 \subsection{M\'etodos avanzados}
