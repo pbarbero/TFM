@@ -272,7 +272,7 @@ $$ d_T(p_0, p) = time_p - time_{p_0} < \delta $$
 \begin{frame}[fragile]
 \frametitle{Consolidaci\'on por distancia}
 Utilizando los tres tipos de vecindarios que hemos definido, definimos el
-siguiente método que realizará la consolidación del tipo que le indiquemos:\\
+siguiente m\'etodo que realizará la consolidaci\'on del tipo que le indiquemos:\\
 
 \bigskip
 
@@ -287,6 +287,20 @@ siguiente método que realizará la consolidación del tipo que le indiquemos:\\
 \EndFor
 \EndFunction
 \end{algorithmic}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Experimento utilizando consolidaci\'on por distancia}
+Se fija un $\varepsilon = 0.0001$ y se realiza una consolidaci\'on utilizando la distancia eucl\'idea:\\
+
+\bigskip
+
+\begin{figure}[H]
+	\includegraphics[scale=.25]{distanceEuEps10-4.png}
+	\caption{Resultado consolidaci\'on por distancia Simple}
+\end{figure}
+
 \end{frame}
 
 \begin{frame}[fragile]
@@ -307,6 +321,21 @@ Se fija un lapso de tiempo que se debe cumplir entre posici\'on y posici\'on, y 
 \end{algorithmic}
 \end{frame}
 
+
+\begin{frame}[fragile]
+\frametitle{Experimento utilizando consolidaci\'on por tiempo}
+Se realiza una consolidaci\'on por tiempo con un lapso de 20 segundos:\\
+
+\bigskip
+
+\begin{figure}[H]
+	\includegraphics[scale=.25]{byTimeSuj1.png}
+	\caption{Resultado consolidaci\'on por tiempo}
+\end{figure}
+
+\end{frame}
+
+
 \begin{frame}[fragile]
 \frametitle{Consolidaci\'on por adelgazamiento}
 Se puede recurrir a un tipo de consolidaci\'on en la cual dada una lista de posiciones normalmente antiguas, se elimine un subconjunto de estas, por ejemplo, 3 de cada 5.\\
@@ -324,7 +353,43 @@ Se puede recurrir a un tipo de consolidaci\'on en la cual dada una lista de posi
 \end{algorithmic}
 \end{frame}
 
-%\section{M\'etodos avanzados}
+
+\begin{frame}[fragile]
+\frametitle{Experimento utilizando consolidaci\'on por adelgazamiento}
+Se realiza una consolidaci\'on por adelgazamiento, se mantienen 2 posiciones de cada 5:\\
+
+\bigskip
+
+\begin{figure}[H]
+	\includegraphics[scale=.25]{thinningSuj1.png}
+	\caption{Resultado consolidaci\'on por adelgazamiento}
+\end{figure}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{M\'etodos avanzados}
+
+\textbf{Algoritmos de consolidaci\'on asociados a m\'etodos de clustering}\\
+
+\bigskip
+
+Un an\'alisis cl\'uster es un conjunto de t\'ecnicas multivariantes utilizadas para clasificar a un conjunto de individuos en grupos homog\'eneos. Hemos elegido una serie de t\'ecnicas de aprendizaje no supervisado ya que \'este parte de que no hay un conocimiento a priori y es \'util en t\'ecnicas de compresi\'on de datos.
+
+
+\begin{itemize}
+\item \textbf{K-means}
+\item \textbf{DBSCAN}
+\item \textbf{DJ-Cl\'uster}
+\end{itemize}
+
+\end{frame}
+
+
+
+
 \begin{frame}[fragile]
 \frametitle{K-means}
 \textbf{K-means} es un m\'etodo eficiente de \textit{clustering} que tiene como objetivo la partici\'on de un conjunto de $n$ elementos en $k$ grupos distintos. Datao un conjunto de $n$ elementos, se construye dicha partici\'on $S=\{S_1, S_2, \ldots, S_k\}$ con el fin de minimizar el t\'ermino del error cuadr\'atico:
@@ -347,21 +412,94 @@ Se procede:
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{K-means}
+\frametitle{Experimento con K-means}
+Se utiliza el software \texttt{Weka} sobre un sujeto con $2000$ posiciones para una consolidaci\'on al $25\%$, es decir, a $500$.
+
+\begin{figure}[H]
+	\includegraphics[scale=.35]{kMeansSujeto1.png}
+	\caption{Resultado de \textbf{K-means}}
+\end{figure}
+
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Conclusiones K-means}
+
+Resultados:
+\begin{itemize}
+\item 10 iteraciones 
+\item Error cuadr\'atico: 0,117363
+\item número de posiciones que ha agrupado por clúster entre 1 y 9
+\end{itemize}
+
+\bigskip
+
 Inconvenientes:
 \begin{itemize}
-	\item N\'umero de cl\'usters prefijado.
+	\item N\'umero de cl\'usters prefijado a 500.
 	\item K-means no determin\'istico.
 	\item No hay puntos considerados ruidos, s\'olo cl\'usters unipuntuales.
 \end{itemize}
 \end{frame}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{frame}[fragile]
 \frametitle{DBSCAN}
+\textbf{DBSCAN}  es un algoritmo de clustering basado en la densidad por lo que encuentra el número de clústers comenzando por una estimación de la distribución
+de densidad de los nodos correspondientes. \\
+
+\begin{itemize}
+\item Punto $p$ n\'ucleo: si posee un n\'umero m\'inimo de puntos ($minPts$) en su vecindario sobre $\varepsilon$.
+\item Punto alcanzable desde $p$: si existe un camino $p1=p, \ldots, p_n=q$ donde $p_{i+1}$ es alcanzable por $p_i$.
+\item Aislados: puntos no considerados ni n\'ucleo ni alcanzables.
+
+\smallskip
+	\centering
+	\includegraphics[scale=.2]{DBSCAN.png}
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{DJ-Cl\'uster}
+\frametitle{DBSCAN}
+\textbf{DBSCAN} necesita de dos par\'ametros: $\varepsilon$ y $MinPts$.
+
+\begin{algorithmic}[1]
+\Function{DBSCAN}{$positions, eps, minPts$}
+	\State{C = 0}
+	\For{\textbf{each} pos in positions}
+		\If{$pos$ has been visited}
+			\State{Continue next position}
+		\Else
+			\State{Mark $pos$ as visited}
+			\State{N(pos) = NeighborPts(pos, eps)}
+			\If{$length(N(pos)) < MinPts$}
+				\State{Mark $pos$ as noise}
+			\Else
+				\State{C = next Cluster}
+				\State{expandCluster(pos, N(pos), C, eps, MinPts)}				
+			\EndIf
+		
+		\EndIf
+	\EndFor
+\EndFunction
+\end{algorithmic}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Experimento con DBSCAN}
+
+Mismos datos que para \textbf{K-means}, sujeto con $2000$ posiciones. 
+
+\begin{figure}[H]
+	\includegraphics[scale=.3]{dbscanSujeto1.png}
+	\caption{Resultado de \textbf{DBSCAN}}
+\end{figure}
+
 \end{frame}
 
 
