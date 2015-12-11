@@ -168,10 +168,10 @@ Se define la clase de \texttt{Cl\'uster} en Python de la siguiente manera:\\
 \bigskip
 \begin{python}
 class Cluster:
-	"Cluster of points"
-	def __init__(self, center, points):
-		self.center = center
-		self.points = points
+"Cluster of points"
+    def __init__(self, center, points):
+	self.center = center
+	self.points = points
 \end{python}
 
 \end{frame}
@@ -203,8 +203,8 @@ donde $p$ es un punto con latitud $lat_{p}$ y longitud $long_{p}$.\\
 
 \bigskip
 \begin{python}
-        def IsInNeighEUSimple(self, q, eps):
-                return self.distance_eu(q) < eps
+    def IsInNeighEUSimple(self, q, eps):
+	return self.distance_eu(q) < eps
 \end{python}
 
 \end{frame}
@@ -221,11 +221,11 @@ $$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \
 
 \bigskip
 \begin{python}
-	def IsInNeighSpeedRelative(self, q, eps):
-			if self.speed != 0:
-				return self.distance_eu(q) < eps * self.speed	
-			else:
-				return False
+    def IsInNeighSpeedRelative(self, q, eps):
+	if self.speed != 0:
+	    return self.distance_eu(q) < eps * self.speed	
+	else:
+	    return False
 \end{python}
 
 \end{frame}
@@ -241,8 +241,8 @@ $$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < v
 
 \bigskip
 \begin{python}
-        def IsInNeighT0Reachable(self, q, t0):
-                return self.distance_eu(q) < t0 * self.speed
+    def IsInNeighT0Reachable(self, q, t0):
+	return self.distance_eu(q) < t0 * self.speed
 \end{python}
 
 \end{frame}
@@ -257,10 +257,10 @@ $$ d_T(p_0, p) = time_p - time_{p_0} < \delta $$
 \bigskip
 
 \begin{python}
-	def is_neighboorhoudByTime(self, q, lapse):
-		time1 = time.mktime(self.date.timetuple())
-		time2 = time.mktime(q.date.timetuple())
-		return abs(time1 - time2) < lapse
+    def is_neighboorhoudByTime(self, q, lapse):
+	time1 = time.mktime(self.date.timetuple())
+	time2 = time.mktime(q.date.timetuple())
+	return abs(time1 - time2) < lapse
 \end{python}
 
 \end{frame}
