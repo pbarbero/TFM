@@ -71,4 +71,5 @@ def deletePositions(dbname, list_pos):
 	cur = connect_db(dbname)
 	for pos in list_pos:
 		cmd = "DELETE FROM posicionesgps WHERE id={0}".format(pos.id)
-		cmd.execute()
+		cur.execute(cmd)
+		print "{0} deleted!".format(pos.toString())
