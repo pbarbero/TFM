@@ -12,6 +12,10 @@ class Position:
 		self.track = track
 		self.date = date
 
+	"Equality"
+	def __eq__(self, other):
+		return self.id == other.id
+
 	"String Representation"
 	def toString(self):
 		return "id:{0}, recurso:{1}, latitud:{2}, longitud:{3}, velocidad:{4}, orientacion:{5}, fecha:{6}".format(self.id, self.resource, self.lat, self.lon, self.speed, self.track, self.date)

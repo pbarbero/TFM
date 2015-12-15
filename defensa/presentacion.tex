@@ -115,6 +115,19 @@ Problemas:
 
 %\section{An\'alisis de los datos}
 
+\begin{frame}[fragile]
+\frametitle{An\'alisis de los datos}
+\begin{itemize}
+	\item Dos bases de datos suministradas posiciones en torno a las ciudades de Salvador de Bah\'ia y R\'io de Janeiro.
+	\item $1971$ recursos distintos.
+	\item $4599974$ posiciones en Salvador de Bah\'ia y $6928467$ en R\'io de Janeiro.	
+\end{itemize}
+
+\begin{center}
+\includegraphics[scale=.55]{GIS.png}
+\end{center}
+
+\end{frame}
 
 \begin{frame}[fragile]
 \frametitle{An\'alisis de los datos}
@@ -125,7 +138,8 @@ Problemas:
 \item \textbf{Latitud}: real que representa la latitud GPS
 \item \textbf{Longitud}: real que representa la longitud GPS
 \item \textbf{Velocidad}: entero que representa la velocidad instant\'anea
-\item \textbf{Orientaci}\'on: entero que representa la orientaci\'on respecto al norte en grados
+\item \textbf{Orientaci\'on}: entero que representa la orientaci\'on respecto al norte en grados
+\item \textbf{Fecha}: dato tipo fecha que transformamos en un \texttt{timestamp}.
 \item \textbf{Cobertura}: booleano que indica si tiene cobertura (n. sat\'elites)
 \item \textbf{Error}: error en la toma de posici\'on
   \end{itemize}
@@ -140,6 +154,8 @@ Problemas:
 
 \item Uso de algoritmos de \textit{clustering} con el fin de identificar varias posiciones con su centro del cl\'uster y consolidarlas en \'esta.
 
+\item Se elige el el lenguaje \texttt{Python} por ser un lenguaje orientado a objetos y la gran cantidad de librer\'ias cient\'ificas.
+
 \end{itemize}
 \end{frame}
 
@@ -147,7 +163,7 @@ Problemas:
 
 \begin{frame}[fragile]
 \frametitle{Posici\'on}
-Se define la clase \texttt{Position} en Python de la siguiente manera:\\
+Se define la clase \texttt{Position} en \texttt{Python} de la siguiente manera:\\
 \bigskip
 \begin{python}
 class Position:
@@ -168,10 +184,9 @@ Se define la clase de \texttt{Cl\'uster} en Python de la siguiente manera:\\
 \bigskip
 \begin{python}
 class Cluster:
-"Cluster of points"
     def __init__(self, center, points):
-	self.center = center
-	self.points = points
+        self.center = center
+        self.points = points
 \end{python}
 
 \end{frame}
@@ -184,12 +199,29 @@ class Cluster:
 
 Distintas nociones de vecindario para los algoritmos de consolidaci\'on simple,
 \begin{itemize}
+	\item Vecindad involucrando el tiempo
 	\item Vecindario utilizando la distancia eucl\'idea
 	\item Vecindario involucrando velocidad
 	\item Vecindad $t_0-$alcanzable
-	\item Vecindad involucrando el tiempo
 \end{itemize}
 \end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Vecindad involucrando el tiempo}
+Las posiciones de nuestros sujetos vienen muestreadas adem\'as con el instante en el que fueron tomadas. Podemos considerar que el tiempo entre tomas tambi\'en es una distancia y definir un vecindario. Definimos esta distancia temporal como la resta de ambos instantes, y el vecindario como: 
+
+$$ d_T(p_0, p) = time_p - time_{p_0} < \delta $$
+
+\bigskip
+
+\begin{python}
+    def is_neighboorhoudByTime(self, q, lapse):
+        return abs(q.time - p.time ) < lapse
+\end{python}
+
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
@@ -204,7 +236,7 @@ donde $p$ es un punto con latitud $lat_{p}$ y longitud $long_{p}$.\\
 \bigskip
 \begin{python}
     def IsInNeighEUSimple(self, q, eps):
-	return self.distance_eu(q) < eps
+        return self.distance_eu(q) < eps
 \end{python}
 
 \end{frame}
@@ -222,10 +254,10 @@ $$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \
 \bigskip
 \begin{python}
     def IsInNeighSpeedRelative(self, q, eps):
-	if self.speed != 0:
-	    return self.distance_eu(q) < eps * self.speed	
-	else:
-	    return False
+        if self.speed != 0:
+            return self.distance_eu(q) < eps * self.speed	
+        else:
+            return False
 \end{python}
 
 \end{frame}
@@ -242,28 +274,13 @@ $$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < v
 \bigskip
 \begin{python}
     def IsInNeighT0Reachable(self, q, t0):
-	return self.distance_eu(q) < t0 * self.speed
+        return self.distance_eu(q) < t0 * self.speed
 \end{python}
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}[fragile]
-\frametitle{Vecindad involucrando el tiempo}
-Las posiciones de nuestros sujetos vienen muestreadas adem\'as con el instante en el que fueron tomadas. Podemos considerar que el tiempo entre tomas tambi\'en es una distancia y definir un vecindario. Definimos esta distancia temporal como la resta de ambos instantes, y el vecindario como: 
 
-$$ d_T(p_0, p) = time_p - time_{p_0} < \delta $$
-
-\bigskip
-
-\begin{python}
-    def is_neighboorhoudByTime(self, q, lapse):
-	time1 = time.mktime(self.date.timetuple())
-	time2 = time.mktime(q.date.timetuple())
-	return abs(time1 - time2) < lapse
-\end{python}
-
-\end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Consolidaci\'on por distancia}
@@ -292,10 +309,9 @@ Se fija un $\varepsilon = 0.0001$ y se realiza una consolidaci\'on utilizando la
 
 \bigskip
 
-\begin{figure}[H]
-	\includegraphics[scale=.25]{distanceEuEps10-4.png}
-	\caption{Resultado consolidaci\'on por distancia Simple}
-\end{figure}
+\begin{center}
+	\includegraphics[scale=.3]{distanceEuEps10-4.png}¡
+\end{center}
 
 \end{frame}
 
@@ -324,10 +340,9 @@ Se realiza una consolidaci\'on por tiempo con un lapso de 20 segundos:\\
 
 \bigskip
 
-\begin{figure}[H]
-	\includegraphics[scale=.25]{byTimeSuj1.png}
-	\caption{Resultado consolidaci\'on por tiempo}
-\end{figure}
+\begin{center}
+	\includegraphics[scale=.3]{byTimeSuj1.png}
+\end{center}
 
 \end{frame}
 
@@ -356,10 +371,9 @@ Se realiza una consolidaci\'on por adelgazamiento, se mantienen 2 posiciones de 
 
 \bigskip
 
-\begin{figure}[H]
-	\includegraphics[scale=.25]{thinningSuj1.png}
-	\caption{Resultado consolidaci\'on por adelgazamiento}
-\end{figure}
+\begin{center}
+	\includegraphics[scale=.3]{thinningSuj1.png}
+\end{center}
 
 \end{frame}
 
@@ -370,11 +384,12 @@ Se realiza una consolidaci\'on por adelgazamiento, se mantienen 2 posiciones de 
 
 \textbf{Algoritmos de consolidaci\'on asociados a m\'etodos de clustering}\\
 
-\bigskip
+\begin{itemize}
+   \item T\'ecnica o conjunto de t\'ecnicas multivariantes utilizadas para clasificar a un conjunto de individuos en grupos homog\'eneos.
+   \item T\'ecnicas de aprendizaje no supervisado ya que \'este parte de que no hay un conocimiento a priori y es \'util en t\'ecnicas de compresi\'on de datos.
+\end{itemize}
 
-Un an\'alisis cl\'uster es un conjunto de t\'ecnicas multivariantes utilizadas para clasificar a un conjunto de individuos en grupos homog\'eneos. Hemos elegido una serie de t\'ecnicas de aprendizaje no supervisado ya que \'este parte de que no hay un conocimiento a priori y es \'util en t\'ecnicas de compresi\'on de datos.
-
-
+\textbf{Algoritmos a analizar}:\\
 \begin{itemize}
 \item \textbf{K-means}
 \item \textbf{DBSCAN}
@@ -384,11 +399,9 @@ Un an\'alisis cl\'uster es un conjunto de t\'ecnicas multivariantes utilizadas p
 \end{frame}
 
 
-
-
 \begin{frame}[fragile]
 \frametitle{K-means}
-\textbf{K-means} es un m\'etodo eficiente de \textit{clustering} que tiene como objetivo la partici\'on de un conjunto de $n$ elementos en $k$ grupos distintos. Datao un conjunto de $n$ elementos, se construye dicha partici\'on $S=\{S_1, S_2, \ldots, S_k\}$ con el fin de minimizar el t\'ermino del error cuadr\'atico:
+\textbf{K-means} es un m\'etodo eficiente de \textit{clustering} que tiene como objetivo la partici\'on de un conjunto de $n$ elementos en $k$ grupos distintos. Dado un conjunto de $n$ elementos, se construye dicha partici\'on $S=\{S_1, S_2, \ldots, S_k\}$ con el fin de minimizar el t\'ermino del error cuadr\'atico:
 
 $$ \sum_{i=1}^{n} \sum_{x\in S_i} \text{d}(x,m_i)$$
 
@@ -411,10 +424,9 @@ Se procede:
 \frametitle{Experimento con K-means}
 Se utiliza el software \texttt{Weka} sobre un sujeto con $2000$ posiciones para una consolidaci\'on al $25\%$, es decir, a $500$.
 
-\begin{figure}[H]
-	\includegraphics[scale=.35]{kMeansSujeto1.png}
-	\caption{Resultado de \textbf{K-means}}
-\end{figure}
+\begin{center}
+	\includegraphics[scale=.43]{kMeansSujeto1.png}
+\end{center}
 
 
 \end{frame}
@@ -451,13 +463,16 @@ de densidad de los nodos correspondientes. \\
 
 \begin{itemize}
 \item Punto $p$ n\'ucleo: si posee un n\'umero m\'inimo de puntos ($minPts$) en su vecindario sobre $\varepsilon$.
-\item Punto alcanzable desde $p$: si existe un camino $p1=p, \ldots, p_n=q$ donde $p_{i+1}$ es alcanzable por $p_i$.
+\item Punto alcanzable desde $p$: si existe un camino $p_1=p, \ldots, p_n=q$ donde $p_{i+1}$ es alcanzable por $p_i$.
 \item Aislados: puntos no considerados ni n\'ucleo ni alcanzables.
 
-\smallskip
-	\centering
-	\includegraphics[scale=.2]{DBSCAN.png}
 \end{itemize}
+\smallskip
+\begin{center}
+
+	\includegraphics[scale=.25]{DBSCAN.png}
+	
+\end{center}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -488,14 +503,24 @@ de densidad de los nodos correspondientes. \\
 
 \begin{frame}[fragile]
 \frametitle{Experimento con DBSCAN}
-
-Mismos datos que para \textbf{K-means}, sujeto con $2000$ posiciones. 
-
-\begin{figure}[H]
+Elegimos un $\varepsilon = 0.0001$ y $minPts = 5$ ya que nos proporcionar\'ia una consolidaci\'on de aprox. $20\%$.\\
+\begin{center}
 	\includegraphics[scale=.3]{dbscanSujeto1.png}
-	\caption{Resultado de \textbf{DBSCAN}}
-\end{figure}
+\end{center}
+\end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Experimento con DBSCAN}
+Resultados:\\
+\begin{itemize}
+\item 9 cl\'usters
+\item Muchos puntos marcados como ruido
+\end{itemize}
+
+Inconvenientes:
+\begin{itemize}
+\item Decididir si esos puntos marcados como ruido son eliminables o no.
+\end{itemize}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -506,10 +531,22 @@ Mismos datos que para \textbf{K-means}, sujeto con $2000$ posiciones.
 
 \begin{frame}[fragile]
 \frametitle{DJ-Cluster}
-\textbf{Density-Joinable Cl\'uster} es un tipo de algoritmo de clustering basado en densidades de puntos.\\
+\textbf{Density-Joinable Cl\'uster} es un tipo de algoritmo de clustering basado en densidades de puntos. \\
 
-\bigskip
+\begin{enumerate}
+	\item Para cada punto, calculamos su vecindario fijado un $\varepsilon$.
+	\item Si el n\'umero de puntos del vecindario es menor que $minPts$, se deshecha.
+	\item Si el n\'umero de puntos es mayor que $minPts$, se crea un cl\'uster.
+	\item Se comprueba si existen cl\'usters densamente acoplables (si existen otros cl\'usters con alg\'un punto en com\'un)
+\end{enumerate}
 
+\begin{center}
+\includegraphics[scale=.45]{djcluster.png}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{DJ-Cluster}
 \begin{algorithmic}[1]
 	\For{\textbf{each} $p$ in set $S$}
 		\State{Compute neighborhood $N(p)$ for $\varepsilon$ and $MinPts$}
@@ -529,10 +566,9 @@ Mismos datos que para \textbf{K-means}, sujeto con $2000$ posiciones.
 \frametitle{Experimento con DJ-Cluster}
 Utilizando \texttt{Weka} dado un $\varepsilon=0.0001$ y $minPts = 2$:\\
 
-\begin{figure}[H]
+\begin{center}
 	\includegraphics[scale=.43]{djClusterSujeto1.png}
-	\caption{Resultado de \textbf{DJ-Cluster}}
-\end{figure}
+\end{center}
 
 \end{frame}
 
@@ -546,6 +582,8 @@ Utilizando \texttt{Weka} dado un $\varepsilon=0.0001$ y $minPts = 2$:\\
 
 \begin{frame}[fragile]
 \frametitle{Comparativa t\'ecnicas simples}
+
+Se ha realizado estos experimentos sobre el mismo sujeto tomando una muestra de las primeras $2000$ posiciones en el tiempo.\\
 
 \begin{center}
 \begin{tabular}{|l|l|l|}
@@ -564,9 +602,6 @@ Utilizando \texttt{Weka} dado un $\varepsilon=0.0001$ y $minPts = 2$:\\
 \end{tabular}
 \end{center}
 
-\begin{itemize}
-	\item Alternar distintos tipos de consolidaci\'on en funci\'on del espacio cr\'itico en ese momento.
-\end{itemize}
 \end{frame}
 
 %\section{Comparativa casos estudiados}
@@ -576,7 +611,7 @@ Utilizando \texttt{Weka} dado un $\varepsilon=0.0001$ y $minPts = 2$:\\
 \begin{tabular}{|l|l|l|l|}
 	\hline
 	\rowcolor{Gray}
-	M\'etodo & Tiempo & N. & Iteraciones\\
+	M\'etodo & Tiempo & Cl\'usters & Iteraciones\\
 	\hline	
 	K-means & 0.69 secs & 500 & 9\\
 	\hline
