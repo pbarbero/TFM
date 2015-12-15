@@ -45,9 +45,7 @@ class Position:
 
 	"Is it in neighboorhood by time?"
 	def is_neighboorhoudByTime(self, q, lapse):
-		foo = time.mktime(self.date.timetuple())
-		bar = time.mktime(q.date.timetuple())
-		return abs(foo - bar) < lapse
+		return abs(self.speed - q.speed) < lapse
 
 	def isInCluster(self, cluster):
 		for q in cluster.points:

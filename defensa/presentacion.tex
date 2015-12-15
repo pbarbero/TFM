@@ -23,8 +23,8 @@
 
 \title{Identificaci\'on de patrones y algoritmos de consolidaci\'on en bases de datos de posicionamiento}
 \date{\today}
-\author{\textsc{Pilar Barbero Iriarte}\\
-Director: \textit{Tom\'as Alcal\'a Nalv\'aiz}}
+\author{\textsc{\Large{Pilar Barbero Iriarte}}\\
+Director: Tom\'as Alcal\'a Nalv\'aiz}
 \institute{Universidad de Zaragoza}
 \titlegraphic{\hfill\includegraphics[height=1.5cm]{unizar.png}}
 
@@ -137,11 +137,11 @@ Problemas:
 \item \textbf{Recurso}: identificador del sujeto que transfiere la posici\'on
 \item \textbf{Latitud}: real que representa la latitud GPS
 \item \textbf{Longitud}: real que representa la longitud GPS
-\item \textbf{Velocidad}: entero que representa la velocidad instant\'anea
+\item \textbf{Velocidad}: entero que representa la velocidad instant\'anea (km/h)
 \item \textbf{Orientaci\'on}: entero que representa la orientaci\'on respecto al norte en grados
 \item \textbf{Fecha}: dato tipo fecha que transformamos en un \texttt{timestamp}.
-\item \textbf{Cobertura}: booleano que indica si tiene cobertura (n. sat\'elites)
-\item \textbf{Error}: error en la toma de posici\'on
+\item \textbf{Cobertura}: booleano que indica si tiene cobertura
+\item \textbf{Error}: booleano que indica si ha habido error en la toma de posici\'on
   \end{itemize}
 \end{frame}
 
@@ -154,7 +154,7 @@ Problemas:
 
 \item Uso de algoritmos de \textit{clustering} con el fin de identificar varias posiciones con su centro del cl\'uster y consolidarlas en \'esta.
 
-\item Se elige el el lenguaje \texttt{Python} por ser un lenguaje orientado a objetos y la gran cantidad de librer\'ias cient\'ificas.
+\item Se elige el el lenguaje \texttt{Python} por ser un lenguaje que tiene orientaci\'on a objetos y la gran cantidad de librer\'ias cient\'ificas de las que consta.
 
 \end{itemize}
 \end{frame}
@@ -178,20 +178,6 @@ class Position:
 \end{python}
 \end{frame}
 
-\begin{frame}[fragile]
-\frametitle{Cl\'uster}
-Se define la clase de \texttt{Cl\'uster} en Python de la siguiente manera:\\
-\bigskip
-\begin{python}
-class Cluster:
-    def __init__(self, center, points):
-        self.center = center
-        self.points = points
-\end{python}
-
-\end{frame}
-
-
 %\section{M\'etodos simples}
 
 \begin{frame}[fragile]
@@ -209,9 +195,10 @@ Distintas nociones de vecindario para los algoritmos de consolidaci\'on simple,
 
 \begin{frame}[fragile]
 \frametitle{Vecindad involucrando el tiempo}
-Las posiciones de nuestros sujetos vienen muestreadas adem\'as con el instante en el que fueron tomadas. Podemos considerar que el tiempo entre tomas tambi\'en es una distancia y definir un vecindario. Definimos esta distancia temporal como la resta de ambos instantes, y el vecindario como: 
+Las posiciones de nuestros sujetos vienen muestreadas adem\'as con el instante en el que fueron tomadas.\\ \bigskip
+Definimos esta distancia temporal tal que:
 
-$$ d_T(p_0, p) = time_p - time_{p_0} < \delta $$
+$$ d_T(p_0, p) = |time_p - time_{p_0}| < \delta $$
 
 \bigskip
 
@@ -246,7 +233,6 @@ donde $p$ es un punto con latitud $lat_{p}$ y longitud $long_{p}$.\\
 \begin{frame}[fragile]
 \frametitle{Vecindario involucrando velocidad}
 
-En el momento que se toma la posici\'on $p_0$, aparte de la latidud y su longitud, se toma la velocidad instant\'anea del sujeto.
 A mayor velocidad, puntos m\'as alejados de lo que considerar\'iamos en el primer caso (fuera de nuestro vecindario simple), podr\'ian estar dentro de nuestro nuevo radio, que depender\'ia de la velocidad instant\'anea.
 
 $$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \varepsilon \cdot vel_{p_0} $$
@@ -265,11 +251,16 @@ $$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \
 \begin{frame}[fragile]
 \frametitle{Vecindad $t_0-$alcanzable}
 
-Fijando un intervalo de tiempo $t_0$, se define una vecindad $t_0$-alcanzable como aquellos puntos que nuestro sujeto puede alcanzar en un tiempo $t_0$. Un sujeto que se desplace a velocidad reducida, tendr\'a una vecindad $t_0$-alcanzable m\'as reducida que otro que se desplace a una velocidad superior. Redefiniremos el radio de nuestro vecindario a trav\'es de la velocidad instant\'anea que lleve nuesto sujeto, es decir, $vel_{p_0}\cdot t_0$.  \\
+Se fija intervalo de tiempo $t_0$, con el cual se define una vecindad $t_0$-alcanzable .\\
+\bigskip
+Sea la velocidad instant\'anea $vel_{p_0}$
 
 $$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < vel_{p_0} \cdot t_0 $$
 
-\'Este es un caso concreto del vecindario involucrando la velocidad. \\
+\begin{itemize}
+ \item A velocidad reducida, vecindad $t_0-$alcanzable menor.
+ \item A mayor velocidad, mayor vecindad $t_0-$alcanzable.
+\end{itemize}
 
 \bigskip
 \begin{python}
@@ -293,9 +284,9 @@ siguiente m\'etodo que realizará la consolidaci\'on del tipo que le indiquemos:
 \Function{ConsolidationByDistance}{$positions, typeOfDistance, eps, t0$}
 \For{\textbf{each} pos \textbf{in} positions}
         \If{$pos.IsInNeighBorhood(typeOfDistance, next(pos), eps)$}
-        		\State{Remove position in DB}
+        		\State{Remove pos from DB}
         \Else
-        		\State{Maintain position in DB}
+        		\State{Maintain pos in DB}
         \EndIf
 \EndFor
 \EndFunction
@@ -636,14 +627,20 @@ Se ha realizado estos experimentos sobre el mismo sujeto tomando una muestra de 
 
 %\section{Conclusiones}
 \begin{frame}[fragile]
-\begin{itemize}[<+- | alert@+>]
-	\item Algoritmos de consolidaci\'on simples son \textit{simples}, pero eficaces.
+\frametitle{Conclusiones}
+\textbf{Algoritmos de consolidaci\'on simple:}
+\begin{enumerate}[<+- | alert@+>]
+	\item Son \textit{simples}, pero eficaces.
 	\item Noci\'on de vecindario distinto al eucl\'ideo implementada en algoritmos de consolidaci\'on simple.
-	\item Algoritmos de \textit{clustering} m\'as avanzados, pero m\'as complejos a la hora de implementar.
+\end{enumerate}
+
+\textbf{Algoritmos de clustering:}
+\begin{enumerate}[<+- | alert@+>]
+	\item M\'as avanzados, pero m\'as complejos a la hora de implementar.
 	\item Importante un procesado previo.
-	\item A la hora de recuperar una traza con los datos borrados, mejor \textit{DJ-Cl\'uster}
-	\item Noci\'on de ruido de DBSCAN importante, tanto DJ-Cl\'uster como K-means s\'olo encuentra cl\'usters de tama\~no 1.
-\end{itemize}
+	\item Mejores a la hora de recuperar una traza con los datos borrados.
+	\item Nociones de ruido implementadas.
+\end{enumerate}
 \end{frame}
 
 %\section{Demostraci\'on}

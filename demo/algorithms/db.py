@@ -54,11 +54,11 @@ def normalize(list_pos):
         for pos in list_pos:
                 q = Position(pos.id
                            , pos.resource
-                           , (pos.lat - meanLat)/devLat
-                           , (pos.lon - meanLon)/devLon
+                           , (pos.lat - meanLat)/(devLat)
+                           , (pos.lon - meanLon)/(devLon)
                            , pos.speed
                            , pos.track
-                           , (pos.date - meanTime)/devTimes
+                           , (pos.date - meanTime)/(devTimes)
                            )
                 listPosTyp.append(q)
                 latsTyp.append(q.lat)
@@ -69,7 +69,11 @@ def normalize(list_pos):
 "Delete positions"
 def deletePositions(dbname, list_pos):
 	cur = connect_db(dbname)
-	for pos in list_pos:
+	for count,pos in enumerate(list_pos, 1):
 		cmd = "DELETE FROM posicionesgps WHERE id={0}".format(pos.id)
 		cur.execute(cmd)
-		print "{0} deleted!".format(pos.toString())
+		if count < 5:
+			print "{0} deleted!".format(pos.toString())
+
+	print "\n...\n"
+	print "Se han eliminado {0} posiciones".format(len(list_pos))
