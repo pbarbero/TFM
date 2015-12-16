@@ -87,7 +87,10 @@ Contexto:
 \begin{itemize}
 	\item Empresa Zaragozana de telecomunicaciones.
 	\item Almacenamiento de posiciones GPS de sujetos.
-	\item Capacidad de guardado de posiciones limitada.
+	
+	\begin{center}
+		\includegraphics[scale=.45]{first.png}
+	\end{center}
 \end{itemize}
 \end{frame}
 
@@ -96,7 +99,7 @@ Contexto:
 \frametitle{Introducci\'on}
 Problemas:
 	\begin{itemize}
-		\item Exceso de \'estas.
+		\item Capacidad de guardado de posiciones limitada.
 		\item No existe preprocesado antes de la inserci\'on.
 		\item No existe postprocesado despu\'es de la inserci\'on.
 		\item No todas aportan informaci\'on.
@@ -203,8 +206,8 @@ $$ d_T(p_0, p) = |time_p - time_{p_0}| < \delta $$
 \bigskip
 
 \begin{python}
-    def is_neighboorhoudByTime(self, q, lapse):
-        return abs(q.time - p.time ) < lapse
+    def is_neighboorhoudByTime(self, p, lapse):
+        return abs(self.time - p.time ) < lapse
 \end{python}
 
 \end{frame}
@@ -222,8 +225,8 @@ donde $p$ es un punto con latitud $lat_{p}$ y longitud $long_{p}$.\\
 
 \bigskip
 \begin{python}
-    def IsInNeighEUSimple(self, q, eps):
-        return self.distance_eu(q) < eps
+    def IsInNeighEUSimple(self, p, eps):
+        return self.distance_eu(p) < eps
 \end{python}
 
 \end{frame}
@@ -239,9 +242,9 @@ $$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < \
 
 \bigskip
 \begin{python}
-    def IsInNeighSpeedRelative(self, q, eps):
+    def IsInNeighSpeedRelative(self, p, eps):
         if self.speed != 0:
-            return self.distance_eu(q) < eps * self.speed	
+            return self.distance_eu(p) < eps * self.speed	
         else:
             return False
 \end{python}
@@ -264,8 +267,8 @@ $$ d_E(p_0, p) = \sqrt{(lat_{p} - lat_{p_0})^2 + (long_{p} - long_{p_0})^2 } < v
 
 \bigskip
 \begin{python}
-    def IsInNeighT0Reachable(self, q, t0):
-        return self.distance_eu(q) < t0 * self.speed
+    def IsInNeighT0Reachable(self, p, t0):
+        return self.distance_eu(p) < t0 * self.speed
 \end{python}
 
 \end{frame}
@@ -346,7 +349,7 @@ Se puede recurrir a un tipo de consolidaci\'on en la cual dada una lista de posi
 \Function{ConsolidationByThinning}{$positions, j, k$}\Comment{$j < k$}
 	\For{\textbf{each} pos in positions}
 		\If{$position.Index \% k == 0$}
-			\For{$i = 0; i < k; i++$}
+			\For{$i = 0; i < j; i++$}
 				\State{Remove position with index == position.Index}
 			\EndFor
 		\EndIf
@@ -376,8 +379,7 @@ Se realiza una consolidaci\'on por adelgazamiento, se mantienen 2 posiciones de 
 \textbf{Algoritmos de consolidaci\'on asociados a m\'etodos de clustering}\\
 
 \begin{itemize}
-   \item T\'ecnica o conjunto de t\'ecnicas multivariantes utilizadas para clasificar a un conjunto de individuos en grupos homog\'eneos.
-   \item T\'ecnicas de aprendizaje no supervisado ya que \'este parte de que no hay un conocimiento a priori y es \'util en t\'ecnicas de compresi\'on de datos.
+   \item T\'ecnica o conjunto de t\'ecnicas multivariantes utilizadas en Miner\'ia de datos y Modelizaci\'on matem\'atica utilizadas para clasificar a un conjunto de individuos en grupos homog\'eneos.
 \end{itemize}
 
 \textbf{Algoritmos a analizar}:\\
@@ -405,9 +407,9 @@ donde $m_i$ es el centro de cada cl\'uster $S_i$ y $\text{d}(x, m_i)$ es la dist
 Se procede:
 \begin{enumerate}
 	\item Se prefija un n\'umero de cl\'usters.
-	\item Se asigna cada punto a su cl\'uster de manera aleatoria.
+	\item Conformamos los primeros centroides de los grupos de manera aleatoria.
 	\item Se itera sobre cada punto, encuentra el centro de cl\'uster m\'as cercano y se lo asigna a dicho cl\'uster.
-	\item Se calcula el error y se reitera hasta que este error se minimiza o estabiliza.
+	\item Se recalcula los centroides de los cl\'usters y se reitera hasta que el error cuadr\'atico se minimiza o se estabiliza.
 \end{enumerate}
 \end{frame}
 
@@ -454,7 +456,7 @@ de densidad de los nodos correspondientes. \\
 
 \begin{itemize}
 \item Punto $p$ n\'ucleo: si posee un n\'umero m\'inimo de puntos ($minPts$) en su vecindario sobre $\varepsilon$.
-\item Punto alcanzable desde $p$: si existe un camino $p_1=p, \ldots, p_n=q$ donde $p_{i+1}$ es alcanzable por $p_i$.
+\item Punto $q$ alcanzable por $p$: si existe un camino $p_1, \ldots, p_n$ tal que $p_i$ est\'a en el vecindario de $p_{i+1}$ (o viceversa).
 \item Aislados: puntos no considerados ni n\'ucleo ni alcanzables.
 
 \end{itemize}
@@ -563,6 +565,28 @@ Utilizando \texttt{Weka} dado un $\varepsilon=0.0001$ y $minPts = 2$:\\
 
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Experimento con DJ-Cluster}
+
+\centering
+22 cl\'usters en total:\\
+
+\bigskip
+\begin{tabular}{|r|r|}
+\hline
+\rowcolor{Gray}
+N. Cl\'uster & Cantidad puntos \\
+\hline
+0 & 3 \\ 
+12 & 605\\
+58 & 7\\
+142 & 449\\
+.... & ... \\
+\hline
+\end{tabular}
+
+\end{frame}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -646,8 +670,8 @@ Se ha realizado estos experimentos sobre el mismo sujeto tomando una muestra de 
 %\section{Demostraci\'on}
 
 \begin{frame}[fragile]
-\frametitle{Demo}
-Demostraci\'on
+\frametitle{Demostraci\'on}
+\texttt{IPython Notebook}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -659,8 +683,19 @@ Demostraci\'on
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Preguntas}
-Preguntas
+\frametitle{Referencias}
+\begin{itemize}
+\item \textsc{Frank E. and Witten I.H.} Data Mining: Practical Machine Learning Tools and Techniques. Morgan Kaufmann, San Francisco, 2nd edition, 2005.
+
+\item \textsc{Terveen L. Frankowski D., Ludford P. Shekhar S. and Zhou C.} Discovering personal gazetteers: An interactive clustering approach. In In Proc. ACMGIS, pages 266–273. ACM Press, 2004.
+
+\item \textsc{Nigam K. McCallum A. and Ungar L. H.} Efficient clustering of high dimensional data sets with application to reference matching, 2000.
+
+\item \textsc{Kafle S.} Implementation of dbscan algorithm in python. \href{https://github.com/SushantKafle/DBSCAN, 2014.}{https://github.com/SushantKafle/DBSCAN}, 2014.
+
+
+\end{itemize}
+
 \end{frame}
 
 %\section{Preguntas}
